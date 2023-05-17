@@ -1,0 +1,7168 @@
+:sprite
+:key tile_1
+:xPos 0
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_2
+:xPos 16
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_3
+:xPos 32
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_4
+:xPos 48
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_5
+:xPos 64
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_6
+:xPos 80
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_7
+:xPos 96
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_8
+:xPos 112
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_9
+:xPos 128
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_10
+:xPos 144
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_11
+:xPos 160
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_12
+:xPos 176
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_13
+:xPos 192
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_14
+:xPos 208
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_15
+:xPos 224
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_16
+:xPos 240
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_17
+:xPos 256
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_18
+:xPos 272
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_19
+:xPos 288
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_20
+:xPos 304
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_21
+:xPos 320
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_22
+:xPos 336
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_23
+:xPos 352
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_24
+:xPos 368
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_25
+:xPos 384
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_26
+:xPos 400
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_27
+:xPos 416
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_28
+:xPos 432
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_29
+:xPos 448
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_30
+:xPos 464
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_31
+:xPos 480
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_32
+:xPos 496
+:yPos 0
+:width 16
+:height 16
+
+:sprite
+:key tile_33
+:xPos 0
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_34
+:xPos 16
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_35
+:xPos 32
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_36
+:xPos 48
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_37
+:xPos 64
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_38
+:xPos 80
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_39
+:xPos 96
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_40
+:xPos 112
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_41
+:xPos 128
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_42
+:xPos 144
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_43
+:xPos 160
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_44
+:xPos 176
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_45
+:xPos 192
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_46
+:xPos 208
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_47
+:xPos 224
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_48
+:xPos 240
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_49
+:xPos 256
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_50
+:xPos 272
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_51
+:xPos 288
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_52
+:xPos 304
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_53
+:xPos 320
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_54
+:xPos 336
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_55
+:xPos 352
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_56
+:xPos 368
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_57
+:xPos 384
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_58
+:xPos 400
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_59
+:xPos 416
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_60
+:xPos 432
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_61
+:xPos 448
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_62
+:xPos 464
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_63
+:xPos 480
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_64
+:xPos 496
+:yPos 16
+:width 16
+:height 16
+
+:sprite
+:key tile_65
+:xPos 0
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_66
+:xPos 16
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_67
+:xPos 32
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_68
+:xPos 48
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_69
+:xPos 64
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_70
+:xPos 80
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_71
+:xPos 96
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_72
+:xPos 112
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_73
+:xPos 128
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_74
+:xPos 144
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_75
+:xPos 160
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_76
+:xPos 176
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_77
+:xPos 192
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_78
+:xPos 208
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_79
+:xPos 224
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_80
+:xPos 240
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_81
+:xPos 256
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_82
+:xPos 272
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_83
+:xPos 288
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_84
+:xPos 304
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_85
+:xPos 320
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_86
+:xPos 336
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_87
+:xPos 352
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_88
+:xPos 368
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_89
+:xPos 384
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_90
+:xPos 400
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_91
+:xPos 416
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_92
+:xPos 432
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_93
+:xPos 448
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_94
+:xPos 464
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_95
+:xPos 480
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_96
+:xPos 496
+:yPos 32
+:width 16
+:height 16
+
+:sprite
+:key tile_97
+:xPos 0
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_98
+:xPos 16
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_99
+:xPos 32
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_100
+:xPos 48
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_101
+:xPos 64
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_102
+:xPos 80
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_103
+:xPos 96
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_104
+:xPos 112
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_105
+:xPos 128
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_106
+:xPos 144
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_107
+:xPos 160
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_108
+:xPos 176
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_109
+:xPos 192
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_110
+:xPos 208
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_111
+:xPos 224
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_112
+:xPos 240
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_113
+:xPos 256
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_114
+:xPos 272
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_115
+:xPos 288
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_116
+:xPos 304
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_117
+:xPos 320
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_118
+:xPos 336
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_119
+:xPos 352
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_120
+:xPos 368
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_121
+:xPos 384
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_122
+:xPos 400
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_123
+:xPos 416
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_124
+:xPos 432
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_125
+:xPos 448
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_126
+:xPos 464
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_127
+:xPos 480
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_128
+:xPos 496
+:yPos 48
+:width 16
+:height 16
+
+:sprite
+:key tile_129
+:xPos 0
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_130
+:xPos 16
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_131
+:xPos 32
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_132
+:xPos 48
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_133
+:xPos 64
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_134
+:xPos 80
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_135
+:xPos 96
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_136
+:xPos 112
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_137
+:xPos 128
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_138
+:xPos 144
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_139
+:xPos 160
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_140
+:xPos 176
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_141
+:xPos 192
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_142
+:xPos 208
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_143
+:xPos 224
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_144
+:xPos 240
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_145
+:xPos 256
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_146
+:xPos 272
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_147
+:xPos 288
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_148
+:xPos 304
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_149
+:xPos 320
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_150
+:xPos 336
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_151
+:xPos 352
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_152
+:xPos 368
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_153
+:xPos 384
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_154
+:xPos 400
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_155
+:xPos 416
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_156
+:xPos 432
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_157
+:xPos 448
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_158
+:xPos 464
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_159
+:xPos 480
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_160
+:xPos 496
+:yPos 64
+:width 16
+:height 16
+
+:sprite
+:key tile_161
+:xPos 0
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_162
+:xPos 16
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_163
+:xPos 32
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_164
+:xPos 48
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_165
+:xPos 64
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_166
+:xPos 80
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_167
+:xPos 96
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_168
+:xPos 112
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_169
+:xPos 128
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_170
+:xPos 144
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_171
+:xPos 160
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_172
+:xPos 176
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_173
+:xPos 192
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_174
+:xPos 208
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_175
+:xPos 224
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_176
+:xPos 240
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_177
+:xPos 256
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_178
+:xPos 272
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_179
+:xPos 288
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_180
+:xPos 304
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_181
+:xPos 320
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_182
+:xPos 336
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_183
+:xPos 352
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_184
+:xPos 368
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_185
+:xPos 384
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_186
+:xPos 400
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_187
+:xPos 416
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_188
+:xPos 432
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_189
+:xPos 448
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_190
+:xPos 464
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_191
+:xPos 480
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_192
+:xPos 496
+:yPos 80
+:width 16
+:height 16
+
+:sprite
+:key tile_193
+:xPos 0
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_194
+:xPos 16
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_195
+:xPos 32
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_196
+:xPos 48
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_197
+:xPos 64
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_198
+:xPos 80
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_199
+:xPos 96
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_200
+:xPos 112
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_201
+:xPos 128
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_202
+:xPos 144
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_203
+:xPos 160
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_204
+:xPos 176
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_205
+:xPos 192
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_206
+:xPos 208
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_207
+:xPos 224
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_208
+:xPos 240
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_209
+:xPos 256
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_210
+:xPos 272
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_211
+:xPos 288
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_212
+:xPos 304
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_213
+:xPos 320
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_214
+:xPos 336
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_215
+:xPos 352
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_216
+:xPos 368
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_217
+:xPos 384
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_218
+:xPos 400
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_219
+:xPos 416
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_220
+:xPos 432
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_221
+:xPos 448
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_222
+:xPos 464
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_223
+:xPos 480
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_224
+:xPos 496
+:yPos 96
+:width 16
+:height 16
+
+:sprite
+:key tile_225
+:xPos 0
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_226
+:xPos 16
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_227
+:xPos 32
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_228
+:xPos 48
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_229
+:xPos 64
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_230
+:xPos 80
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_231
+:xPos 96
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_232
+:xPos 112
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_233
+:xPos 128
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_234
+:xPos 144
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_235
+:xPos 160
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_236
+:xPos 176
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_237
+:xPos 192
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_238
+:xPos 208
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_239
+:xPos 224
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_240
+:xPos 240
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_241
+:xPos 256
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_242
+:xPos 272
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_243
+:xPos 288
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_244
+:xPos 304
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_245
+:xPos 320
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_246
+:xPos 336
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_247
+:xPos 352
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_248
+:xPos 368
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_249
+:xPos 384
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_250
+:xPos 400
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_251
+:xPos 416
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_252
+:xPos 432
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_253
+:xPos 448
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_254
+:xPos 464
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_255
+:xPos 480
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_256
+:xPos 496
+:yPos 112
+:width 16
+:height 16
+
+:sprite
+:key tile_257
+:xPos 0
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_258
+:xPos 16
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_259
+:xPos 32
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_260
+:xPos 48
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_261
+:xPos 64
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_262
+:xPos 80
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_263
+:xPos 96
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_264
+:xPos 112
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_265
+:xPos 128
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_266
+:xPos 144
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_267
+:xPos 160
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_268
+:xPos 176
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_269
+:xPos 192
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_270
+:xPos 208
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_271
+:xPos 224
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_272
+:xPos 240
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_273
+:xPos 256
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_274
+:xPos 272
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_275
+:xPos 288
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_276
+:xPos 304
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_277
+:xPos 320
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_278
+:xPos 336
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_279
+:xPos 352
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_280
+:xPos 368
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_281
+:xPos 384
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_282
+:xPos 400
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_283
+:xPos 416
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_284
+:xPos 432
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_285
+:xPos 448
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_286
+:xPos 464
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_287
+:xPos 480
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_288
+:xPos 496
+:yPos 128
+:width 16
+:height 16
+
+:sprite
+:key tile_289
+:xPos 0
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_290
+:xPos 16
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_291
+:xPos 32
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_292
+:xPos 48
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_293
+:xPos 64
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_294
+:xPos 80
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_295
+:xPos 96
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_296
+:xPos 112
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_297
+:xPos 128
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_298
+:xPos 144
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_299
+:xPos 160
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_300
+:xPos 176
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_301
+:xPos 192
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_302
+:xPos 208
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_303
+:xPos 224
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_304
+:xPos 240
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_305
+:xPos 256
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_306
+:xPos 272
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_307
+:xPos 288
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_308
+:xPos 304
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_309
+:xPos 320
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_310
+:xPos 336
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_311
+:xPos 352
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_312
+:xPos 368
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_313
+:xPos 384
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_314
+:xPos 400
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_315
+:xPos 416
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_316
+:xPos 432
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_317
+:xPos 448
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_318
+:xPos 464
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_319
+:xPos 480
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_320
+:xPos 496
+:yPos 144
+:width 16
+:height 16
+
+:sprite
+:key tile_321
+:xPos 0
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_322
+:xPos 16
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_323
+:xPos 32
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_324
+:xPos 48
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_325
+:xPos 64
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_326
+:xPos 80
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_327
+:xPos 96
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_328
+:xPos 112
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_329
+:xPos 128
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_330
+:xPos 144
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_331
+:xPos 160
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_332
+:xPos 176
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_333
+:xPos 192
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_334
+:xPos 208
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_335
+:xPos 224
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_336
+:xPos 240
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_337
+:xPos 256
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_338
+:xPos 272
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_339
+:xPos 288
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_340
+:xPos 304
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_341
+:xPos 320
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_342
+:xPos 336
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_343
+:xPos 352
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_344
+:xPos 368
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_345
+:xPos 384
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_346
+:xPos 400
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_347
+:xPos 416
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_348
+:xPos 432
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_349
+:xPos 448
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_350
+:xPos 464
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_351
+:xPos 480
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_352
+:xPos 496
+:yPos 160
+:width 16
+:height 16
+
+:sprite
+:key tile_353
+:xPos 0
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_354
+:xPos 16
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_355
+:xPos 32
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_356
+:xPos 48
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_357
+:xPos 64
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_358
+:xPos 80
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_359
+:xPos 96
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_360
+:xPos 112
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_361
+:xPos 128
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_362
+:xPos 144
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_363
+:xPos 160
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_364
+:xPos 176
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_365
+:xPos 192
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_366
+:xPos 208
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_367
+:xPos 224
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_368
+:xPos 240
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_369
+:xPos 256
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_370
+:xPos 272
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_371
+:xPos 288
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_372
+:xPos 304
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_373
+:xPos 320
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_374
+:xPos 336
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_375
+:xPos 352
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_376
+:xPos 368
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_377
+:xPos 384
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_378
+:xPos 400
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_379
+:xPos 416
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_380
+:xPos 432
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_381
+:xPos 448
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_382
+:xPos 464
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_383
+:xPos 480
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_384
+:xPos 496
+:yPos 176
+:width 16
+:height 16
+
+:sprite
+:key tile_385
+:xPos 0
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_386
+:xPos 16
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_387
+:xPos 32
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_388
+:xPos 48
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_389
+:xPos 64
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_390
+:xPos 80
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_391
+:xPos 96
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_392
+:xPos 112
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_393
+:xPos 128
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_394
+:xPos 144
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_395
+:xPos 160
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_396
+:xPos 176
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_397
+:xPos 192
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_398
+:xPos 208
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_399
+:xPos 224
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_400
+:xPos 240
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_401
+:xPos 256
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_402
+:xPos 272
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_403
+:xPos 288
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_404
+:xPos 304
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_405
+:xPos 320
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_406
+:xPos 336
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_407
+:xPos 352
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_408
+:xPos 368
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_409
+:xPos 384
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_410
+:xPos 400
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_411
+:xPos 416
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_412
+:xPos 432
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_413
+:xPos 448
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_414
+:xPos 464
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_415
+:xPos 480
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_416
+:xPos 496
+:yPos 192
+:width 16
+:height 16
+
+:sprite
+:key tile_417
+:xPos 0
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_418
+:xPos 16
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_419
+:xPos 32
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_420
+:xPos 48
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_421
+:xPos 64
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_422
+:xPos 80
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_423
+:xPos 96
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_424
+:xPos 112
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_425
+:xPos 128
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_426
+:xPos 144
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_427
+:xPos 160
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_428
+:xPos 176
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_429
+:xPos 192
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_430
+:xPos 208
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_431
+:xPos 224
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_432
+:xPos 240
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_433
+:xPos 256
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_434
+:xPos 272
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_435
+:xPos 288
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_436
+:xPos 304
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_437
+:xPos 320
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_438
+:xPos 336
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_439
+:xPos 352
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_440
+:xPos 368
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_441
+:xPos 384
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_442
+:xPos 400
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_443
+:xPos 416
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_444
+:xPos 432
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_445
+:xPos 448
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_446
+:xPos 464
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_447
+:xPos 480
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_448
+:xPos 496
+:yPos 208
+:width 16
+:height 16
+
+:sprite
+:key tile_449
+:xPos 0
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_450
+:xPos 16
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_451
+:xPos 32
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_452
+:xPos 48
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_453
+:xPos 64
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_454
+:xPos 80
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_455
+:xPos 96
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_456
+:xPos 112
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_457
+:xPos 128
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_458
+:xPos 144
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_459
+:xPos 160
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_460
+:xPos 176
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_461
+:xPos 192
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_462
+:xPos 208
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_463
+:xPos 224
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_464
+:xPos 240
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_465
+:xPos 256
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_466
+:xPos 272
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_467
+:xPos 288
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_468
+:xPos 304
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_469
+:xPos 320
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_470
+:xPos 336
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_471
+:xPos 352
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_472
+:xPos 368
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_473
+:xPos 384
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_474
+:xPos 400
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_475
+:xPos 416
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_476
+:xPos 432
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_477
+:xPos 448
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_478
+:xPos 464
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_479
+:xPos 480
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_480
+:xPos 496
+:yPos 224
+:width 16
+:height 16
+
+:sprite
+:key tile_481
+:xPos 0
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_482
+:xPos 16
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_483
+:xPos 32
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_484
+:xPos 48
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_485
+:xPos 64
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_486
+:xPos 80
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_487
+:xPos 96
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_488
+:xPos 112
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_489
+:xPos 128
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_490
+:xPos 144
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_491
+:xPos 160
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_492
+:xPos 176
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_493
+:xPos 192
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_494
+:xPos 208
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_495
+:xPos 224
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_496
+:xPos 240
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_497
+:xPos 256
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_498
+:xPos 272
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_499
+:xPos 288
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_500
+:xPos 304
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_501
+:xPos 320
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_502
+:xPos 336
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_503
+:xPos 352
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_504
+:xPos 368
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_505
+:xPos 384
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_506
+:xPos 400
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_507
+:xPos 416
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_508
+:xPos 432
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_509
+:xPos 448
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_510
+:xPos 464
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_511
+:xPos 480
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_512
+:xPos 496
+:yPos 240
+:width 16
+:height 16
+
+:sprite
+:key tile_513
+:xPos 0
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_514
+:xPos 16
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_515
+:xPos 32
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_516
+:xPos 48
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_517
+:xPos 64
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_518
+:xPos 80
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_519
+:xPos 96
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_520
+:xPos 112
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_521
+:xPos 128
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_522
+:xPos 144
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_523
+:xPos 160
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_524
+:xPos 176
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_525
+:xPos 192
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_526
+:xPos 208
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_527
+:xPos 224
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_528
+:xPos 240
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_529
+:xPos 256
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_530
+:xPos 272
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_531
+:xPos 288
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_532
+:xPos 304
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_533
+:xPos 320
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_534
+:xPos 336
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_535
+:xPos 352
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_536
+:xPos 368
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_537
+:xPos 384
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_538
+:xPos 400
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_539
+:xPos 416
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_540
+:xPos 432
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_541
+:xPos 448
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_542
+:xPos 464
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_543
+:xPos 480
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_544
+:xPos 496
+:yPos 256
+:width 16
+:height 16
+
+:sprite
+:key tile_545
+:xPos 0
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_546
+:xPos 16
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_547
+:xPos 32
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_548
+:xPos 48
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_549
+:xPos 64
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_550
+:xPos 80
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_551
+:xPos 96
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_552
+:xPos 112
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_553
+:xPos 128
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_554
+:xPos 144
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_555
+:xPos 160
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_556
+:xPos 176
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_557
+:xPos 192
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_558
+:xPos 208
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_559
+:xPos 224
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_560
+:xPos 240
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_561
+:xPos 256
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_562
+:xPos 272
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_563
+:xPos 288
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_564
+:xPos 304
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_565
+:xPos 320
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_566
+:xPos 336
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_567
+:xPos 352
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_568
+:xPos 368
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_569
+:xPos 384
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_570
+:xPos 400
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_571
+:xPos 416
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_572
+:xPos 432
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_573
+:xPos 448
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_574
+:xPos 464
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_575
+:xPos 480
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_576
+:xPos 496
+:yPos 272
+:width 16
+:height 16
+
+:sprite
+:key tile_577
+:xPos 0
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_578
+:xPos 16
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_579
+:xPos 32
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_580
+:xPos 48
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_581
+:xPos 64
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_582
+:xPos 80
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_583
+:xPos 96
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_584
+:xPos 112
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_585
+:xPos 128
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_586
+:xPos 144
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_587
+:xPos 160
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_588
+:xPos 176
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_589
+:xPos 192
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_590
+:xPos 208
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_591
+:xPos 224
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_592
+:xPos 240
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_593
+:xPos 256
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_594
+:xPos 272
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_595
+:xPos 288
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_596
+:xPos 304
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_597
+:xPos 320
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_598
+:xPos 336
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_599
+:xPos 352
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_600
+:xPos 368
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_601
+:xPos 384
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_602
+:xPos 400
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_603
+:xPos 416
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_604
+:xPos 432
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_605
+:xPos 448
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_606
+:xPos 464
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_607
+:xPos 480
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_608
+:xPos 496
+:yPos 288
+:width 16
+:height 16
+
+:sprite
+:key tile_609
+:xPos 0
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_610
+:xPos 16
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_611
+:xPos 32
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_612
+:xPos 48
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_613
+:xPos 64
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_614
+:xPos 80
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_615
+:xPos 96
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_616
+:xPos 112
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_617
+:xPos 128
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_618
+:xPos 144
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_619
+:xPos 160
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_620
+:xPos 176
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_621
+:xPos 192
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_622
+:xPos 208
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_623
+:xPos 224
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_624
+:xPos 240
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_625
+:xPos 256
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_626
+:xPos 272
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_627
+:xPos 288
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_628
+:xPos 304
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_629
+:xPos 320
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_630
+:xPos 336
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_631
+:xPos 352
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_632
+:xPos 368
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_633
+:xPos 384
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_634
+:xPos 400
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_635
+:xPos 416
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_636
+:xPos 432
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_637
+:xPos 448
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_638
+:xPos 464
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_639
+:xPos 480
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_640
+:xPos 496
+:yPos 304
+:width 16
+:height 16
+
+:sprite
+:key tile_641
+:xPos 0
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_642
+:xPos 16
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_643
+:xPos 32
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_644
+:xPos 48
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_645
+:xPos 64
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_646
+:xPos 80
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_647
+:xPos 96
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_648
+:xPos 112
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_649
+:xPos 128
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_650
+:xPos 144
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_651
+:xPos 160
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_652
+:xPos 176
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_653
+:xPos 192
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_654
+:xPos 208
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_655
+:xPos 224
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_656
+:xPos 240
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_657
+:xPos 256
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_658
+:xPos 272
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_659
+:xPos 288
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_660
+:xPos 304
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_661
+:xPos 320
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_662
+:xPos 336
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_663
+:xPos 352
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_664
+:xPos 368
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_665
+:xPos 384
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_666
+:xPos 400
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_667
+:xPos 416
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_668
+:xPos 432
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_669
+:xPos 448
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_670
+:xPos 464
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_671
+:xPos 480
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_672
+:xPos 496
+:yPos 320
+:width 16
+:height 16
+
+:sprite
+:key tile_673
+:xPos 0
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_674
+:xPos 16
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_675
+:xPos 32
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_676
+:xPos 48
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_677
+:xPos 64
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_678
+:xPos 80
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_679
+:xPos 96
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_680
+:xPos 112
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_681
+:xPos 128
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_682
+:xPos 144
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_683
+:xPos 160
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_684
+:xPos 176
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_685
+:xPos 192
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_686
+:xPos 208
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_687
+:xPos 224
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_688
+:xPos 240
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_689
+:xPos 256
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_690
+:xPos 272
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_691
+:xPos 288
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_692
+:xPos 304
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_693
+:xPos 320
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_694
+:xPos 336
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_695
+:xPos 352
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_696
+:xPos 368
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_697
+:xPos 384
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_698
+:xPos 400
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_699
+:xPos 416
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_700
+:xPos 432
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_701
+:xPos 448
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_702
+:xPos 464
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_703
+:xPos 480
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_704
+:xPos 496
+:yPos 336
+:width 16
+:height 16
+
+:sprite
+:key tile_705
+:xPos 0
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_706
+:xPos 16
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_707
+:xPos 32
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_708
+:xPos 48
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_709
+:xPos 64
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_710
+:xPos 80
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_711
+:xPos 96
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_712
+:xPos 112
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_713
+:xPos 128
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_714
+:xPos 144
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_715
+:xPos 160
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_716
+:xPos 176
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_717
+:xPos 192
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_718
+:xPos 208
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_719
+:xPos 224
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_720
+:xPos 240
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_721
+:xPos 256
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_722
+:xPos 272
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_723
+:xPos 288
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_724
+:xPos 304
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_725
+:xPos 320
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_726
+:xPos 336
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_727
+:xPos 352
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_728
+:xPos 368
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_729
+:xPos 384
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_730
+:xPos 400
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_731
+:xPos 416
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_732
+:xPos 432
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_733
+:xPos 448
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_734
+:xPos 464
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_735
+:xPos 480
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_736
+:xPos 496
+:yPos 352
+:width 16
+:height 16
+
+:sprite
+:key tile_737
+:xPos 0
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_738
+:xPos 16
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_739
+:xPos 32
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_740
+:xPos 48
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_741
+:xPos 64
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_742
+:xPos 80
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_743
+:xPos 96
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_744
+:xPos 112
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_745
+:xPos 128
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_746
+:xPos 144
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_747
+:xPos 160
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_748
+:xPos 176
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_749
+:xPos 192
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_750
+:xPos 208
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_751
+:xPos 224
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_752
+:xPos 240
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_753
+:xPos 256
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_754
+:xPos 272
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_755
+:xPos 288
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_756
+:xPos 304
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_757
+:xPos 320
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_758
+:xPos 336
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_759
+:xPos 352
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_760
+:xPos 368
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_761
+:xPos 384
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_762
+:xPos 400
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_763
+:xPos 416
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_764
+:xPos 432
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_765
+:xPos 448
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_766
+:xPos 464
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_767
+:xPos 480
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_768
+:xPos 496
+:yPos 368
+:width 16
+:height 16
+
+:sprite
+:key tile_769
+:xPos 0
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_770
+:xPos 16
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_771
+:xPos 32
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_772
+:xPos 48
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_773
+:xPos 64
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_774
+:xPos 80
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_775
+:xPos 96
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_776
+:xPos 112
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_777
+:xPos 128
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_778
+:xPos 144
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_779
+:xPos 160
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_780
+:xPos 176
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_781
+:xPos 192
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_782
+:xPos 208
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_783
+:xPos 224
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_784
+:xPos 240
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_785
+:xPos 256
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_786
+:xPos 272
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_787
+:xPos 288
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_788
+:xPos 304
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_789
+:xPos 320
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_790
+:xPos 336
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_791
+:xPos 352
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_792
+:xPos 368
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_793
+:xPos 384
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_794
+:xPos 400
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_795
+:xPos 416
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_796
+:xPos 432
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_797
+:xPos 448
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_798
+:xPos 464
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_799
+:xPos 480
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_800
+:xPos 496
+:yPos 384
+:width 16
+:height 16
+
+:sprite
+:key tile_801
+:xPos 0
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_802
+:xPos 16
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_803
+:xPos 32
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_804
+:xPos 48
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_805
+:xPos 64
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_806
+:xPos 80
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_807
+:xPos 96
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_808
+:xPos 112
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_809
+:xPos 128
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_810
+:xPos 144
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_811
+:xPos 160
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_812
+:xPos 176
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_813
+:xPos 192
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_814
+:xPos 208
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_815
+:xPos 224
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_816
+:xPos 240
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_817
+:xPos 256
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_818
+:xPos 272
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_819
+:xPos 288
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_820
+:xPos 304
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_821
+:xPos 320
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_822
+:xPos 336
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_823
+:xPos 352
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_824
+:xPos 368
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_825
+:xPos 384
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_826
+:xPos 400
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_827
+:xPos 416
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_828
+:xPos 432
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_829
+:xPos 448
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_830
+:xPos 464
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_831
+:xPos 480
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_832
+:xPos 496
+:yPos 400
+:width 16
+:height 16
+
+:sprite
+:key tile_833
+:xPos 0
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_834
+:xPos 16
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_835
+:xPos 32
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_836
+:xPos 48
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_837
+:xPos 64
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_838
+:xPos 80
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_839
+:xPos 96
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_840
+:xPos 112
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_841
+:xPos 128
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_842
+:xPos 144
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_843
+:xPos 160
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_844
+:xPos 176
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_845
+:xPos 192
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_846
+:xPos 208
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_847
+:xPos 224
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_848
+:xPos 240
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_849
+:xPos 256
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_850
+:xPos 272
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_851
+:xPos 288
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_852
+:xPos 304
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_853
+:xPos 320
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_854
+:xPos 336
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_855
+:xPos 352
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_856
+:xPos 368
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_857
+:xPos 384
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_858
+:xPos 400
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_859
+:xPos 416
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_860
+:xPos 432
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_861
+:xPos 448
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_862
+:xPos 464
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_863
+:xPos 480
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_864
+:xPos 496
+:yPos 416
+:width 16
+:height 16
+
+:sprite
+:key tile_865
+:xPos 0
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_866
+:xPos 16
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_867
+:xPos 32
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_868
+:xPos 48
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_869
+:xPos 64
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_870
+:xPos 80
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_871
+:xPos 96
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_872
+:xPos 112
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_873
+:xPos 128
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_874
+:xPos 144
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_875
+:xPos 160
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_876
+:xPos 176
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_877
+:xPos 192
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_878
+:xPos 208
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_879
+:xPos 224
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_880
+:xPos 240
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_881
+:xPos 256
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_882
+:xPos 272
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_883
+:xPos 288
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_884
+:xPos 304
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_885
+:xPos 320
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_886
+:xPos 336
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_887
+:xPos 352
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_888
+:xPos 368
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_889
+:xPos 384
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_890
+:xPos 400
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_891
+:xPos 416
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_892
+:xPos 432
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_893
+:xPos 448
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_894
+:xPos 464
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_895
+:xPos 480
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_896
+:xPos 496
+:yPos 432
+:width 16
+:height 16
+
+:sprite
+:key tile_897
+:xPos 0
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_898
+:xPos 16
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_899
+:xPos 32
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_900
+:xPos 48
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_901
+:xPos 64
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_902
+:xPos 80
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_903
+:xPos 96
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_904
+:xPos 112
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_905
+:xPos 128
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_906
+:xPos 144
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_907
+:xPos 160
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_908
+:xPos 176
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_909
+:xPos 192
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_910
+:xPos 208
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_911
+:xPos 224
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_912
+:xPos 240
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_913
+:xPos 256
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_914
+:xPos 272
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_915
+:xPos 288
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_916
+:xPos 304
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_917
+:xPos 320
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_918
+:xPos 336
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_919
+:xPos 352
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_920
+:xPos 368
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_921
+:xPos 384
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_922
+:xPos 400
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_923
+:xPos 416
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_924
+:xPos 432
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_925
+:xPos 448
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_926
+:xPos 464
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_927
+:xPos 480
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_928
+:xPos 496
+:yPos 448
+:width 16
+:height 16
+
+:sprite
+:key tile_929
+:xPos 0
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_930
+:xPos 16
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_931
+:xPos 32
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_932
+:xPos 48
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_933
+:xPos 64
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_934
+:xPos 80
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_935
+:xPos 96
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_936
+:xPos 112
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_937
+:xPos 128
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_938
+:xPos 144
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_939
+:xPos 160
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_940
+:xPos 176
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_941
+:xPos 192
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_942
+:xPos 208
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_943
+:xPos 224
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_944
+:xPos 240
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_945
+:xPos 256
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_946
+:xPos 272
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_947
+:xPos 288
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_948
+:xPos 304
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_949
+:xPos 320
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_950
+:xPos 336
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_951
+:xPos 352
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_952
+:xPos 368
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_953
+:xPos 384
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_954
+:xPos 400
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_955
+:xPos 416
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_956
+:xPos 432
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_957
+:xPos 448
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_958
+:xPos 464
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_959
+:xPos 480
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_960
+:xPos 496
+:yPos 464
+:width 16
+:height 16
+
+:sprite
+:key tile_961
+:xPos 0
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_962
+:xPos 16
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_963
+:xPos 32
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_964
+:xPos 48
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_965
+:xPos 64
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_966
+:xPos 80
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_967
+:xPos 96
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_968
+:xPos 112
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_969
+:xPos 128
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_970
+:xPos 144
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_971
+:xPos 160
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_972
+:xPos 176
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_973
+:xPos 192
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_974
+:xPos 208
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_975
+:xPos 224
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_976
+:xPos 240
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_977
+:xPos 256
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_978
+:xPos 272
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_979
+:xPos 288
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_980
+:xPos 304
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_981
+:xPos 320
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_982
+:xPos 336
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_983
+:xPos 352
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_984
+:xPos 368
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_985
+:xPos 384
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_986
+:xPos 400
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_987
+:xPos 416
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_988
+:xPos 432
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_989
+:xPos 448
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_990
+:xPos 464
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_991
+:xPos 480
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_992
+:xPos 496
+:yPos 480
+:width 16
+:height 16
+
+:sprite
+:key tile_993
+:xPos 0
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_994
+:xPos 16
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_995
+:xPos 32
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_996
+:xPos 48
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_997
+:xPos 64
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_998
+:xPos 80
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_999
+:xPos 96
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1000
+:xPos 112
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1001
+:xPos 128
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1002
+:xPos 144
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1003
+:xPos 160
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1004
+:xPos 176
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1005
+:xPos 192
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1006
+:xPos 208
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1007
+:xPos 224
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1008
+:xPos 240
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1009
+:xPos 256
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1010
+:xPos 272
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1011
+:xPos 288
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1012
+:xPos 304
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1013
+:xPos 320
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1014
+:xPos 336
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1015
+:xPos 352
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1016
+:xPos 368
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1017
+:xPos 384
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1018
+:xPos 400
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1019
+:xPos 416
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1020
+:xPos 432
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1021
+:xPos 448
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1022
+:xPos 464
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1023
+:xPos 480
+:yPos 496
+:width 16
+:height 16
+
+:sprite
+:key tile_1024
+:xPos 496
+:yPos 496
+:width 16
+:height 16
+
