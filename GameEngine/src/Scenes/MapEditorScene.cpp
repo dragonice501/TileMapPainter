@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
+
 #include <SDL_image.h>
 #include <imgui.h>
 #include <imgui_sdl.h>
@@ -55,6 +57,12 @@ void MapEditorScene::Destroy()
 		delete[] mMapRects[i];
 	}
 	delete[] mMapRects;
+
+	for (SDL_Texture* texture : mUnitClassTextures)
+	{
+		SDL_DestroyTexture(texture);
+	}
+	mUnitClassTextures.clear();
 }
 
 void MapEditorScene::Setup(SDL_Renderer* renderer)
@@ -85,9 +93,33 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	mSpriteSheet = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	SDL_Surface* overlaySurface = IMG_Load("./Assets/world2.png");
-	mOverlayTexture = SDL_CreateTextureFromSurface(renderer, overlaySurface);
-	SDL_FreeSurface(overlaySurface);
+	surface = IMG_Load("./Assets/world2.png");
+	mOverlayTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+
+	mUnitClassTextures.resize(EUnitClass::SWORD_ARMOUR + 1);
+
+	surface = IMG_Load("./Assets/Bow_Fighter.png");
+	SDL_Texture* bowFighterTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[BOW_FIGHTER] = bowFighterTexture;
+
+	surface = IMG_Load("./Assets/Dancer.png");
+	SDL_Texture* dancerTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[DANCER] = dancerTexture;
+
+	surface = IMG_Load("./Assets/Sigurd.png");
+	SDL_Texture* sigurdTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[KNIGHT_LORD] = sigurdTexture;
+
+	surface = IMG_Load("./Assets/Mage.png");
+	SDL_Texture* mageTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[MAGE] = mageTexture;
+
+	surface = IMG_Load("./Assets/Sword_Armour.png");
+	SDL_Texture* swordArmourTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[SWORD_ARMOUR] = swordArmourTexture;
+
+	SDL_FreeSurface(surface);
 }
 
 void MapEditorScene::Input()
@@ -113,6 +145,7 @@ void MapEditorScene::Input()
 			mIsRunning = false;
 			break;
 		case SDL_KEYDOWN:
+		{
 			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 			{
 				mIsRunning = false;
@@ -150,6 +183,7 @@ void MapEditorScene::Input()
 				}
 			}
 			break;
+		}
 		case SDL_MOUSEBUTTONDOWN:
 			if (!CursorInGUI())
 			{
@@ -168,6 +202,7 @@ void MapEditorScene::Input()
 							//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
 							break;
 						case PAINT_UNIT_TOOL:
+							PaintUnit(GetCursorMapRect());
 							break;
 						case PAN_TOOL:
 							break;
@@ -195,6 +230,7 @@ void MapEditorScene::Input()
 						CopyMapRectSprite();
 						break;
 					case PAINT_UNIT_TOOL:
+						RemoveUnit(GetCursorMapRect());
 						break;
 					case PAN_TOOL:
 						break;
@@ -208,6 +244,7 @@ void MapEditorScene::Input()
 			}
 			break;
 		case SDL_MOUSEBUTTONUP:
+		{
 			mMouseButtonDown = false;
 			if (mSelectedTool == SELECT_TOOL)
 			{
@@ -222,7 +259,9 @@ void MapEditorScene::Input()
 				}
 			}
 			break;
+		}
 		case SDL_MOUSEMOTION:
+		{
 			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
 			GetCursorMapRect();
 			if (mMouseButtonDown && !CursorInGUI())
@@ -243,6 +282,7 @@ void MapEditorScene::Input()
 				}
 			}
 			break;
+		}
 		default:
 			break;
 		}
@@ -255,6 +295,12 @@ void MapEditorScene::Update(float deltaTime)
 	{
 		CheckCursorInMap();
 	}
+
+	for (AnimatedSprite& sprite : mAnimatedSprites)
+	{
+		sprite.currentFrame =
+			static_cast<int>(((SDL_GetTicks() - sprite.startTime) * sprite.frameRate / 1000.0f)) % sprite.numFrames;
+	}
 }
 
 void MapEditorScene::Render(SDL_Renderer* renderer)
@@ -266,6 +312,10 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 	{
 	case EDITING_MAP:
 		DrawMap(renderer);
+		if (mAnimatedSprites.size() > 0)
+		{
+			DrawAnimatedSprites(renderer);
+		}
 		break;
 	case SELECTING_SPRITE:
 		DrawTileMap(renderer);
@@ -340,6 +390,21 @@ void MapEditorScene::DrawTileMap(SDL_Renderer* renderer)
 
 			SDL_RenderCopy(renderer, mSpriteSheet, &srcRect, &dstRect);
 		}
+	}
+}
+
+void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
+{
+	for (AnimatedSprite& sprite : mAnimatedSprites)
+	{
+		Vec2D position = {
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, 0, sprite.frameSize, sprite.frameSize };
+		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32, sprite.frameSize * 2, sprite.frameSize * 2 };
+
+		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
 	}
 }
 
@@ -420,16 +485,15 @@ void MapEditorScene::DrawGUI()
 				else mEditorState = EDITING_MAP;
 			}
 
-			static int selectedClassIndex = 0;
+			static int selectedUnitClassIndex = mSelectedUnit;
 			const char* classes[] =
 			{
-				"Junior Lord", "Knight Lord", "Prince", "Princess", "Master Knight", "Myrmidon", "Swordmaster", "Forrest",
-				"Thief", "Thief Fighter", "Dancer", "Axe Fighter", "Warrior", "Bow Fighter", "Sniper", "Cavalier", "Paladin_M", "Paladin_F"
-				"Troubadour", "Ranger", "Lance Knight", "Duke Knight", "Axe Knight", "Great Knight", "Bow Knight", "Sword Armour", "General",
-				"Pegasus Knight", "Falcon Knight", "Wyvern Rider", "Wyvern Lord", "Thunder Mage", "Wind Mage", "Mage Fighter_M", "Mage Fighter_F",
-				"Mage", "Mage Knight", "Bard", "Light Preistess", "Sage", "High Priest"
+				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour"
 			};
-			ImGui::Combo("Class", &selectedClassIndex, classes, IM_ARRAYSIZE(classes));
+			if (ImGui::Combo("Class", &selectedUnitClassIndex, classes, IM_ARRAYSIZE(classes)))
+			{
+				SetSelectedUnitClass(selectedUnitClassIndex);
+			}
 
 			static int level = 1;
 			static int hp = 1;
@@ -643,6 +707,77 @@ void MapEditorScene::FillTile(uint16_t xIndex, uint16_t yIndex)
 	if (xIndex + 1 < mMapWidth)
 	{
 		if (mMapSpriteIndeces[xIndex + 1][yIndex] != mSelectedSpriteIndex) FillTile(xIndex + 1, yIndex);
+	}
+}
+
+void MapEditorScene::PaintUnit(Vec2D position)
+{
+	if (mAnimatedSprites.size() > 0)
+	{
+		for (AnimatedSprite& sprite : mAnimatedSprites)
+		{
+			if (sprite.position == position)
+			{
+				if (sprite.unitTexture == mSelectedUnit) return;
+				else if (sprite.unitTexture != mSelectedUnit)
+				{
+					sprite.unitTexture = mSelectedUnit;
+					return;
+				}
+			}
+		}
+	}
+
+	AnimatedSprite animatedSprite;
+	animatedSprite.position = position;
+	animatedSprite.textureIndex = mSelectedUnit;
+	animatedSprite.unitTexture = mSelectedUnit;
+	animatedSprite.startTime = SDL_GetTicks();
+
+	mAnimatedSprites.push_back(animatedSprite);
+}
+
+void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
+{
+	EUnitClass unit = static_cast<EUnitClass>(unitSelectionIndex);
+
+	switch (unit)
+	{
+	case MapEditorScene::BOW_FIGHTER:
+		mSelectedUnit = BOW_FIGHTER;
+		break;
+	case MapEditorScene::DANCER:
+		mSelectedUnit = DANCER;
+		break;
+	case MapEditorScene::KNIGHT_LORD:
+		mSelectedUnit = KNIGHT_LORD;
+		break;
+	case MapEditorScene::MAGE:
+		mSelectedUnit = MAGE;
+		break;
+	case MapEditorScene::SWORD_ARMOUR:
+		mSelectedUnit = SWORD_ARMOUR;
+		break;
+	default:
+		break;
+	}
+
+	mSelectedAnimatedSprite.startTime = SDL_GetTicks();
+	mSelectedAnimatedSprite.position = GetCursorMapRect();
+}
+
+void MapEditorScene::RemoveUnit(Vec2D position)
+{
+	for (int i = 0; i < mAnimatedSprites.size(); i++)
+	{
+		if (mAnimatedSprites[i].position == position)
+		{
+			AnimatedSprite temp = mAnimatedSprites[i];
+			mAnimatedSprites[i] = mAnimatedSprites.back();
+			mAnimatedSprites.back() = temp;
+			mAnimatedSprites.pop_back();
+			return;
+		}
 	}
 }
 

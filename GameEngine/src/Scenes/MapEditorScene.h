@@ -26,6 +26,7 @@ public:
 
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
+	void DrawAnimatedSprites(SDL_Renderer* renderer);
 	void DrawGUI();
 	bool TileInsideCamera(uint16_t x, uint16_t y);
 	bool CursorInGUI();
@@ -41,6 +42,12 @@ public:
 	void CopyMapRectSprite();
 	void FillTile(uint16_t xIndex, uint16_t yIndex);
 
+	// Unit Functions
+	void PaintUnit(Vec2D position);
+	void SetSelectedUnitClass(int unitSelectionIndex);
+	void RemoveUnit(Vec2D position);
+
+	// Select Functions
 	void SetSelectionRect();
 	void MoveSelectionUp();
 	void MoveSelectionDown();
@@ -89,6 +96,28 @@ private:
 		BRAGI_TOWER,
 		CASTLE_DEFENSE,
 		CASTLE_WALL
+	};
+
+	enum EUnitClass
+	{
+		BOW_FIGHTER,
+		DANCER,
+		KNIGHT_LORD,
+		MAGE,
+		SWORD_ARMOUR
+	};
+
+	struct AnimatedSprite
+	{
+		uint8_t textureIndex = 0;
+		uint8_t textureSize = 128;
+		uint8_t frameSize = 32;
+		uint8_t numFrames = 4;
+		uint8_t frameRate = 4;
+		uint8_t currentFrame = 0;
+		uint32_t startTime = 0;
+		Vec2D position = Vec2D::Zero;
+		EUnitClass unitTexture = BOW_FIGHTER;
 	};
 
 	uint32_t mRoadIndeces[47] =
@@ -192,12 +221,25 @@ private:
 	uint32_t millisecondsPreviousFrame;
 
 	EEditorState mEditorState = EDITING_MAP;
-	ESelectedTool mSelectedTool = PAINT_TILE_TOOL;
+	ESelectedTool mSelectedTool = PAINT_UNIT_TOOL;
 
 	bool mMouseButtonDown = false;
 	bool mShowOverlay = false;
 	SDL_Texture* mOverlayTexture;
 
+	Vec2D mCursorPosition;
+
+	// Paint Variables
+	uint16_t mSelectedSpriteIndex = 168;
+
+	// Unit Variables
+	std::vector<SDL_Texture*> mUnitClassTextures;
+	std::vector<AnimatedSprite> mAnimatedSprites;
+	int mSelectedUnitClassIndex = 0;
+	AnimatedSprite mSelectedAnimatedSprite;
+	EUnitClass mSelectedUnit = KNIGHT_LORD;
+
+	// Select Tool Variables
 	SDL_Rect mSelectionRect;
 	Vec2D mSelectionRectStart;
 	Vec2D mSelectionRectEnd;
@@ -207,9 +249,7 @@ private:
 	uint16_t mSelectionWidth;
 	uint16_t mSelectionHeight;
 
-	Vec2D mCursorPosition;
-	uint16_t mSelectedSpriteIndex = 168;
-
+	// Map Variables
 	float mMapXOffset = 0;
 	float mMapYOffset = 0;
 	uint16_t mMapWidth = 256;
