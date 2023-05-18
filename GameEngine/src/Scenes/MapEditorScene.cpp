@@ -402,7 +402,7 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
 		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, 0, sprite.frameSize, sprite.frameSize };
-		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32, sprite.frameSize * 2, sprite.frameSize * 2 };
+		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
 
 		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
 	}
@@ -446,6 +446,30 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Show Overlay"))
 			{
 				mShowOverlay = !mShowOverlay;
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Input/Output", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("New Map"))
+			{
+				InitMap();
+				mShowOverlay = false;
+				mShowSelection = false;
+
+				mAnimatedUnitSprites.clear();
+			}
+
+			if (ImGui::Button("Save Map"))
+			{
+				SaveMap();
+				SaveUnits();
+			}
+
+			if (ImGui::Button("Load Map"))
+			{
+				LoadMap();
+				LoadUnits();
 			}
 		}
 
@@ -495,6 +519,20 @@ void MapEditorScene::DrawGUI()
 				LoadUnits();
 			}
 
+			if (ImGui::Button("Reset Stats"))
+			{
+				mSelectedUnit = KNIGHT_LORD;
+				mNewUnitLevel = 1;
+				mNewUnitHP = 1;
+				mNewUnitStrength = 1;
+				mNewUnitMagic = 1;
+				mNewUnitSkill = 1;
+				mNewUnitSpeed = 1;
+				mNewUnitLuck = 1;
+				mNewUnitDefense = 1;
+				mNewUnitModifier = 1;
+			}
+
 			static int selectedUnitClassIndex = mSelectedUnit;
 			const char* classes[] =
 			{
@@ -505,48 +543,47 @@ void MapEditorScene::DrawGUI()
 				SetSelectedUnitClass(selectedUnitClassIndex);
 			}
 
-			static int level = 1;
-			static int hp = 1;
-			static int strength = 1;
-			static int magic = 1;
-			static int skill = 1;
-			static int speed = 1;
-			static int luck = 1;
-			static int defense = 1;
-			static int modifier = 1;
-			ImGui::InputInt("Level", &level);
-			ImGui::InputInt("HP", &hp);
-			ImGui::InputInt("Strength", &strength);
-			ImGui::InputInt("Magic", &magic);
-			ImGui::InputInt("Skill", &skill);
-			ImGui::InputInt("Speed", &speed);
-			ImGui::InputInt("Luck", &luck);
-			ImGui::InputInt("Defense", &defense);
-			ImGui::InputInt("Modifier", &modifier);
-		}
+			mSelectedPaintUnit.level = mNewUnitLevel;
+			mSelectedPaintUnit.hp = mNewUnitHP;
+			mSelectedPaintUnit.strength = mNewUnitStrength;
+			mSelectedPaintUnit.magic = mNewUnitMagic;
+			mSelectedPaintUnit.skill = mNewUnitSkill;
+			mSelectedPaintUnit.speed = mNewUnitSpeed;
+			mSelectedPaintUnit.luck = mNewUnitLuck;
+			mSelectedPaintUnit.defense = mNewUnitDefense;
+			mSelectedPaintUnit.modifier = mNewUnitModifier;
+			
+			ImGui::InputInt("Level", &mNewUnitLevel);
+			ImGui::InputInt("HP", &mNewUnitHP);
+			ImGui::InputInt("Strength", &mNewUnitStrength);
+			ImGui::InputInt("Magic", &mNewUnitMagic);
+			ImGui::InputInt("Skill", &mNewUnitSkill);
+			ImGui::InputInt("Speed", &mNewUnitSpeed);
+			ImGui::InputInt("Luck", &mNewUnitLuck);
+			ImGui::InputInt("Defense", &mNewUnitDefense);
+			ImGui::InputInt("Modifier", &mNewUnitModifier);
 
-		if (ImGui::CollapsingHeader("Input/Output", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (ImGui::Button("New Map"))
-			{
-				InitMap();
-				mShowOverlay = false;
-				mShowSelection = false;
+			std::string unitString = "Selected Unit: " + std::to_string(mSelectedMapUnit.unitTexture);
+			std::string levelString = "Selected Unit Level: " + std::to_string(mSelectedMapUnit.level);
+			std::string hpString = "Selected Unit HP: " + std::to_string(mSelectedMapUnit.hp);
+			std::string strengthString = "Selected Unit Strength: " + std::to_string(mSelectedMapUnit.strength);
+			std::string magicString = "Selected Unit magic: " + std::to_string(mSelectedMapUnit.magic);
+			std::string skillString = "Selected Unit Skill: " + std::to_string(mSelectedMapUnit.skill);
+			std::string speedString = "Selected Unit Speed: " + std::to_string(mSelectedMapUnit.speed);
+			std::string luckString = "Selected Unit Luck: " + std::to_string(mSelectedMapUnit.luck);
+			std::string defenseString = "Selected Unit Defense: " + std::to_string(mSelectedMapUnit.defense);
+			std::string modifierString = "Selected Unit Modifier: " + std::to_string(mSelectedMapUnit.modifier);
 
-				mAnimatedUnitSprites.clear();
-			}
-
-			if (ImGui::Button("Save Map"))
-			{
-				SaveMap();
-				SaveUnits();
-			}
-
-			if (ImGui::Button("Load Map"))
-			{
-				LoadMap();
-				LoadUnits();
-			}
+			ImGui::Text(unitString.c_str());
+			ImGui::Text(levelString.c_str());
+			ImGui::Text(hpString.c_str());
+			ImGui::Text(strengthString.c_str());
+			ImGui::Text(magicString.c_str());
+			ImGui::Text(skillString.c_str());
+			ImGui::Text(speedString.c_str());
+			ImGui::Text(luckString.c_str());
+			ImGui::Text(defenseString.c_str());
+			ImGui::Text(modifierString.c_str());
 		}
 	}
 	ImGui::End();
@@ -571,8 +608,8 @@ bool MapEditorScene::TileInsideCamera(uint16_t x, uint16_t y)
 bool MapEditorScene::CursorInGUI()
 {
 	return
-		mCursorPosition.GetX() < 280 &&
-		mCursorPosition.GetY() < 680;
+		mCursorPosition.GetX() < 283 &&
+		mCursorPosition.GetY() < 728;
 }
 
 void MapEditorScene::InitMap()
@@ -727,26 +764,49 @@ void MapEditorScene::PaintUnit(Vec2D position)
 {
 	if (mAnimatedUnitSprites.size() > 0)
 	{
-		for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+		for (const AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 		{
 			if (sprite.position == position)
 			{
-				if (sprite.unitTexture == mSelectedUnit) return;
-				else if (sprite.unitTexture != mSelectedUnit)
+				if (mSelectedMapUnit != sprite)
 				{
-					sprite.unitTexture = mSelectedUnit;
-					return;
+					mSelectedMapUnit = sprite;
 				}
+				else if (mSelectedMapUnit == sprite)
+				{
+					mSelectedUnit = mSelectedMapUnit.unitTexture;
+					mNewUnitLevel = mSelectedMapUnit.level;
+					mNewUnitHP = mSelectedMapUnit.hp;
+					mNewUnitStrength = mSelectedMapUnit.strength;
+					mNewUnitMagic = mSelectedMapUnit.magic;
+					mNewUnitSkill = mSelectedMapUnit.skill;
+					mNewUnitSpeed = mSelectedMapUnit.speed;
+					mNewUnitLuck = mSelectedMapUnit.luck;
+					mNewUnitDefense = mSelectedMapUnit.defense;
+					mNewUnitModifier = mSelectedMapUnit.modifier;
+				}
+				return;
 			}
 		}
 	}
 
-	AnimatedUnitSprite animatedSprite;
-	animatedSprite.position = position;
-	animatedSprite.unitTexture = mSelectedUnit;
-	animatedSprite.startTime = SDL_GetTicks();
+	AnimatedUnitSprite animatedUnitSprite;
+	animatedUnitSprite.position = position;
+	animatedUnitSprite.unitTexture = mSelectedUnit;
+	animatedUnitSprite.startTime = SDL_GetTicks();
 
-	mAnimatedUnitSprites.push_back(animatedSprite);
+	animatedUnitSprite.level = mNewUnitLevel;
+	animatedUnitSprite.hp = mNewUnitHP;
+	animatedUnitSprite.strength = mNewUnitStrength;
+	animatedUnitSprite.skill = mNewUnitSkill;
+	animatedUnitSprite.speed = mNewUnitSpeed;
+	animatedUnitSprite.luck = mNewUnitLuck;
+	animatedUnitSprite.defense = mNewUnitDefense;
+	animatedUnitSprite.modifier = mNewUnitModifier;
+
+	mSelectedMapUnit = animatedUnitSprite;
+
+	mAnimatedUnitSprites.push_back(animatedUnitSprite);
 }
 
 void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
@@ -755,27 +815,27 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 
 	switch (unit)
 	{
-	case MapEditorScene::BOW_FIGHTER:
+	case BOW_FIGHTER:
 		mSelectedUnit = BOW_FIGHTER;
 		break;
-	case MapEditorScene::DANCER:
+	case DANCER:
 		mSelectedUnit = DANCER;
 		break;
-	case MapEditorScene::KNIGHT_LORD:
+	case KNIGHT_LORD:
 		mSelectedUnit = KNIGHT_LORD;
 		break;
-	case MapEditorScene::MAGE:
+	case MAGE:
 		mSelectedUnit = MAGE;
 		break;
-	case MapEditorScene::SWORD_ARMOUR:
+	case SWORD_ARMOUR:
 		mSelectedUnit = SWORD_ARMOUR;
 		break;
 	default:
 		break;
 	}
 
-	mSelectedUnitSprite.startTime = SDL_GetTicks();
-	mSelectedUnitSprite.position = GetCursorMapRect();
+	mSelectedPaintUnit.startTime = SDL_GetTicks();
+	mSelectedPaintUnit.position = GetCursorMapRect();
 }
 
 void MapEditorScene::RemoveUnit(Vec2D position)
@@ -808,11 +868,20 @@ void MapEditorScene::SaveUnits()
 	unitOutFile.open(unitsPath);
 	if (unitOutFile.is_open())
 	{
-		for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+		for (AnimatedUnitSprite& uint : mAnimatedUnitSprites)
 		{
-			unitOutFile << ":unit " + std::to_string(sprite.unitTexture) << std::endl;
-			unitOutFile << ":x " + std::to_string(static_cast<int>(sprite.position.GetX())) << std::endl;
-			unitOutFile << ":y " + std::to_string(static_cast<int>(sprite.position.GetY())) << std::endl << std::endl;
+			unitOutFile << ":unit " + std::to_string(uint.unitTexture) << std::endl;
+			unitOutFile << ":x " + std::to_string(static_cast<int>(uint.position.GetX())) << std::endl;
+			unitOutFile << ":y " + std::to_string(static_cast<int>(uint.position.GetY())) << std::endl;
+			unitOutFile << ":level " + std::to_string(static_cast<int>(uint.level)) << std::endl;
+			unitOutFile << ":hp " + std::to_string(static_cast<int>(uint.hp)) << std::endl;
+			unitOutFile << ":strength " + std::to_string(static_cast<int>(uint.strength)) << std::endl;
+			unitOutFile << ":magic " + std::to_string(static_cast<int>(uint.magic)) << std::endl;
+			unitOutFile << ":skill " + std::to_string(static_cast<int>(uint.skill)) << std::endl;
+			unitOutFile << ":speed " + std::to_string(static_cast<int>(uint.speed)) << std::endl;
+			unitOutFile << ":luck " + std::to_string(static_cast<int>(uint.luck)) << std::endl;
+			unitOutFile << ":defense " + std::to_string(static_cast<int>(uint.defense)) << std::endl;
+			unitOutFile << ":modifier " + std::to_string(static_cast<int>(uint.modifier)) << std::endl << std::endl;
 		}
 	}
 	unitOutFile.close();
@@ -851,6 +920,70 @@ void MapEditorScene::LoadUnits()
 		};
 		fileLoader.AddCommand(unitYPositionCommand);
 
+		Command unitHPCommand;
+		unitHPCommand.command = "hp";
+		unitHPCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsHP.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitHPCommand);
+
+		Command unitStengthCommand;
+		unitStengthCommand.command = "strength";
+		unitStengthCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsStrength.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitStengthCommand);
+
+		Command unitMagicCommand;
+		unitMagicCommand.command = "magic";
+		unitMagicCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsMagic.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitMagicCommand);
+
+		Command unitsSkillCommand;
+		unitsSkillCommand.command = "skill";
+		unitsSkillCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsSkill.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitsSkillCommand);
+
+		Command unitSpeedCommand;
+		unitSpeedCommand.command = "speed";
+		unitSpeedCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsSpeed.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitSpeedCommand);
+
+		Command unitLuckCommand;
+		unitLuckCommand.command = "luck";
+		unitLuckCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsLuck.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitLuckCommand);
+
+		Command unitDefenseCommand;
+		unitDefenseCommand.command = "defense";
+		unitDefenseCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsDefense.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitDefenseCommand);
+
+		Command unitModifierCommand;
+		unitModifierCommand.command = "modifier";
+		unitModifierCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsModifier.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitModifierCommand);
+
 		fileLoader.LoadFile(unitsFilePath);
 	}
 
@@ -869,12 +1002,30 @@ void MapEditorScene::InitUnits()
 		newUnit.unitTexture = static_cast<EUnitClass>(mLoadedUnits[i]);
 		newUnit.position = { static_cast<float>(mLoadedUnitsXPositions[i]), static_cast<float>(mLoadedUnitsYPositions[i]) };
 		newUnit.startTime = SDL_GetTicks();
+
+		newUnit.hp = mLoadedUnitsHP[i];
+		newUnit.strength = mLoadedUnitsStrength[i];
+		newUnit.magic = mLoadedUnitsMagic[i];
+		newUnit.skill = mLoadedUnitsSkill[i];
+		newUnit.speed = mLoadedUnitsSpeed[i];
+		newUnit.luck = mLoadedUnitsLuck[i];
+		newUnit.defense = mLoadedUnitsDefense[i];
+		newUnit.modifier = mLoadedUnitsModifier[i];
+
 		mAnimatedUnitSprites.push_back(newUnit);
 	}
 
 	mLoadedUnits.clear();
 	mLoadedUnitsXPositions.clear();
 	mLoadedUnitsYPositions.clear();
+	mLoadedUnitsHP.clear();
+	mLoadedUnitsStrength.clear();
+	mLoadedUnitsMagic.clear();
+	mLoadedUnitsSkill.clear();
+	mLoadedUnitsSpeed.clear();
+	mLoadedUnitsLuck.clear();
+	mLoadedUnitsDefense.clear();
+	mLoadedUnitsModifier.clear();
 }
 
 void MapEditorScene::SetSelectionRect()

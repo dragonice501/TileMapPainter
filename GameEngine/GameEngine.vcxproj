@@ -579,6 +579,7 @@
     <ClInclude Include="src\Systems\MovementSystem.h" />
     <ClInclude Include="src\Systems\RenderSystem.h" />
     <ClInclude Include="src\Utils\FileCommandLoader.h" />
+    <ClInclude Include="src\Utils\MapEditorUtils.h" />
     <ClInclude Include="src\Utils\Utils.h" />
     <ClInclude Include="src\Utils\Vec2D.h" />
     <ClInclude Include="src\_App\Application.h" />
