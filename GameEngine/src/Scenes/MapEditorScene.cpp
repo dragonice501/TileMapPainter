@@ -296,7 +296,7 @@ void MapEditorScene::Update(float deltaTime)
 		CheckCursorInMap();
 	}
 
-	for (AnimatedSprite& sprite : mAnimatedSprites)
+	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 	{
 		sprite.currentFrame =
 			static_cast<int>(((SDL_GetTicks() - sprite.startTime) * sprite.frameRate / 1000.0f)) % sprite.numFrames;
@@ -312,7 +312,7 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 	{
 	case EDITING_MAP:
 		DrawMap(renderer);
-		if (mAnimatedSprites.size() > 0)
+		if (mAnimatedUnitSprites.size() > 0)
 		{
 			DrawAnimatedSprites(renderer);
 		}
@@ -395,7 +395,7 @@ void MapEditorScene::DrawTileMap(SDL_Renderer* renderer)
 
 void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 {
-	for (AnimatedSprite& sprite : mAnimatedSprites)
+	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 	{
 		Vec2D position = {
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
@@ -712,9 +712,9 @@ void MapEditorScene::FillTile(uint16_t xIndex, uint16_t yIndex)
 
 void MapEditorScene::PaintUnit(Vec2D position)
 {
-	if (mAnimatedSprites.size() > 0)
+	if (mAnimatedUnitSprites.size() > 0)
 	{
-		for (AnimatedSprite& sprite : mAnimatedSprites)
+		for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 		{
 			if (sprite.position == position)
 			{
@@ -728,13 +728,12 @@ void MapEditorScene::PaintUnit(Vec2D position)
 		}
 	}
 
-	AnimatedSprite animatedSprite;
+	AnimatedUnitSprite animatedSprite;
 	animatedSprite.position = position;
-	animatedSprite.textureIndex = mSelectedUnit;
 	animatedSprite.unitTexture = mSelectedUnit;
 	animatedSprite.startTime = SDL_GetTicks();
 
-	mAnimatedSprites.push_back(animatedSprite);
+	mAnimatedUnitSprites.push_back(animatedSprite);
 }
 
 void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
@@ -762,20 +761,20 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 		break;
 	}
 
-	mSelectedAnimatedSprite.startTime = SDL_GetTicks();
-	mSelectedAnimatedSprite.position = GetCursorMapRect();
+	mSelectedUnitSprite.startTime = SDL_GetTicks();
+	mSelectedUnitSprite.position = GetCursorMapRect();
 }
 
 void MapEditorScene::RemoveUnit(Vec2D position)
 {
-	for (int i = 0; i < mAnimatedSprites.size(); i++)
+	for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
 	{
-		if (mAnimatedSprites[i].position == position)
+		if (mAnimatedUnitSprites[i].position == position)
 		{
-			AnimatedSprite temp = mAnimatedSprites[i];
-			mAnimatedSprites[i] = mAnimatedSprites.back();
-			mAnimatedSprites.back() = temp;
-			mAnimatedSprites.pop_back();
+			AnimatedUnitSprite temp = mAnimatedUnitSprites[i];
+			mAnimatedUnitSprites[i] = mAnimatedUnitSprites.back();
+			mAnimatedUnitSprites.back() = temp;
+			mAnimatedUnitSprites.pop_back();
 			return;
 		}
 	}

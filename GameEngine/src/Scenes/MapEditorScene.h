@@ -107,9 +107,8 @@ private:
 		SWORD_ARMOUR
 	};
 
-	struct AnimatedSprite
+	struct AnimatedUnitSprite
 	{
-		uint8_t textureIndex = 0;
 		uint8_t textureSize = 128;
 		uint8_t frameSize = 32;
 		uint8_t numFrames = 4;
@@ -234,9 +233,9 @@ private:
 
 	// Unit Variables
 	std::vector<SDL_Texture*> mUnitClassTextures;
-	std::vector<AnimatedSprite> mAnimatedSprites;
+	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
 	int mSelectedUnitClassIndex = 0;
-	AnimatedSprite mSelectedAnimatedSprite;
+	AnimatedUnitSprite mSelectedUnitSprite;
 	EUnitClass mSelectedUnit = KNIGHT_LORD;
 
 	// Select Tool Variables
