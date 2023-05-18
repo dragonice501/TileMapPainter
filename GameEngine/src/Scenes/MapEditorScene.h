@@ -46,6 +46,9 @@ public:
 	void PaintUnit(Vec2D position);
 	void SetSelectedUnitClass(int unitSelectionIndex);
 	void RemoveUnit(Vec2D position);
+	void SaveUnits();
+	void LoadUnits();
+	void InitUnits();
 
 	// Select Functions
 	void SetSelectionRect();
@@ -116,7 +119,7 @@ private:
 		uint8_t currentFrame = 0;
 		uint32_t startTime = 0;
 		Vec2D position = Vec2D::Zero;
-		EUnitClass unitTexture = BOW_FIGHTER;
+		EUnitClass unitTexture = KNIGHT_LORD;
 	};
 
 	uint32_t mRoadIndeces[47] =
@@ -219,8 +222,9 @@ private:
 
 	uint32_t millisecondsPreviousFrame;
 
+	// Editor Variables
 	EEditorState mEditorState = EDITING_MAP;
-	ESelectedTool mSelectedTool = PAINT_UNIT_TOOL;
+	ESelectedTool mSelectedTool = PAINT_TILE_TOOL;
 
 	bool mMouseButtonDown = false;
 	bool mShowOverlay = false;
@@ -237,6 +241,10 @@ private:
 	int mSelectedUnitClassIndex = 0;
 	AnimatedUnitSprite mSelectedUnitSprite;
 	EUnitClass mSelectedUnit = KNIGHT_LORD;
+	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
+	std::vector<int> mLoadedUnits;
+	std::vector<int> mLoadedUnitsXPositions;
+	std::vector<int> mLoadedUnitsYPositions;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;

@@ -485,6 +485,16 @@ void MapEditorScene::DrawGUI()
 				else mEditorState = EDITING_MAP;
 			}
 
+			if (ImGui::Button("Save Units"))
+			{
+				SaveUnits();
+			}
+
+			if (ImGui::Button("Load Units"))
+			{
+				LoadUnits();
+			}
+
 			static int selectedUnitClassIndex = mSelectedUnit;
 			const char* classes[] =
 			{
@@ -522,16 +532,20 @@ void MapEditorScene::DrawGUI()
 				InitMap();
 				mShowOverlay = false;
 				mShowSelection = false;
+
+				mAnimatedUnitSprites.clear();
 			}
 
 			if (ImGui::Button("Save Map"))
 			{
 				SaveMap();
+				SaveUnits();
 			}
 
 			if (ImGui::Button("Load Map"))
 			{
 				LoadMap();
+				LoadUnits();
 			}
 		}
 	}
@@ -581,7 +595,6 @@ void MapEditorScene::InitMap()
 			for (uint32_t x = 0; x < mMapWidth; x++)
 			{
 				mMapSpriteIndeces[x][y] = mLoadedSpriteIndeces[x + y * mMapWidth];
-				//SetMapSquareTerrainType(x, y);
 			}
 		}
 
@@ -778,6 +791,90 @@ void MapEditorScene::RemoveUnit(Vec2D position)
 			return;
 		}
 	}
+}
+
+void MapEditorScene::SaveUnits()
+{
+	std::string unitsPath = "./Assets/UnitsSaveFile.txt";
+	std::ifstream unitsInFile;
+	unitsInFile.open(unitsPath);
+	if (unitsInFile.is_open())
+	{
+		unitsInFile.close();
+		std::remove(unitsPath.c_str());
+	}
+
+	std::ofstream unitOutFile;
+	unitOutFile.open(unitsPath);
+	if (unitOutFile.is_open())
+	{
+		for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+		{
+			unitOutFile << ":unit " + std::to_string(sprite.unitTexture) << std::endl;
+			unitOutFile << ":x " + std::to_string(static_cast<int>(sprite.position.GetX())) << std::endl;
+			unitOutFile << ":y " + std::to_string(static_cast<int>(sprite.position.GetY())) << std::endl << std::endl;
+		}
+	}
+	unitOutFile.close();
+}
+
+void MapEditorScene::LoadUnits()
+{
+	std::string unitsFilePath = "./Assets/UnitsSaveFile.txt";
+	std::ifstream unitsInFile;
+	unitsInFile.open(unitsFilePath);
+	if (unitsInFile.is_open())
+	{
+		FileCommandLoader fileLoader;
+
+		Command unitTypeCommand;
+		unitTypeCommand.command = "unit";
+		unitTypeCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnits.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitTypeCommand);
+
+		Command unitXPositionCommand;
+		unitXPositionCommand.command = "x";
+		unitXPositionCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsXPositions.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitXPositionCommand);
+
+		Command unitYPositionCommand;
+		unitYPositionCommand.command = "y";
+		unitYPositionCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsYPositions.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitYPositionCommand);
+
+		fileLoader.LoadFile(unitsFilePath);
+	}
+
+	unitsInFile.close();
+
+	InitUnits();
+}
+
+void MapEditorScene::InitUnits()
+{
+	mAnimatedUnitSprites.clear();
+
+	AnimatedUnitSprite newUnit;
+	for (int i = 0; i < mLoadedUnits.size(); i++)
+	{
+		newUnit.unitTexture = static_cast<EUnitClass>(mLoadedUnits[i]);
+		newUnit.position = { static_cast<float>(mLoadedUnitsXPositions[i]), static_cast<float>(mLoadedUnitsYPositions[i]) };
+		newUnit.startTime = SDL_GetTicks();
+		mAnimatedUnitSprites.push_back(newUnit);
+	}
+
+	mLoadedUnits.clear();
+	mLoadedUnitsXPositions.clear();
+	mLoadedUnitsYPositions.clear();
 }
 
 void MapEditorScene::SetSelectionRect()
@@ -982,37 +1079,36 @@ void MapEditorScene::MoveSelectionRight()
 
 void MapEditorScene::SaveMap()
 {
-	std::string path = "./Assets/testExport.txt";
-	std::ifstream testFile;
-	testFile.open(path);
-	if (testFile.is_open())
+	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::ifstream tileMapInFile;
+	tileMapInFile.open(tileMapPath);
+	if (tileMapInFile.is_open())
 	{
-		testFile.close();
-		std::remove(path.c_str());
+		tileMapInFile.close();
+		std::remove(tileMapPath.c_str());
 	}
 
-	std::ofstream test;
-	test.open(path);
-	if (test.is_open())
+	std::ofstream tileMapOutFile;
+	tileMapOutFile.open(tileMapPath);
+	if (tileMapOutFile.is_open())
 	{
-		test << ":width " + std::to_string(mMapWidth) << std::endl;
-		test << ":height " + std::to_string(mMapHeight) << std::endl;
+		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
+		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
 
 		for (int y = 0; y < mMapHeight; y++)
 		{
 			for (int x = 0; x < mMapWidth; x++)
 			{
-				test << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
+				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
 			}
 		}
 	}
-
-	test.close();
+	tileMapOutFile.close();
 }
 
 void MapEditorScene::LoadMap()
 {
-	std::string path = "./Assets/testExport.txt";
+	std::string path = "./Assets/MapSaveFile.txt";
 	std::ifstream testFile;
 	testFile.open(path);
 	if (testFile.is_open())
