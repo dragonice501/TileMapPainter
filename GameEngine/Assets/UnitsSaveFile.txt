@@ -1,0 +1,65 @@
+:unit 2
+:x 120
+:y 220
+:level 1
+:hp 3
+:strength 4
+:magic 1
+:skill 1
+:speed 3
+:luck 1
+:defense 1
+:modifier 1
+
+:unit 0
+:x 122
+:y 222
+:level 1
+:hp 3
+:strength 2
+:magic 1
+:skill 1
+:speed 3
+:luck 6
+:defense 1
+:modifier 1
+
+:unit 1
+:x 119
+:y 222
+:level 1
+:hp 3
+:strength 2
+:magic 1
+:skill 1
+:speed 3
+:luck 6
+:defense 1
+:modifier 1
+
+:unit 3
+:x 123
+:y 219
+:level 1
+:hp 3
+:strength 2
+:magic 1
+:skill 1
+:speed 3
+:luck 6
+:defense 1
+:modifier 1
+
+:unit 4
+:x 120
+:y 218
+:level 1
+:hp 3
+:strength 2
+:magic 1
+:skill 1
+:speed 3
+:luck 6
+:defense 1
+:modifier 1
+

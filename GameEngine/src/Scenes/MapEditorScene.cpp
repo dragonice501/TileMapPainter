@@ -27,7 +27,7 @@ MapEditorScene::~MapEditorScene()
 
 }
 
-bool MapEditorScene::Init(SDL_Renderer* renderer, std::unique_ptr<Registry>& registry, std::unique_ptr<AssetStore>& assetStore)
+bool MapEditorScene::Init(SDL_Renderer* renderer)
 {
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(renderer, static_cast<int>(Application::GetWindowWidth()), static_cast<int>(Application::GetWindowHeight()));
@@ -156,28 +156,28 @@ void MapEditorScene::Input()
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_UP)
 			{
-				if (mSelectedTool == SELECT_TOOL)
+				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionUp();
 				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
 			{
-				if (mSelectedTool == SELECT_TOOL)
+				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionRight();
 				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
 			{
-				if (mSelectedTool == SELECT_TOOL)
+				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionLeft();
 				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
 			{
-				if (mSelectedTool == SELECT_TOOL)
+				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionDown();
 				}
@@ -202,11 +202,11 @@ void MapEditorScene::Input()
 							//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
 							break;
 						case PAINT_UNIT_TOOL:
-							PaintUnit(GetCursorMapRect());
+							if(mSelectedUnit != NONE) PaintUnit(GetCursorMapRect());
 							break;
 						case PAN_TOOL:
 							break;
-						case SELECT_TOOL:
+						case SELECT_TILE_TOOL:
 							mSelectionRectStart = GetCursorMapRect();
 							break;
 						default:
@@ -234,7 +234,7 @@ void MapEditorScene::Input()
 						break;
 					case PAN_TOOL:
 						break;
-					case SELECT_TOOL:
+					case SELECT_TILE_TOOL:
 						mShowSelection = false;
 						break;
 					default:
@@ -246,7 +246,7 @@ void MapEditorScene::Input()
 		case SDL_MOUSEBUTTONUP:
 		{
 			mMouseButtonDown = false;
-			if (mSelectedTool == SELECT_TOOL)
+			if (mSelectedTool == SELECT_TILE_TOOL)
 			{
 				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 				{
@@ -275,7 +275,7 @@ void MapEditorScene::Input()
 					mMapYOffset += sdlEvent.motion.yrel;
 					SetMapRectPositions();
 					break;
-				case SELECT_TOOL:
+				case SELECT_TILE_TOOL:
 					break;
 				default:
 					break;
@@ -425,32 +425,6 @@ void MapEditorScene::DrawGUI()
 			Vec2D cursorRect = GetCursorMapRect();
 			ImGui::Text("Mouse coordinates (x=%.1f, y=%.1f)", static_cast<float>(mCursorPosition.GetX()), static_cast<float>(mCursorPosition.GetY()));
 			ImGui::Text("Map coordinates (x=%.1f, y=%.1f)", static_cast<float>(cursorRect.GetX()), static_cast<float>(cursorRect.GetY()));
-			if (ImGui::SliderFloat("Zoom", &zoomLevel, 0.1f, 3.0f))
-			{
-				mMouseButtonDown = false;
-				mMapZoom = zoomLevel;
-				SetMapRectPositions();
-			}
-			if (ImGui::Button("Reset Zoom"))
-			{
-				zoomLevel = 1;
-				mMapZoom = zoomLevel;
-				SetMapRectPositions();
-			}
-			if (ImGui::Button("Recenter Map"))
-			{
-				mMapXOffset = 0;
-				mMapYOffset = 0;
-				SetMapRectPositions();
-			}
-			if (ImGui::Button("Show Overlay"))
-			{
-				mShowOverlay = !mShowOverlay;
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Input/Output", ImGuiTreeNodeFlags_DefaultOpen))
-		{
 			if (ImGui::Button("New Map"))
 			{
 				InitMap();
@@ -473,8 +447,44 @@ void MapEditorScene::DrawGUI()
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Map Tools", ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			if (ImGui::SliderFloat("Zoom", &zoomLevel, 0.1f, 3.0f))
+			{
+				mMouseButtonDown = false;
+				mMapZoom = zoomLevel;
+				SetMapRectPositions();
+			}
+			if (ImGui::Button("Reset Zoom"))
+			{
+				zoomLevel = 1;
+				mMapZoom = zoomLevel;
+				SetMapRectPositions();
+			}
+			if (ImGui::Button("Recenter Map"))
+			{
+				mMapXOffset = 0;
+				mMapYOffset = 0;
+				SetMapRectPositions();
+			}
+			if (ImGui::Button("Pan"))
+			{
+				mSelectedTool = PAN_TOOL;
+				mShowSelection = false;
+			}
+			if (ImGui::Button("Show Overlay"))
+			{
+				mShowOverlay = !mShowOverlay;
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Tile Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Tile Map"))
+			{
+				if (mEditorState == EDITING_MAP) mEditorState = SELECTING_SPRITE;
+				else mEditorState = EDITING_MAP;
+			}
 			if (ImGui::Button("Paint Tile"))
 			{
 				mSelectedTool = PAINT_TILE_TOOL;
@@ -484,44 +494,23 @@ void MapEditorScene::DrawGUI()
 			{
 				mSelectedTool = FILL_TILE_TOOL;
 			}
+			if (ImGui::Button("Select Tile"))
+			{
+				mSelectedTool = SELECT_TILE_TOOL;
+				mShowSelection = true;
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Unit Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		{
 			if (ImGui::Button("Paint Unit"))
 			{
 				mSelectedTool = PAINT_UNIT_TOOL;
 				mShowSelection = false;
 			}
-			if (ImGui::Button("Pan"))
-			{
-				mSelectedTool = PAN_TOOL;
-				mShowSelection = false;
-			}
-			if (ImGui::Button("Select"))
-			{
-				mSelectedTool = SELECT_TOOL;
-				mShowSelection = true;
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Tiles/Units", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			if (ImGui::Button("Tile Map"))
-			{
-				if (mEditorState == EDITING_MAP) mEditorState = SELECTING_SPRITE;
-				else mEditorState = EDITING_MAP;
-			}
-
-			if (ImGui::Button("Save Units"))
-			{
-				SaveUnits();
-			}
-
-			if (ImGui::Button("Load Units"))
-			{
-				LoadUnits();
-			}
-
 			if (ImGui::Button("Reset Stats"))
 			{
-				mSelectedUnit = KNIGHT_LORD;
+				mSelectedUnit = NONE;
 				mNewUnitLevel = 1;
 				mNewUnitHP = 1;
 				mNewUnitStrength = 1;
@@ -530,13 +519,13 @@ void MapEditorScene::DrawGUI()
 				mNewUnitSpeed = 1;
 				mNewUnitLuck = 1;
 				mNewUnitDefense = 1;
-				mNewUnitModifier = 1;
+				mNewUnitMovement = 1;
 			}
 
 			static int selectedUnitClassIndex = mSelectedUnit;
 			const char* classes[] =
 			{
-				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour"
+				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour", "None"
 			};
 			if (ImGui::Combo("Class", &selectedUnitClassIndex, classes, IM_ARRAYSIZE(classes)))
 			{
@@ -551,7 +540,7 @@ void MapEditorScene::DrawGUI()
 			mSelectedPaintUnit.speed = mNewUnitSpeed;
 			mSelectedPaintUnit.luck = mNewUnitLuck;
 			mSelectedPaintUnit.defense = mNewUnitDefense;
-			mSelectedPaintUnit.modifier = mNewUnitModifier;
+			mSelectedPaintUnit.movement = mNewUnitMovement;
 			
 			ImGui::InputInt("Level", &mNewUnitLevel);
 			ImGui::InputInt("HP", &mNewUnitHP);
@@ -561,9 +550,9 @@ void MapEditorScene::DrawGUI()
 			ImGui::InputInt("Speed", &mNewUnitSpeed);
 			ImGui::InputInt("Luck", &mNewUnitLuck);
 			ImGui::InputInt("Defense", &mNewUnitDefense);
-			ImGui::InputInt("Modifier", &mNewUnitModifier);
+			ImGui::InputInt("Movement", &mNewUnitMovement);
 
-			std::string unitString = "Selected Unit: " + std::to_string(mSelectedMapUnit.unitTexture);
+			std::string unitString = "Selected Unit: " + GetUnitTypeName(mSelectedMapUnit.unitTexture);
 			std::string levelString = "Selected Unit Level: " + std::to_string(mSelectedMapUnit.level);
 			std::string hpString = "Selected Unit HP: " + std::to_string(mSelectedMapUnit.hp);
 			std::string strengthString = "Selected Unit Strength: " + std::to_string(mSelectedMapUnit.strength);
@@ -572,7 +561,7 @@ void MapEditorScene::DrawGUI()
 			std::string speedString = "Selected Unit Speed: " + std::to_string(mSelectedMapUnit.speed);
 			std::string luckString = "Selected Unit Luck: " + std::to_string(mSelectedMapUnit.luck);
 			std::string defenseString = "Selected Unit Defense: " + std::to_string(mSelectedMapUnit.defense);
-			std::string modifierString = "Selected Unit Modifier: " + std::to_string(mSelectedMapUnit.modifier);
+			std::string modifierString = "Selected Unit Movement: " + std::to_string(mSelectedMapUnit.movement);
 
 			ImGui::Text(unitString.c_str());
 			ImGui::Text(levelString.c_str());
@@ -783,7 +772,7 @@ void MapEditorScene::PaintUnit(Vec2D position)
 					mNewUnitSpeed = mSelectedMapUnit.speed;
 					mNewUnitLuck = mSelectedMapUnit.luck;
 					mNewUnitDefense = mSelectedMapUnit.defense;
-					mNewUnitModifier = mSelectedMapUnit.modifier;
+					mNewUnitMovement = mSelectedMapUnit.movement;
 				}
 				return;
 			}
@@ -802,7 +791,7 @@ void MapEditorScene::PaintUnit(Vec2D position)
 	animatedUnitSprite.speed = mNewUnitSpeed;
 	animatedUnitSprite.luck = mNewUnitLuck;
 	animatedUnitSprite.defense = mNewUnitDefense;
-	animatedUnitSprite.modifier = mNewUnitModifier;
+	animatedUnitSprite.movement = mNewUnitMovement;
 
 	mSelectedMapUnit = animatedUnitSprite;
 
@@ -829,6 +818,9 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 		break;
 	case SWORD_ARMOUR:
 		mSelectedUnit = SWORD_ARMOUR;
+		break;
+	case NONE:
+		mSelectedUnit = NONE;
 		break;
 	default:
 		break;
@@ -881,7 +873,7 @@ void MapEditorScene::SaveUnits()
 			unitOutFile << ":speed " + std::to_string(static_cast<int>(uint.speed)) << std::endl;
 			unitOutFile << ":luck " + std::to_string(static_cast<int>(uint.luck)) << std::endl;
 			unitOutFile << ":defense " + std::to_string(static_cast<int>(uint.defense)) << std::endl;
-			unitOutFile << ":modifier " + std::to_string(static_cast<int>(uint.modifier)) << std::endl << std::endl;
+			unitOutFile << ":modifier " + std::to_string(static_cast<int>(uint.movement)) << std::endl << std::endl;
 		}
 	}
 	unitOutFile.close();
@@ -1010,7 +1002,7 @@ void MapEditorScene::InitUnits()
 		newUnit.speed = mLoadedUnitsSpeed[i];
 		newUnit.luck = mLoadedUnitsLuck[i];
 		newUnit.defense = mLoadedUnitsDefense[i];
-		newUnit.modifier = mLoadedUnitsModifier[i];
+		newUnit.movement = mLoadedUnitsModifier[i];
 
 		mAnimatedUnitSprites.push_back(newUnit);
 	}
@@ -1026,6 +1018,36 @@ void MapEditorScene::InitUnits()
 	mLoadedUnitsLuck.clear();
 	mLoadedUnitsDefense.clear();
 	mLoadedUnitsModifier.clear();
+}
+
+std::string MapEditorScene::GetUnitTypeName(EUnitClass unit)
+{
+	switch (unit)
+	{
+	case BOW_FIGHTER:
+		return "Bow Fighter";
+		break;
+	case DANCER:
+		return "Dancer";
+		break;
+	case KNIGHT_LORD:
+		return "Knight Lord";
+		break;
+	case MAGE:
+		return "Mage";
+		break;
+	case SWORD_ARMOUR:
+		return "Sword Armour";
+		break;
+	case NONE:
+		return "";
+		break;
+	default:
+		return "";
+		break;
+	}
+
+	return "";
 }
 
 void MapEditorScene::SetSelectionRect()

@@ -12,11 +12,12 @@ enum EEditorState
 
 enum ESelectedTool
 {
+	PAN_TOOL,
 	PAINT_TILE_TOOL,
 	FILL_TILE_TOOL,
+	SELECT_TILE_TOOL,
 	PAINT_UNIT_TOOL,
-	PAN_TOOL,
-	SELECT_TOOL
+	SELECT_TILE_TOL
 };
 
 enum ETerrainType
@@ -49,6 +50,7 @@ enum EUnitClass
 	KNIGHT_LORD,
 	MAGE,
 	SWORD_ARMOUR,
+	NONE
 };
 
 struct AnimatedUnitSprite
@@ -60,7 +62,7 @@ struct AnimatedUnitSprite
 	uint8_t currentFrame = 0;
 	uint32_t startTime = 0;
 	Vec2D position = Vec2D::Zero;
-	EUnitClass unitTexture = BOW_FIGHTER;
+	EUnitClass unitTexture = NONE;
 
 	uint8_t level = 1;
 	uint8_t hp = 1;
@@ -70,7 +72,7 @@ struct AnimatedUnitSprite
 	uint8_t speed = 1;
 	uint8_t luck = 1;
 	uint8_t defense = 1;
-	uint8_t modifier = 1;
+	uint8_t movement = 1;
 
 	bool operator!= (const AnimatedUnitSprite& other)
 	{
@@ -84,7 +86,7 @@ struct AnimatedUnitSprite
 			speed != other.speed ||
 			luck != other.luck ||
 			defense != other.defense ||
-			modifier != other.modifier;
+			movement != other.movement;
 	}
 	bool operator== (const AnimatedUnitSprite& other)
 	{
@@ -98,7 +100,7 @@ struct AnimatedUnitSprite
 			speed == other.speed &&
 			luck == other.luck &&
 			defense == other.defense &&
-			modifier == other.modifier;
+			movement == other.movement;
 	}
 };
 

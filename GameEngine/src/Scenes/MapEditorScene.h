@@ -15,7 +15,7 @@ public:
 	MapEditorScene();
 	~MapEditorScene();
 
-	bool Init(SDL_Renderer* renderer, std::unique_ptr<Registry>& registry, std::unique_ptr<AssetStore>& assetStore);
+	bool Init(SDL_Renderer* renderer);
 	void Destroy();
 
 	void Setup(SDL_Renderer* renderer);
@@ -49,6 +49,7 @@ public:
 	void SaveUnits();
 	void LoadUnits();
 	void InitUnits();
+	std::string GetUnitTypeName(EUnitClass unit);
 
 	// Select Functions
 	void SetSelectionRect();
@@ -67,8 +68,6 @@ private:
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 
-	std::unique_ptr<Registry> mRegistry;
-
 	uint32_t mWindowWidth = 1024;
 	uint32_t mWindowHeight = 1024;
 
@@ -76,7 +75,7 @@ private:
 
 	// Editor Variables
 	EEditorState mEditorState = EDITING_MAP;
-	ESelectedTool mSelectedTool = PAINT_TILE_TOOL;
+	ESelectedTool mSelectedTool = PAN_TOOL;
 
 	bool mMouseButtonDown = false;
 	bool mShowOverlay = false;
@@ -93,7 +92,7 @@ private:
 	int mSelectedUnitClassIndex = 0;
 	AnimatedUnitSprite mSelectedPaintUnit;
 	AnimatedUnitSprite mSelectedMapUnit;
-	EUnitClass mSelectedUnit = KNIGHT_LORD;
+	EUnitClass mSelectedUnit = NONE;
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
 	std::vector<int> mLoadedUnits;
 	std::vector<int> mLoadedUnitsXPositions;
@@ -115,7 +114,7 @@ private:
 	int mNewUnitSpeed = 1;
 	int mNewUnitLuck = 1;
 	int mNewUnitDefense = 1;
-	int mNewUnitModifier = 1;
+	int mNewUnitMovement = 1;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;
