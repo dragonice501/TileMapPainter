@@ -67,27 +67,8 @@ void MapEditorScene::Destroy()
 
 void MapEditorScene::Setup(SDL_Renderer* renderer)
 {
-	mMapRects = new SDL_Rect*[mMapWidth];
-	mMapSpriteIndeces = new uint16_t* [mMapWidth];
-	for (uint16_t i = 0; i < mMapWidth; i++)
-	{
-		mMapRects[i] = new SDL_Rect[mMapHeight];
-		mMapSpriteIndeces[i] = new uint16_t[mMapHeight];
-	}
-
-	SetMapRectPositions();
-	SetMapSpriteIndeces();
-
-	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
-	{
-		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
-		{
-			Vec2D position = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - (TILE_MAP_WIDTH * SQUARE_RENDER_SIZE) / 2 + x * SQUARE_RENDER_SIZE)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - (TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2 + y * SQUARE_RENDER_SIZE)) };
-			mSpriteSheetRects[x][y] = new SDL_Rect{ static_cast<int>(position.GetX()),static_cast<int>(position.GetY()), SQUARE_RENDER_SIZE, SQUARE_RENDER_SIZE };
-		}
-	}
+	InitMap();
+	InitSpriteSheet();
 
 	SDL_Surface* surface = IMG_Load("./Assets/Chapter_0_m.png");
 	mSpriteSheet = SDL_CreateTextureFromSurface(renderer, surface);
@@ -623,14 +604,17 @@ void MapEditorScene::InitMap()
 {
 	mMapRects = new SDL_Rect * [mMapWidth];
 	mMapSpriteIndeces = new uint16_t * [mMapWidth];
+	mMapTerrainIndeces = new ETerrainType * [mMapWidth];
 	for (uint16_t i = 0; i < mMapWidth; i++)
 	{
 		mMapRects[i] = new SDL_Rect[mMapHeight];
 		mMapSpriteIndeces[i] = new uint16_t[mMapHeight];
+		mMapTerrainIndeces[i] = new ETerrainType[mMapHeight];
 	}
 
 	SetMapRectPositions();
 	SetMapSpriteIndeces();
+	SetMapTerrainIndeces();
 
 	if (mLoadedSpriteIndeces.size() > 0)
 	{
@@ -676,6 +660,127 @@ void MapEditorScene::SetMapSpriteIndeces()
 	}
 }
 
+void MapEditorScene::SetMapTerrainIndeces()
+{
+	for (uint16_t y = 0; y < mMapHeight; y++)
+	{
+		for (uint16_t x = 0; x < mMapWidth; x++)
+		{
+			mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
+
+			switch (mMapTerrainIndeces[x][y])
+			{
+			case ROAD:
+				std::cout << "Road" << std::endl;
+				break;
+			case BRIDGE:
+				break;
+			case PLAIN:
+				std::cout << "Plain" << std::endl;
+				break;
+			case SAND:
+				break;
+			case RUINS:
+				break;
+			case FOREST:
+				std::cout << "Forest" << std::endl;
+				break;
+			case THICKET:
+				break;
+			case MOUNTAIN:
+				std::cout << "Mountain" << std::endl;
+				break;
+			case PEAK:
+				break;
+			case CLIFF:
+				break;
+			case SEA:
+				std::cout << "Sea" << std::endl;
+				break;
+			case RIVER:
+				std::cout << "River" << std::endl;
+				break;
+			case DESERT:
+				break;
+			case VILLAGE:
+				std::cout << "Village" << std::endl;
+				break;
+			case CHURCH:
+				break;
+			case BRAGI_TOWER:
+				break;
+			case CASTLE_DEFENSE:
+				break;
+			case CASTLE_WALL:
+				break;
+			case UNDEFINED:
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+ETerrainType MapEditorScene::GetTerrainType(uint16_t mapSpriteIndex)
+{
+	for (const uint16_t& index : mSeaIndeces)
+	{
+		if (mapSpriteIndex == index) return SEA;
+	}
+
+	for (const uint16_t& index : mRiverIndeces)
+	{
+		if (mapSpriteIndex == index) return RIVER;
+	}
+
+	for (const uint16_t& index : mRoadIndeces)
+	{
+		if (mapSpriteIndex == index) return ROAD;
+	}
+
+	for (const uint16_t& index : mPlainIndeces)
+	{
+		if (mapSpriteIndex == index) return PLAIN;
+	}
+
+	for (const uint16_t& index : mForestIndeces)
+	{
+		if (mapSpriteIndex == index) return FOREST;
+	}
+
+	for (const uint16_t& index : mMountainIndeces)
+	{
+		if (mapSpriteIndex == index) return MOUNTAIN;
+	}
+
+	for (const uint16_t& index : mVillageIndeces)
+	{
+		if (mapSpriteIndex == index) return VILLAGE;
+	}
+
+	return UNDEFINED;
+}
+
+void MapEditorScene::InitSpriteSheet()
+{
+	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
+	{
+		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
+		{
+			Vec2D position = {
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((TILE_MAP_WIDTH * SQUARE_RENDER_SIZE) / 2) + x * SQUARE_RENDER_SIZE )),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2) + y * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+			mSpriteSheetRects[x][y] = new SDL_Rect{
+				static_cast<int>(position.GetX()),
+				static_cast<int>(position.GetY()),
+				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE) * mMapZoom),
+				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE) * mMapZoom) };
+		}
+	}
+}
+
 Vec2D MapEditorScene::GetCursorMapRect()
 {
 	for (uint16_t y = 0; y < mMapHeight; y++)
@@ -715,6 +820,7 @@ void MapEditorScene::CheckCursorInSpriteSheet()
 			{
 				mSelectedSpriteIndex = x % TILE_MAP_WIDTH + y * TILE_MAP_WIDTH;
 				mEditorState = EDITING_MAP;
+				std::cout << mSelectedSpriteIndex << ',';
 				return;
 			}
 		}
@@ -1061,7 +1167,8 @@ void MapEditorScene::SelectUnit(Vec2D position)
 				mSelectedMapUnit = sprite;
 				mShowSelectedUnitMovement = true;
 				mMovementPositions.clear();
-				GetMovementPositions(mSelectedMapUnit.position, Vec2D(-1, -1), 5);
+
+				GetMovementPositions(mSelectedMapUnit.position, Vec2D(-1, -1), 2);
 				DeleteMovementPositionCopies();
 				return;
 			}
@@ -1114,6 +1221,60 @@ void MapEditorScene::DeleteMovementPositionCopies()
 
 	mMovementPositions.clear();
 	mMovementPositions = newPositions;
+
+	for (const Vec2D& position : mMovementPositions)
+	{
+		switch (GetTerrainType(mMapTerrainIndeces[static_cast<uint16_t>(position.GetX())][static_cast<uint16_t>(position.GetY())]))
+		{
+		case ROAD:
+			std::cout << "Road" << std::endl;
+			break;
+		case BRIDGE:
+			break;
+		case PLAIN:
+			std::cout << "Plain" << std::endl;
+			break;
+		case SAND:
+			break;
+		case RUINS:
+			break;
+		case FOREST:
+			std::cout << "Forest" << std::endl;
+			break;
+		case THICKET:
+			break;
+		case MOUNTAIN:
+			std::cout << "Mountain" << std::endl;
+			break;
+		case PEAK:
+			break;
+		case CLIFF:
+			break;
+		case SEA:
+			std::cout << "Sea" << std::endl;
+			break;
+		case RIVER:
+			std::cout << "River" << std::endl;
+			break;
+		case DESERT:
+			break;
+		case VILLAGE:
+			std::cout << "Village" << std::endl;
+			break;
+		case CHURCH:
+			break;
+		case BRAGI_TOWER:
+			break;
+		case CASTLE_DEFENSE:
+			break;
+		case CASTLE_WALL:
+			break;
+		case UNDEFINED:
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void MapEditorScene::SetSelectionRect()

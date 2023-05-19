@@ -33,15 +33,24 @@ public:
 	bool TileInsideCamera(uint16_t x, uint16_t y);
 	bool CursorInGUI();
 
+	// Map Functions
 	void InitMap();
 	void SetMapRectPositions();
 	void SetMapSpriteIndeces();
+	void SetMapTerrainIndeces();
+	ETerrainType GetTerrainType(uint16_t mapSpriteIndex);
 
+	// SpriteShet Functions
+	void InitSpriteSheet();
+
+	// Tile Functions
 	Vec2D GetCursorMapRect();
 	void CheckCursorInMap();
 	void CheckCursorInSpriteSheet();
 	bool SquareContainsCursorPosition(const SDL_Rect& rect);
 	void CopyMapRectSprite();
+
+	// Fill Function
 	void FillTile(uint16_t xIndex, uint16_t yIndex);
 
 	// Unit Functions
@@ -151,7 +160,99 @@ private:
 	SDL_Rect** mMapRects;
 	SDL_Rect* mSpriteSheetRects[TILE_MAP_WIDTH][TILE_MAP_HEIGHT];
 	uint16_t** mMapSpriteIndeces;
+	ETerrainType** mMapTerrainIndeces;
 
 	std::vector<uint32_t> mLoadedSpriteIndeces;
+
+	// Terrain Indeces
+	uint16_t mRoadIndeces[47] =
+	{
+		65,66,67,68,69,70,73,75,76,77,78,97,98,99,100,101,102,105,106,108,109,110,130,131,132,133,
+		134,135,136,137,138,139,140,141,142,162,165,166,167,168,170,173,357,358,359,360,363
+	};
+
+	uint16_t mBridgeIndeces[5] =
+	{
+		529,530,531,561,593
+	};
+
+	uint16_t mPlainIndeces[38] =
+	{
+		0,1,2,3,4,6,7,8,9,11,12,28,29,30,31,32,33,33,34,35,36,37,38,39,40,41,62,91,112,140,201,202,204,205,308,
+		309,338,366
+	};
+
+	uint16_t mSandIndeces[10] =
+	{
+		454,455,456,457,458,486,487,488,489,490
+	};
+
+	uint16_t mForestIndeces[16] =
+	{
+		168,169,170,171,172,173,174,175,176,177,196,197,198,199,200,203
+	};
+
+	uint16_t mThicketIndeces[18] =
+	{
+		224,225,226,227,228,229,230,231,232,233,252,253,254,255,256,259,260,261
+	};
+
+	uint16_t mMountainIndeces[58] =
+	{
+		16,17,18,19,23,24,44,45,47,50,51,52,53,54,72,73,74,75,77,78,79,80,101,102,103,105,106,107,108,109,110,
+		111,129,130,134,135,136,138,139,161,162,163,164,165,166,167,189,190,191,192,193,194,217,218,219,221,247,248
+	};
+
+	/*uint16_t mPeakIndeces[] =
+	{
+
+	};*/
+
+	uint16_t mCliffIndeces[38] =
+	{
+		235,236,237,267,268,269,270,299,300,301,302,321,322,323,324,325,326,327,
+		328,329,330,332,355,356,513,514,515,516,517,518,520,521,522,545,549,550,552,555
+	};
+
+	uint16_t mSeaIndeces[4] =
+	{
+		402,403,404,459
+	};
+
+	uint16_t mRiverIndeces[17] =
+	{
+		336,364,365,337,339,367,368,369,341,342,370,371,343,344,372,373,345
+	};
+
+	/*uint16_t mDesertIndeces[] =
+	{
+
+	};*/
+
+	uint16_t mVillageIndeces[3] =
+	{
+		595,596,597
+	};
+
+	uint16_t mChurchIndeces[1] =
+	{
+		594
+	};
+
+	uint16_t mBragiTowerIndeces[3] =
+	{
+		626,658,690
+	};
+
+	uint16_t mCastleDefenseIndeces[4] =
+	{
+		532,533,625,657
+	};
+
+	uint16_t mCastleWallIndeces[35] =
+	{
+		535,536,538,539,566,567,568,569,570,571,598,599,600,601,602,603,662,
+		663,665,666,667,693,694,695,696,697,698,699,725,726,727,728,729,762,763
+	};
 };
 

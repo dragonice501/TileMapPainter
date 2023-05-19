@@ -37,7 +37,7 @@ bool Application::Init()
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	mWindowWidth = displayMode.w;
 	mWindowHeight = displayMode.h;
-	mWindowWidth = 1024;
+	mWindowWidth = 1500;
 	mWindowHeight = 1024;
 
 	mWindow = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mWindowWidth, mWindowHeight, SDL_WINDOW_FOREIGN);
