@@ -195,19 +195,22 @@ void MapEditorScene::Input()
 						Vec2D position = GetCursorMapRect();
 						switch (mSelectedTool)
 						{
+						case PAN_TOOL:
+							break;
 						case PAINT_TILE_TOOL:
 							CheckCursorInMap();
 							break;
 						case FILL_TILE_TOOL:
 							//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
 							break;
-						case PAINT_UNIT_TOOL:
-							if(mSelectedUnit != NONE) PaintUnit(GetCursorMapRect());
-							break;
-						case PAN_TOOL:
-							break;
 						case SELECT_TILE_TOOL:
 							mSelectionRectStart = GetCursorMapRect();
+							break;
+						case PAINT_UNIT_TOOL:
+							if (mSelectedUnit != NONE) PaintUnit(GetCursorMapRect());
+							break;
+						case SELECT_UNIT_TOOL:
+							SelectUnit(GetCursorMapRect());
 							break;
 						default:
 							break;
@@ -223,19 +226,19 @@ void MapEditorScene::Input()
 				{
 					switch (mSelectedTool)
 					{
+					case PAN_TOOL:
+						break;
 					case PAINT_TILE_TOOL:
 						CopyMapRectSprite();
 						break;
 					case FILL_TILE_TOOL:
 						CopyMapRectSprite();
 						break;
+					case SELECT_TILE_TOOL:
+						mShowTileSelection = false;
+						break;
 					case PAINT_UNIT_TOOL:
 						RemoveUnit(GetCursorMapRect());
-						break;
-					case PAN_TOOL:
-						break;
-					case SELECT_TILE_TOOL:
-						mShowSelection = false;
 						break;
 					default:
 						break;
@@ -255,7 +258,7 @@ void MapEditorScene::Input()
 				}
 				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
 				{
-					mShowSelection = false;
+					mShowTileSelection = false;
 				}
 			}
 			break;
@@ -350,7 +353,7 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 		}
 	}
 
-	if (mShowSelection)
+	if (mShowTileSelection)
 	{
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 100);
@@ -429,7 +432,7 @@ void MapEditorScene::DrawGUI()
 			{
 				InitMap();
 				mShowOverlay = false;
-				mShowSelection = false;
+				mShowTileSelection = false;
 
 				mAnimatedUnitSprites.clear();
 			}
@@ -470,7 +473,7 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Pan"))
 			{
 				mSelectedTool = PAN_TOOL;
-				mShowSelection = false;
+				mShowTileSelection = false;
 			}
 			if (ImGui::Button("Show Overlay"))
 			{
@@ -488,7 +491,7 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Paint Tile"))
 			{
 				mSelectedTool = PAINT_TILE_TOOL;
-				mShowSelection = false;
+				mShowTileSelection = false;
 			}
 			if (ImGui::Button("Fill Tile"))
 			{
@@ -497,7 +500,7 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Select Tile"))
 			{
 				mSelectedTool = SELECT_TILE_TOOL;
-				mShowSelection = true;
+				mShowTileSelection = true;
 			}
 		}
 
@@ -506,7 +509,12 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Paint Unit"))
 			{
 				mSelectedTool = PAINT_UNIT_TOOL;
-				mShowSelection = false;
+				mShowTileSelection = false;
+			}
+			if (ImGui::Button("Select Unit"))
+			{
+				mSelectedTool = SELECT_UNIT_TOOL;
+				mShowTileSelection = false;
 			}
 			if (ImGui::Button("Reset Stats"))
 			{
@@ -531,16 +539,6 @@ void MapEditorScene::DrawGUI()
 			{
 				SetSelectedUnitClass(selectedUnitClassIndex);
 			}
-
-			mSelectedPaintUnit.level = mNewUnitLevel;
-			mSelectedPaintUnit.hp = mNewUnitHP;
-			mSelectedPaintUnit.strength = mNewUnitStrength;
-			mSelectedPaintUnit.magic = mNewUnitMagic;
-			mSelectedPaintUnit.skill = mNewUnitSkill;
-			mSelectedPaintUnit.speed = mNewUnitSpeed;
-			mSelectedPaintUnit.luck = mNewUnitLuck;
-			mSelectedPaintUnit.defense = mNewUnitDefense;
-			mSelectedPaintUnit.movement = mNewUnitMovement;
 			
 			ImGui::InputInt("Level", &mNewUnitLevel);
 			ImGui::InputInt("HP", &mNewUnitHP);
@@ -757,23 +755,6 @@ void MapEditorScene::PaintUnit(Vec2D position)
 		{
 			if (sprite.position == position)
 			{
-				if (mSelectedMapUnit != sprite)
-				{
-					mSelectedMapUnit = sprite;
-				}
-				else if (mSelectedMapUnit == sprite)
-				{
-					mSelectedUnit = mSelectedMapUnit.unitTexture;
-					mNewUnitLevel = mSelectedMapUnit.level;
-					mNewUnitHP = mSelectedMapUnit.hp;
-					mNewUnitStrength = mSelectedMapUnit.strength;
-					mNewUnitMagic = mSelectedMapUnit.magic;
-					mNewUnitSkill = mSelectedMapUnit.skill;
-					mNewUnitSpeed = mSelectedMapUnit.speed;
-					mNewUnitLuck = mSelectedMapUnit.luck;
-					mNewUnitDefense = mSelectedMapUnit.defense;
-					mNewUnitMovement = mSelectedMapUnit.movement;
-				}
 				return;
 			}
 		}
@@ -825,9 +806,6 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 	default:
 		break;
 	}
-
-	mSelectedPaintUnit.startTime = SDL_GetTicks();
-	mSelectedPaintUnit.position = GetCursorMapRect();
 }
 
 void MapEditorScene::RemoveUnit(Vec2D position)
@@ -843,6 +821,8 @@ void MapEditorScene::RemoveUnit(Vec2D position)
 			return;
 		}
 	}
+
+	mSelectedMapUnit = AnimatedUnitSprite();
 }
 
 void MapEditorScene::SaveUnits()
@@ -1050,6 +1030,24 @@ std::string MapEditorScene::GetUnitTypeName(EUnitClass unit)
 	return "";
 }
 
+void MapEditorScene::SelectUnit(Vec2D position)
+{
+	for (const AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+	{
+		if (sprite.position == position)
+		{
+			if (mSelectedMapUnit != sprite)
+			{
+				mSelectedMapUnit = sprite;
+				return;
+			}
+			else if (mSelectedMapUnit == sprite) return;
+		}
+	}
+
+	mSelectedMapUnit = AnimatedUnitSprite();
+}
+
 void MapEditorScene::SetSelectionRect()
 {
 	if (mSelectionRectEnd == mSelectionRectStart)
@@ -1073,7 +1071,7 @@ void MapEditorScene::SetSelectionRect()
 			SQUARE_RENDER_SIZE
 		};
 
-		mShowSelection = true;
+		mShowTileSelection = true;
 		return;
 	}
 
@@ -1097,7 +1095,7 @@ void MapEditorScene::SetSelectionRect()
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
 		};
-		mShowSelection = true;
+		mShowTileSelection = true;
 		return;
 	}
 	else if (mSelectionRectStart.GetX() < mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() > mSelectionRectEnd.GetY())
@@ -1120,7 +1118,7 @@ void MapEditorScene::SetSelectionRect()
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
 		};
-		mShowSelection = true;
+		mShowTileSelection = true;
 		return;
 	}
 	else if (mSelectionRectStart.GetX() > mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() > mSelectionRectEnd.GetY())
@@ -1143,7 +1141,7 @@ void MapEditorScene::SetSelectionRect()
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
 		};
-		mShowSelection = true;
+		mShowTileSelection = true;
 		return;
 	}
 	else if (mSelectionRectStart.GetX() > mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() < mSelectionRectEnd.GetY())
@@ -1166,11 +1164,11 @@ void MapEditorScene::SetSelectionRect()
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
 			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
 		};
-		mShowSelection = true;
+		mShowTileSelection = true;
 		return;
 	}
 
-	mShowSelection = false;
+	mShowTileSelection = false;
 	return;
 }
 

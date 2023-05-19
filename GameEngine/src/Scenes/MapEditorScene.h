@@ -50,6 +50,8 @@ public:
 	void LoadUnits();
 	void InitUnits();
 	std::string GetUnitTypeName(EUnitClass unit);
+	void SelectUnit(Vec2D position);
+
 
 	// Select Functions
 	void SetSelectionRect();
@@ -90,7 +92,6 @@ private:
 	std::vector<SDL_Texture*> mUnitClassTextures;
 	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
 	int mSelectedUnitClassIndex = 0;
-	AnimatedUnitSprite mSelectedPaintUnit;
 	AnimatedUnitSprite mSelectedMapUnit;
 	EUnitClass mSelectedUnit = NONE;
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
@@ -120,7 +121,7 @@ private:
 	SDL_Rect mSelectionRect;
 	Vec2D mSelectionRectStart;
 	Vec2D mSelectionRectEnd;
-	bool mShowSelection = false;
+	bool mShowTileSelection = false;
 	uint16_t mSelectionXStart;
 	uint16_t mSelectionYStart;
 	uint16_t mSelectionWidth;

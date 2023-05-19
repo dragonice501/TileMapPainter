@@ -17,7 +17,7 @@ enum ESelectedTool
 	FILL_TILE_TOOL,
 	SELECT_TILE_TOOL,
 	PAINT_UNIT_TOOL,
-	SELECT_TILE_TOL
+	SELECT_UNIT_TOOL
 };
 
 enum ETerrainType
@@ -77,6 +77,8 @@ struct AnimatedUnitSprite
 	bool operator!= (const AnimatedUnitSprite& other)
 	{
 		return
+			position.GetX() != other.position.GetX() ||
+			position.GetY() != other.position.GetY() ||
 			unitTexture != other.unitTexture ||
 			level != other.level ||
 			hp != other.hp ||
@@ -91,6 +93,8 @@ struct AnimatedUnitSprite
 	bool operator== (const AnimatedUnitSprite& other)
 	{
 		return
+			position.GetX() == other.position.GetX() &&
+			position.GetY() == other.position.GetY() &&
 			unitTexture == other.unitTexture &&
 			level == other.level &&
 			hp == other.hp &&

@@ -37,8 +37,8 @@ bool Application::Init()
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	mWindowWidth = displayMode.w;
 	mWindowHeight = displayMode.h;
-	/*mWindowWidth = 1024;
-	mWindowHeight = 1024;*/
+	mWindowWidth = 1024;
+	mWindowHeight = 1024;
 
 	mWindow = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mWindowWidth, mWindowHeight, SDL_WINDOW_FOREIGN);
 	if (!mWindow) return false;
@@ -63,28 +63,8 @@ void Application::Run()
 		Render();
 	}*/
 
-	/*ECSMapTest mapTest;
-	mapTest.Init(mRegistry, mAssetStore, mRenderer);
-
-	while (mapTest.IsRunning())
-	{
-		uint32_t timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - millisecondsPreviousFrame);
-		if (timeToWait > 0 && timeToWait <= millisecondsPreviousFrame)
-		{
-			SDL_Delay(timeToWait);
-		}
-
-		double deltaTime = (SDL_GetTicks() - millisecondsPreviousFrame) / 1000.0;
-
-		millisecondsPreviousFrame = SDL_GetTicks();
-
-		mapTest.Input(mRegistry);
-		mapTest.Update(mRegistry, deltaTime);
-		mapTest.Render(mRegistry, mAssetStore, mRenderer);
-	}*/
-
 	MapEditorScene mMapEditorScene;
-	mMapEditorScene.Init(mRenderer, mRegistry, mAssetStore);
+	mMapEditorScene.Init(mRenderer);
 
 	while (mMapEditorScene.mIsRunning)
 	{
