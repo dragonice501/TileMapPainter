@@ -315,6 +315,10 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 	{
 	case EDITING_MAP:
 		DrawMap(renderer);
+		if (mShowSelectedUnitMovement)
+		{
+			DrawSelectUnitMovement(renderer);
+		}
 		if (mAnimatedUnitSprites.size() > 0)
 		{
 			DrawAnimatedSprites(renderer);
@@ -408,6 +412,22 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
 
 		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
+	}
+}
+
+void MapEditorScene::DrawSelectUnitMovement(SDL_Renderer* renderer)
+{
+	for (const Vec2D& position : mMovementPositions)
+	{
+		Vec2D drawPosition = {
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE, SQUARE_RENDER_SIZE };
+
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
+		SDL_RenderFillRect(renderer, &rect);
 	}
 }
 
@@ -1039,13 +1059,61 @@ void MapEditorScene::SelectUnit(Vec2D position)
 			if (mSelectedMapUnit != sprite)
 			{
 				mSelectedMapUnit = sprite;
+				mShowSelectedUnitMovement = true;
+				mMovementPositions.clear();
+				GetMovementPositions(mSelectedMapUnit.position, Vec2D(-1, -1), 5);
+				DeleteMovementPositionCopies();
 				return;
 			}
 			else if (mSelectedMapUnit == sprite) return;
 		}
 	}
 
+	mMovementPositions.clear();
+	mShowSelectedUnitMovement = false;
 	mSelectedMapUnit = AnimatedUnitSprite();
+}
+
+void MapEditorScene::GetMovementPositions(const Vec2D& newPosition, const Vec2D& oldPosition, float movement)
+{
+	if (newPosition == oldPosition) return;
+
+	mMovementPositions.push_back(newPosition);
+
+	if (movement > 0)
+	{
+		GetMovementPositions(newPosition + Vec2D(0, -1), newPosition, movement - 1);
+		GetMovementPositions(newPosition + Vec2D(0, 1), newPosition, movement - 1);
+		GetMovementPositions(newPosition + Vec2D(1, 0), newPosition, movement - 1);
+		GetMovementPositions(newPosition + Vec2D(-1, 0), newPosition, movement - 1);
+	}
+}
+
+void MapEditorScene::DeleteMovementPositionCopies()
+{
+	bool contains = false;
+	std::vector<Vec2D> newPositions;
+	for (int i = 0; i < mMovementPositions.size(); i++)
+	{
+		for (const Vec2D& position : newPositions)
+		{
+			if (position == mMovementPositions[i])
+			{
+				contains = true;
+				break;
+			}
+		}
+
+		if (!contains)
+		{
+			newPositions.push_back(mMovementPositions[i]);
+		}
+
+		contains = false;
+	}
+
+	mMovementPositions.clear();
+	mMovementPositions = newPositions;
 }
 
 void MapEditorScene::SetSelectionRect()

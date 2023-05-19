@@ -27,7 +27,9 @@ public:
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
+	void DrawSelectUnitMovement(SDL_Renderer* renderer);
 	void DrawGUI();
+
 	bool TileInsideCamera(uint16_t x, uint16_t y);
 	bool CursorInGUI();
 
@@ -51,7 +53,8 @@ public:
 	void InitUnits();
 	std::string GetUnitTypeName(EUnitClass unit);
 	void SelectUnit(Vec2D position);
-
+	void GetMovementPositions(const Vec2D& newPosition, const Vec2D& oldPosition, float movement);
+	void DeleteMovementPositionCopies();
 
 	// Select Functions
 	void SetSelectionRect();
@@ -94,6 +97,7 @@ private:
 	int mSelectedUnitClassIndex = 0;
 	AnimatedUnitSprite mSelectedMapUnit;
 	EUnitClass mSelectedUnit = NONE;
+	bool mShowSelectedUnitMovement = false;
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
 	std::vector<int> mLoadedUnits;
 	std::vector<int> mLoadedUnitsXPositions;
@@ -116,6 +120,8 @@ private:
 	int mNewUnitLuck = 1;
 	int mNewUnitDefense = 1;
 	int mNewUnitMovement = 1;
+
+	std::vector<Vec2D> mMovementPositions;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;
