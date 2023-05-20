@@ -617,19 +617,6 @@ void MapEditorScene::InitMap()
 	SetMapRectPositions();
 	SetMapSpriteIndeces();
 	SetMapTerrainIndeces();
-
-	if (mLoadedSpriteIndeces.size() > 0)
-	{
-		for (uint32_t y = 0; y < mMapHeight; y++)
-		{
-			for (uint32_t x = 0; x < mMapWidth; x++)
-			{
-				mMapSpriteIndeces[x][y] = mLoadedSpriteIndeces[x + y * mMapWidth];
-			}
-		}
-
-		mLoadedSpriteIndeces.clear();
-	}
 }
 
 void MapEditorScene::SetMapRectPositions()
@@ -653,11 +640,26 @@ void MapEditorScene::SetMapRectPositions()
 
 void MapEditorScene::SetMapSpriteIndeces()
 {
-	for (uint16_t y = 0; y < mMapHeight; y++)
+	if (mLoadedSpriteIndeces.size() > 0)
 	{
-		for (uint16_t x = 0; x < mMapWidth; x++)
+		for (uint32_t y = 0; y < mMapHeight; y++)
 		{
-			mMapSpriteIndeces[x][y] = 0;
+			for (uint32_t x = 0; x < mMapWidth; x++)
+			{
+				mMapSpriteIndeces[x][y] = mLoadedSpriteIndeces[x + y * mMapWidth];
+			}
+		}
+
+		mLoadedSpriteIndeces.clear();
+	}
+	else
+	{
+		for (uint16_t y = 0; y < mMapHeight; y++)
+		{
+			for (uint16_t x = 0; x < mMapWidth; x++)
+			{
+				mMapSpriteIndeces[x][y] = 0;
+			}
 		}
 	}
 }
@@ -668,60 +670,12 @@ void MapEditorScene::SetMapTerrainIndeces()
 	{
 		for (uint16_t x = 0; x < mMapWidth; x++)
 		{
-			std::cout << static_cast<int>(x) << ',' << static_cast<int>(y) << ' ';
 			mMapTerrainIndeces[x][y] = GetTerrainType(static_cast<uint32_t>(mMapSpriteIndeces[x][y]));
-
-			switch (GetTerrainType(mMapSpriteIndeces[x][y]))
+			/*if (x >= 111 && x <= 131 && y >= 210 && y <= 213)
 			{
-			case ROAD:
-				std::cout << "ROAD" << std::endl;
-				break;
-			case BRIDGE:
-				break;
-			case PLAIN:
-				std::cout << "ROAD" << std::endl;
-				break;
-			case SAND:
-				break;
-			case RUINS:
-				break;
-			case FOREST:
-				std::cout << "FOREST" << std::endl;
-				break;
-			case THICKET:
-				break;
-			case MOUNTAIN:
-				std::cout << "MOUNTAIN" << std::endl;
-				break;
-			case PEAK:
-				break;
-			case CLIFF:
-				break;
-			case SEA:
-				std::cout << "SEA" << std::endl;
-				break;
-			case RIVER:
-				std::cout << "RIVER" << std::endl;
-				break;
-			case DESERT:
-				break;
-			case VILLAGE:
-				std::cout << "VILLAGE" << std::endl;
-				break;
-			case CHURCH:
-				break;
-			case BRAGI_TOWER:
-				break;
-			case CASTLE_DEFENSE:
-				std::cout << "CASTLE_DEFENSE" << std::endl;
-				break;
-			case CASTLE_WALL:
-				break;
-			case UNDEFINED:
-				break;
-			default:
-				break;
-			}
+				std::cout << static_cast<int>(x) << ',' << static_cast<int>(y) << ' ';
+				PrintTerrain(mMapTerrainIndeces[x][y]);
+			}*/
 		}
 	}
 }
@@ -761,6 +715,11 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	for (const uint32_t& index : mVillageIndeces)
 	{
 		if (mapSpriteIndex == index) return VILLAGE;
+	}
+
+	for (const uint32_t& index : mCastleDefenseIndeces)
+	{
+		if (mapSpriteIndex == index) return CASTLE_DEFENSE;
 	}
 
 	return UNDEFINED;
@@ -823,7 +782,7 @@ void MapEditorScene::CheckCursorInSpriteSheet()
 			if (SquareContainsCursorPosition(*mSpriteSheetRects[x][y]))
 			{
 				mSelectedSpriteIndex = x % TILE_MAP_WIDTH + y * TILE_MAP_WIDTH;
-				mEditorState = EDITING_MAP;
+				//mEditorState = EDITING_MAP;
 				std::cout << mSelectedSpriteIndex << ',';
 				return;
 			}
@@ -1186,34 +1145,28 @@ void MapEditorScene::SelectUnit(Vec2D position)
 	mSelectedMapUnit = AnimatedUnitSprite();
 }
 
-void MapEditorScene::GetMovementPositions(const Vec2D& currentPosition, float movement)
+void MapEditorScene::GetMovementPositions(const Vec2D& currentPosition, const float& movement)
 {
-	std::cout << currentPosition << ' ';
-	PrintTerrain(mMapTerrainIndeces[static_cast<int>(currentPosition.GetX())][static_cast<int>(currentPosition.GetY())]);
-
 	CheckMovementPosition(currentPosition, currentPosition + Vec2D(0, -1), movement);
 	CheckMovementPosition(currentPosition, currentPosition + Vec2D(0, 1), movement);
 	CheckMovementPosition(currentPosition, currentPosition + Vec2D(1, 0), movement);
 	CheckMovementPosition(currentPosition, currentPosition + Vec2D(-1, 0), movement);
 }
 
-void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, float movement)
+void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement)
 {
 	if (newPosition == oldPosition) return;
 
-	//float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+	float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
 
-	if (movement > 0)
+	if (movement - cost >= 0)
 	{
-		std::cout << newPosition << ' ';
-		PrintTerrain(mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
-
-		movement -= 1;
 		mMovementPositions.push_back(newPosition);
-		CheckMovementPosition(newPosition, newPosition + Vec2D(0, -1), movement);
-		CheckMovementPosition(newPosition, newPosition + Vec2D(0, 1), movement);
-		CheckMovementPosition(newPosition, newPosition + Vec2D(1, 0), movement);
-		CheckMovementPosition(newPosition, newPosition + Vec2D(-1, 0), movement);
+
+		CheckMovementPosition(newPosition, newPosition + Vec2D(0, -1), movement - cost);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(0, 1), movement - cost);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(1, 0), movement - cost);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(-1, 0), movement - cost);
 	}
 }
 
@@ -1222,7 +1175,7 @@ float MapEditorScene::GetTerrainMovementCost(const EUnitClass& unit, const ETerr
 	switch (terrain)
 	{
 	case ROAD:
-		return 0.7f;
+		return 0.7;
 		break;
 	case BRIDGE:
 		break;
@@ -1265,6 +1218,7 @@ float MapEditorScene::GetTerrainMovementCost(const EUnitClass& unit, const ETerr
 	case CASTLE_WALL:
 		break;
 	case UNDEFINED:
+		return 0;
 		break;
 	default:
 		break;
@@ -1298,60 +1252,6 @@ void MapEditorScene::DeleteMovementPositionCopies()
 
 	mMovementPositions.clear();
 	mMovementPositions = newPositions;
-
-	for (const Vec2D& position : mMovementPositions)
-	{
-		switch (GetTerrainType(mMapTerrainIndeces[static_cast<uint16_t>(position.GetX())][static_cast<uint16_t>(position.GetY())]))
-		{
-		case ROAD:
-			std::cout << "Road" << std::endl;
-			break;
-		case BRIDGE:
-			break;
-		case PLAIN:
-			std::cout << "Plain" << std::endl;
-			break;
-		case SAND:
-			break;
-		case RUINS:
-			break;
-		case FOREST:
-			std::cout << "Forest" << std::endl;
-			break;
-		case THICKET:
-			break;
-		case MOUNTAIN:
-			std::cout << "Mountain" << std::endl;
-			break;
-		case PEAK:
-			break;
-		case CLIFF:
-			break;
-		case SEA:
-			std::cout << "Sea" << std::endl;
-			break;
-		case RIVER:
-			std::cout << "River" << std::endl;
-			break;
-		case DESERT:
-			break;
-		case VILLAGE:
-			std::cout << "Village" << std::endl;
-			break;
-		case CHURCH:
-			break;
-		case BRAGI_TOWER:
-			break;
-		case CASTLE_DEFENSE:
-			break;
-		case CASTLE_WALL:
-			break;
-		case UNDEFINED:
-			break;
-		default:
-			break;
-		}
-	}
 }
 
 void MapEditorScene::PrintTerrain(const ETerrainType& terrain)
@@ -1383,6 +1283,7 @@ void MapEditorScene::PrintTerrain(const ETerrainType& terrain)
 	case CLIFF:
 		break;
 	case SEA:
+		std::cout << "SEA" << std::endl;
 		break;
 	case RIVER:
 		std::cout << "RIVER" << std::endl;
@@ -1404,6 +1305,7 @@ void MapEditorScene::PrintTerrain(const ETerrainType& terrain)
 	case UNDEFINED:
 		break;
 	default:
+		std::cout << std::endl;
 		break;
 	}
 }

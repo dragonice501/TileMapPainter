@@ -62,8 +62,8 @@ public:
 	void InitUnits();
 	std::string GetUnitTypeName(EUnitClass unit);
 	void SelectUnit(Vec2D position);
-	void GetMovementPositions(const Vec2D& currentPosition, float movement);
-	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, float movement);
+	void GetMovementPositions(const Vec2D& currentPosition, const float& movement);
+	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement);
 	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
 	void DeleteMovementPositionCopies();
 	void PrintTerrain(const ETerrainType& terrain);
@@ -170,8 +170,8 @@ private:
 	// Terrain Indeces
 	uint16_t mRoadIndeces[47] =
 	{
-		65,66,67,68,69,70,73,75,76,77,78,97,98,99,100,101,102,105,106,108,109,110,130,131,132,133,
-		134,135,136,137,138,139,140,141,142,162,165,166,167,168,170,173,357,358,359,360,363
+		56,57,58,59,60,61,64,66,67,68,69,84,85,86,87,88,89,92,93,95,96,97,113,114,115,116,117,
+		118,119,120,121,122,123,124,125,141,144,145,146,147,149,152,312,313,314,315,318
 	};
 
 	uint16_t mBridgeIndeces[5] =
@@ -179,10 +179,10 @@ private:
 		529,530,531,561,593
 	};
 
-	uint16_t mPlainIndeces[38] =
+	uint16_t mPlainIndeces[40] =
 	{
 		0,1,2,3,4,6,7,8,9,11,12,28,29,30,31,32,33,33,34,35,36,37,38,39,40,41,62,91,112,140,201,202,204,205,308,
-		309,338,366
+		309,338,366,495,496
 	};
 
 	uint16_t mSandIndeces[10] =
@@ -234,7 +234,7 @@ private:
 
 	uint16_t mVillageIndeces[3] =
 	{
-		595,596,597
+		522,523,524
 	};
 
 	uint16_t mChurchIndeces[1] =
@@ -249,7 +249,7 @@ private:
 
 	uint16_t mCastleDefenseIndeces[4] =
 	{
-		532,533,625,657
+		467,468,548,576
 	};
 
 	uint16_t mCastleWallIndeces[35] =
