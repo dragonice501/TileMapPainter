@@ -67,7 +67,9 @@ void MapEditorScene::Destroy()
 
 void MapEditorScene::Setup(SDL_Renderer* renderer)
 {
-	InitMap();
+	LoadMap();
+	LoadUnits();
+	//InitMap();
 	InitSpriteSheet();
 
 	SDL_Surface* surface = IMG_Load("./Assets/Chapter_0_m.png");
@@ -666,50 +668,52 @@ void MapEditorScene::SetMapTerrainIndeces()
 	{
 		for (uint16_t x = 0; x < mMapWidth; x++)
 		{
-			mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
+			std::cout << static_cast<int>(x) << ',' << static_cast<int>(y) << ' ';
+			mMapTerrainIndeces[x][y] = GetTerrainType(static_cast<uint32_t>(mMapSpriteIndeces[x][y]));
 
-			switch (mMapTerrainIndeces[x][y])
+			switch (GetTerrainType(mMapSpriteIndeces[x][y]))
 			{
 			case ROAD:
-				std::cout << "Road" << std::endl;
+				std::cout << "ROAD" << std::endl;
 				break;
 			case BRIDGE:
 				break;
 			case PLAIN:
-				std::cout << "Plain" << std::endl;
+				std::cout << "ROAD" << std::endl;
 				break;
 			case SAND:
 				break;
 			case RUINS:
 				break;
 			case FOREST:
-				std::cout << "Forest" << std::endl;
+				std::cout << "FOREST" << std::endl;
 				break;
 			case THICKET:
 				break;
 			case MOUNTAIN:
-				std::cout << "Mountain" << std::endl;
+				std::cout << "MOUNTAIN" << std::endl;
 				break;
 			case PEAK:
 				break;
 			case CLIFF:
 				break;
 			case SEA:
-				std::cout << "Sea" << std::endl;
+				std::cout << "SEA" << std::endl;
 				break;
 			case RIVER:
-				std::cout << "River" << std::endl;
+				std::cout << "RIVER" << std::endl;
 				break;
 			case DESERT:
 				break;
 			case VILLAGE:
-				std::cout << "Village" << std::endl;
+				std::cout << "VILLAGE" << std::endl;
 				break;
 			case CHURCH:
 				break;
 			case BRAGI_TOWER:
 				break;
 			case CASTLE_DEFENSE:
+				std::cout << "CASTLE_DEFENSE" << std::endl;
 				break;
 			case CASTLE_WALL:
 				break;
@@ -722,39 +726,39 @@ void MapEditorScene::SetMapTerrainIndeces()
 	}
 }
 
-ETerrainType MapEditorScene::GetTerrainType(uint16_t mapSpriteIndex)
+ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 {
-	for (const uint16_t& index : mSeaIndeces)
+	for (const uint32_t& index : mSeaIndeces)
 	{
 		if (mapSpriteIndex == index) return SEA;
 	}
 
-	for (const uint16_t& index : mRiverIndeces)
+	for (const uint32_t& index : mRiverIndeces)
 	{
 		if (mapSpriteIndex == index) return RIVER;
 	}
 
-	for (const uint16_t& index : mRoadIndeces)
+	for (const uint32_t& index : mRoadIndeces)
 	{
 		if (mapSpriteIndex == index) return ROAD;
 	}
 
-	for (const uint16_t& index : mPlainIndeces)
+	for (const uint32_t& index : mPlainIndeces)
 	{
 		if (mapSpriteIndex == index) return PLAIN;
 	}
 
-	for (const uint16_t& index : mForestIndeces)
+	for (const uint32_t& index : mForestIndeces)
 	{
 		if (mapSpriteIndex == index) return FOREST;
 	}
 
-	for (const uint16_t& index : mMountainIndeces)
+	for (const uint32_t& index : mMountainIndeces)
 	{
 		if (mapSpriteIndex == index) return MOUNTAIN;
 	}
 
-	for (const uint16_t& index : mVillageIndeces)
+	for (const uint32_t& index : mVillageIndeces)
 	{
 		if (mapSpriteIndex == index) return VILLAGE;
 	}
@@ -1168,7 +1172,8 @@ void MapEditorScene::SelectUnit(Vec2D position)
 				mShowSelectedUnitMovement = true;
 				mMovementPositions.clear();
 
-				GetMovementPositions(mSelectedMapUnit.position, Vec2D(-1, -1), 2);
+				mMovementPositions.push_back(mSelectedMapUnit.position);
+				GetMovementPositions(mSelectedMapUnit.position, static_cast<float>(mSelectedMapUnit.movement));
 				DeleteMovementPositionCopies();
 				return;
 			}
@@ -1181,19 +1186,91 @@ void MapEditorScene::SelectUnit(Vec2D position)
 	mSelectedMapUnit = AnimatedUnitSprite();
 }
 
-void MapEditorScene::GetMovementPositions(const Vec2D& newPosition, const Vec2D& oldPosition, float movement)
+void MapEditorScene::GetMovementPositions(const Vec2D& currentPosition, float movement)
+{
+	std::cout << currentPosition << ' ';
+	PrintTerrain(mMapTerrainIndeces[static_cast<int>(currentPosition.GetX())][static_cast<int>(currentPosition.GetY())]);
+
+	CheckMovementPosition(currentPosition, currentPosition + Vec2D(0, -1), movement);
+	CheckMovementPosition(currentPosition, currentPosition + Vec2D(0, 1), movement);
+	CheckMovementPosition(currentPosition, currentPosition + Vec2D(1, 0), movement);
+	CheckMovementPosition(currentPosition, currentPosition + Vec2D(-1, 0), movement);
+}
+
+void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, float movement)
 {
 	if (newPosition == oldPosition) return;
 
-	mMovementPositions.push_back(newPosition);
+	//float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
 
 	if (movement > 0)
 	{
-		GetMovementPositions(newPosition + Vec2D(0, -1), newPosition, movement - 1);
-		GetMovementPositions(newPosition + Vec2D(0, 1), newPosition, movement - 1);
-		GetMovementPositions(newPosition + Vec2D(1, 0), newPosition, movement - 1);
-		GetMovementPositions(newPosition + Vec2D(-1, 0), newPosition, movement - 1);
+		std::cout << newPosition << ' ';
+		PrintTerrain(mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+
+		movement -= 1;
+		mMovementPositions.push_back(newPosition);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(0, -1), movement);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(0, 1), movement);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(1, 0), movement);
+		CheckMovementPosition(newPosition, newPosition + Vec2D(-1, 0), movement);
 	}
+}
+
+float MapEditorScene::GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain)
+{
+	switch (terrain)
+	{
+	case ROAD:
+		return 0.7f;
+		break;
+	case BRIDGE:
+		break;
+	case PLAIN:
+		return 2;
+		break;
+	case SAND:
+		break;
+	case RUINS:
+		break;
+	case FOREST:
+		return 2;
+		break;
+	case THICKET:
+		break;
+	case MOUNTAIN:
+		return 4;
+		break;
+	case PEAK:
+		break;
+	case CLIFF:
+		break;
+	case SEA:
+		break;
+	case RIVER:
+		return 10;
+		break;
+	case DESERT:
+		break;
+	case VILLAGE:
+		return 1;
+		break;
+	case CHURCH:
+		break;
+	case BRAGI_TOWER:
+		break;
+	case CASTLE_DEFENSE:
+		return 1;
+		break;
+	case CASTLE_WALL:
+		break;
+	case UNDEFINED:
+		break;
+	default:
+		break;
+	}
+
+	return 0;
 }
 
 void MapEditorScene::DeleteMovementPositionCopies()
@@ -1274,6 +1351,60 @@ void MapEditorScene::DeleteMovementPositionCopies()
 		default:
 			break;
 		}
+	}
+}
+
+void MapEditorScene::PrintTerrain(const ETerrainType& terrain)
+{
+	switch (terrain)
+	{
+	case ROAD:
+		std::cout << "ROAD" << std::endl;
+		break;
+	case BRIDGE:
+		break;
+	case PLAIN:
+		std::cout << "PLAIN" << std::endl;
+		break;
+	case SAND:
+		break;
+	case RUINS:
+		break;
+	case FOREST:
+		std::cout << "FOREST" << std::endl;
+		break;
+	case THICKET:
+		break;
+	case MOUNTAIN:
+		std::cout << "MOUNTAIN" << std::endl;
+		break;
+	case PEAK:
+		break;
+	case CLIFF:
+		break;
+	case SEA:
+		break;
+	case RIVER:
+		std::cout << "RIVER" << std::endl;
+		break;
+	case DESERT:
+		break;
+	case VILLAGE:
+		std::cout << "VILLAGE" << std::endl;
+		break;
+	case CHURCH:
+		break;
+	case BRAGI_TOWER:
+		break;
+	case CASTLE_DEFENSE:
+		std::cout << "CASTLE_DEFENSE" << std::endl;
+		break;
+	case CASTLE_WALL:
+		break;
+	case UNDEFINED:
+		break;
+	default:
+		break;
 	}
 }
 

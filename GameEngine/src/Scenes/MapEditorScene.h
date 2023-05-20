@@ -38,7 +38,7 @@ public:
 	void SetMapRectPositions();
 	void SetMapSpriteIndeces();
 	void SetMapTerrainIndeces();
-	ETerrainType GetTerrainType(uint16_t mapSpriteIndex);
+	ETerrainType GetTerrainType(uint32_t mapSpriteIndex);
 
 	// SpriteShet Functions
 	void InitSpriteSheet();
@@ -62,8 +62,11 @@ public:
 	void InitUnits();
 	std::string GetUnitTypeName(EUnitClass unit);
 	void SelectUnit(Vec2D position);
-	void GetMovementPositions(const Vec2D& newPosition, const Vec2D& oldPosition, float movement);
+	void GetMovementPositions(const Vec2D& currentPosition, float movement);
+	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, float movement);
+	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
 	void DeleteMovementPositionCopies();
+	void PrintTerrain(const ETerrainType& terrain);
 
 	// Select Functions
 	void SetSelectionRect();
