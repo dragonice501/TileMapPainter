@@ -27,7 +27,8 @@ public:
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
-	void DrawSelectUnitMovement(SDL_Renderer* renderer);
+	void DrawSelectedUnitMovement(SDL_Renderer* renderer);
+	void DrawSelectedUnitAttackRange(SDL_Renderer* renderer);
 	void DrawGUI();
 
 	bool TileInsideCamera(uint16_t x, uint16_t y);
@@ -42,6 +43,8 @@ public:
 
 	// SpriteShet Functions
 	void InitSpriteSheet();
+
+	void ResetTools();
 
 	// Tile Functions
 	Vec2D GetCursorMapRect();
@@ -63,10 +66,13 @@ public:
 	std::string GetUnitTypeName(EUnitClass unit);
 	void SelectUnit(Vec2D position);
 	void GetMovementPositions(const Vec2D& currentPosition, const float& movement);
-	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement);
+	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement, const EAttackDirection& direction);
 	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
+	void CheckAttackPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const int& attackRange, const EAttackDirection& direction);
 	void DeleteMovementPositionCopies();
+	void DeleteAttackPositionCopies();
 	void PrintTerrain(const ETerrainType& terrain);
+	bool MovementsAlreadyContainsPosition(const Vec2D& position);
 
 	// Select Functions
 	void SetSelectionRect();
@@ -134,6 +140,7 @@ private:
 	int mNewUnitMovement = 1;
 
 	std::vector<Vec2D> mMovementPositions;
+	std::vector<Vec2D> mAttackPositions;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;

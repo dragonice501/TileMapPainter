@@ -53,6 +53,25 @@ enum EUnitClass
 	NONE
 };
 
+enum EAttackType
+{
+	PHYSICAL,
+	RANGED,
+	MAGIC
+};
+
+enum EAttackDirection
+{
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	UP_RIGHT,
+	UP_LEFT,
+	DOWN_RIGHT,
+	DOWN_LEFT
+};
+
 struct AnimatedUnitSprite
 {
 	uint8_t textureSize = 128;
@@ -73,6 +92,7 @@ struct AnimatedUnitSprite
 	uint8_t luck = 1;
 	uint8_t defense = 1;
 	uint8_t movement = 1;
+	uint8_t attackRange = 1;
 
 	bool operator!= (const AnimatedUnitSprite& other)
 	{
