@@ -73,6 +73,7 @@ public:
 	void DeleteAttackPositionCopies();
 	void PrintTerrain(const ETerrainType& terrain);
 	bool MovementsAlreadyContainsPosition(const Vec2D& position);
+	bool CursorInSelectedUnitMovement(const Vec2D& mapPosition);
 
 	// Select Functions
 	void SetSelectionRect();

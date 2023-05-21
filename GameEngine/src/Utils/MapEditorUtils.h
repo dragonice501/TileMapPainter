@@ -92,7 +92,7 @@ struct AnimatedUnitSprite
 	uint8_t luck = 1;
 	uint8_t defense = 1;
 	uint8_t movement = 1;
-	uint8_t attackRange = 1;
+	uint8_t attackRange = 2;
 
 	bool operator!= (const AnimatedUnitSprite& other)
 	{

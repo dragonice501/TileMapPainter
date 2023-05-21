@@ -194,7 +194,27 @@ void MapEditorScene::Input()
 							if (mSelectedUnit != NONE) PaintUnit(GetCursorMapRect());
 							break;
 						case SELECT_UNIT_TOOL:
-							SelectUnit(GetCursorMapRect());
+							
+							if (CursorInSelectedUnitMovement(GetCursorMapRect()))
+							{
+								for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+								{
+									if (unit == mSelectedMapUnit)
+									{
+										unit.position = GetCursorMapRect();
+										std::cout << "unit new position: " << unit.position << std::endl;
+									}
+								}
+
+								mSelectedMapUnit = AnimatedUnitSprite();
+								mMovementPositions.clear();
+								mAttackPositions.clear();
+								ResetTools();
+							}
+							else
+							{
+								SelectUnit(GetCursorMapRect());
+							}
 							break;
 						default:
 							break;
@@ -1445,6 +1465,26 @@ bool MapEditorScene::MovementsAlreadyContainsPosition(const Vec2D& position)
 	{
 		if (movementPosition == position)
 		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool MapEditorScene::CursorInSelectedUnitMovement(const Vec2D& mapPosition)
+{
+	for (const Vec2D& position : mMovementPositions)
+	{
+		if (position == mapPosition)
+		{
+			for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			{
+				if (unit.position == mapPosition)
+				{
+					return false;
+				}
+			}
 			return true;
 		}
 	}
