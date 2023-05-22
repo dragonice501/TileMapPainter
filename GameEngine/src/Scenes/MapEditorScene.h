@@ -77,6 +77,8 @@ public:
 	void PrintTerrain(const ETerrainType& terrain);
 	bool MovementsAlreadyContainsPosition(const Vec2D& position);
 	bool CursorInSelectedUnitMovement(const Vec2D& mapPosition);
+	void SetUnitMovementPath(const Vec2D& destination);
+	bool CheckMovementPath(const Vec2D& oldPosition, const Vec2D& newPosition, const Vec2D& destination, const float& movement);
 
 	// Select Functions
 	void SetSelectionRect();
@@ -134,6 +136,9 @@ private:
 	std::vector<int> mLoadedUnitsDefense;
 	std::vector<int> mLoadedUnitsModifier;
 
+	EUnitMovementDirection mMovementDirection = UM_IDLE;
+	Vec2D mDesiredUnitMovementDestination;
+
 	EAttackType mNewUnitAttackType = AT_NONE;
 	int mNewUnitLevel = 1;
 	int mNewUnitHP = 1;
@@ -147,6 +152,7 @@ private:
 
 	std::vector<Vec2D> mMovementPositions;
 	std::vector<Vec2D> mAttackPositions;
+	std::vector<Vec2D> mUnitMovementPath;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;

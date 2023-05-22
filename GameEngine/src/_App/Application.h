@@ -19,12 +19,6 @@ public:
 	void Run();
 	void Destroy();
 
-	void Setup();
-
-	void Input();
-	void Update();
-	void Render();
-
 	static const uint32_t GetWindowWidth() { return mWindowWidth; }
 	static const uint32_t GetWindowHeight() { return mWindowHeight; }
 

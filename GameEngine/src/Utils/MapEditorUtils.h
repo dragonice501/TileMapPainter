@@ -7,7 +7,8 @@
 enum EEditorState
 {
 	EDITING_MAP,
-	SELECTING_SPRITE
+	SELECTING_SPRITE,
+	UNIT_SELECTED
 };
 
 enum ESelectedTool
@@ -53,6 +54,22 @@ enum EUnitClass
 	NONE
 };
 
+enum EUnitState
+{
+	US_IDLE,
+	US_MOVING,
+	US_ATTACKING
+};
+
+enum EUnitMovementDirection
+{
+	UM_IDLE,
+	UM_UP,
+	UM_DOWN,
+	UM_LEFT,
+	UM_RIGHT
+};
+
 enum EAttackType
 {
 	PHYSICAL,
@@ -94,7 +111,11 @@ struct AnimatedUnitSprite
 	uint8_t defense = 1;
 	uint8_t movement = 1;
 
+	EUnitState unitState = US_IDLE;
 	EAttackType attackType = AT_NONE;
+	EUnitMovementDirection movementDirection = UM_IDLE;
+
+	std::vector<Vec2D> movementPath;
 
 	bool operator!= (const AnimatedUnitSprite& other)
 	{

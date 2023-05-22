@@ -123,6 +123,8 @@ void MapEditorScene::Input()
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		//io.KeysDown[io.KeyMap[ImGuiKey_Backspace]] = SDL_BUTTON(SDL_SCANCODE_BACKSPACE);
 
+		Vec2D cursorMapPosition;
+
 		switch (sdlEvent.type)
 		{
 		case SDL_QUIT:
@@ -137,12 +139,20 @@ void MapEditorScene::Input()
 			else if (sdlEvent.key.keysym.sym == SDLK_SPACE)
 			{
 				modifier = true;
+				if (mEditorState == UNIT_SELECTED)
+				{
+					mMovementDirection = UM_IDLE;
+				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_UP)
 			{
 				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionUp();
+				}
+				else if (mEditorState == UNIT_SELECTED)
+				{
+					mMovementDirection = UM_UP;
 				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
@@ -151,6 +161,10 @@ void MapEditorScene::Input()
 				{
 					MoveSelectionRight();
 				}
+				else if (mEditorState == UNIT_SELECTED)
+				{
+					mMovementDirection = UM_RIGHT;
+				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
 			{
@@ -158,12 +172,20 @@ void MapEditorScene::Input()
 				{
 					MoveSelectionLeft();
 				}
+				else if (mEditorState == UNIT_SELECTED)
+				{
+					mMovementDirection = UM_LEFT;
+				}
 			}
 			else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
 			{
 				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
 					MoveSelectionDown();
+				}
+				else if (mEditorState == UNIT_SELECTED)
+				{
+					mMovementDirection = UM_DOWN;
 				}
 			}
 			break;
@@ -174,9 +196,9 @@ void MapEditorScene::Input()
 				mMouseButtonDown = true;
 				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 				{
+					cursorMapPosition = GetCursorMapRect();
 					if (mEditorState == EDITING_MAP)
 					{
-						Vec2D position = GetCursorMapRect();
 						switch (mSelectedTool)
 						{
 						case PAN_TOOL:
@@ -188,22 +210,15 @@ void MapEditorScene::Input()
 							//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
 							break;
 						case SELECT_TILE_TOOL:
-							mSelectionRectStart = GetCursorMapRect();
+							mSelectionRectStart = cursorMapPosition;
 							break;
 						case PAINT_UNIT_TOOL:
-							if (mSelectedUnit != NONE) PaintUnit(GetCursorMapRect());
+							if (mSelectedUnit != NONE) PaintUnit(cursorMapPosition);
 							break;
 						case SELECT_UNIT_TOOL:
-							
-							if (CursorInSelectedUnitMovement(GetCursorMapRect()))
+							if (CursorInSelectedUnitMovement(cursorMapPosition))
 							{
-								for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-								{
-									if (unit == mSelectedMapUnit)
-									{
-										unit.position = GetCursorMapRect();
-									}
-								}
+								SetUnitMovementPath(cursorMapPosition);
 
 								mSelectedMapUnit = AnimatedUnitSprite();
 								mMovementPositions.clear();
@@ -212,7 +227,7 @@ void MapEditorScene::Input()
 							}
 							else
 							{
-								SelectUnit(GetCursorMapRect());
+								SelectUnit(cursorMapPosition);
 							}
 							break;
 						default:
@@ -304,8 +319,7 @@ void MapEditorScene::Update(float deltaTime)
 
 	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 	{
-		sprite.currentFrame =
-			static_cast<int>(((SDL_GetTicks() - sprite.startTime) * sprite.frameRate / 1000.0f)) % sprite.numFrames;
+		sprite.currentFrame = static_cast<int>(((SDL_GetTicks() - sprite.startTime) * sprite.frameRate / 1000.0f)) % sprite.numFrames;
 	}
 }
 
@@ -322,7 +336,37 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 		{
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
-			//SDL_RenderFillRect(renderer, &mSelectionRect);
+
+			DrawSelectedUnitMovement(renderer);
+
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+			DrawSelectedUnitAttackRange(renderer);
+		}
+		if (mAnimatedUnitSprites.size() > 0)
+		{
+			DrawAnimatedSprites(renderer);
+		}
+		if (mUnitMovementPath.size() > 0)
+		{
+			SDL_SetRenderDrawColor(renderer, 255, 255, 0, 100);
+			for (const Vec2D& position : mUnitMovementPath)
+			{
+				Vec2D drawPosition = {
+						static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+						static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+				SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE - 4, SQUARE_RENDER_SIZE - 4 };
+
+				SDL_RenderFillRect(renderer, &rect);
+			}
+		}
+		break;
+	case UNIT_SELECTED:
+		DrawMap(renderer);
+		if (mShowSelectedUnitMovement)
+		{
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
 
 			DrawSelectedUnitMovement(renderer);
 
@@ -407,14 +451,43 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 {
 	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 	{
+		int directionIndex = 0;
+		switch (mMovementDirection)
+		{
+		case UM_IDLE:
+			directionIndex = 0;
+			break;
+		case UM_UP:
+			directionIndex = 1;
+			break;
+		case UM_DOWN:
+			directionIndex = 2;
+			break;
+		case UM_LEFT:
+			directionIndex = 3;
+			break;
+		case UM_RIGHT:
+			directionIndex = 3;
+			break;
+		default:
+			break;
+		}
+
 		Vec2D position = {
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
 				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, 0, sprite.frameSize, sprite.frameSize };
+		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, directionIndex * sprite.frameSize, sprite.frameSize, sprite.frameSize };
 		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
 
-		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
+		//SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
+
+		SDL_RendererFlip flip = mMovementDirection == UM_RIGHT ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+		if (mMovementDirection == UM_RIGHT)
+		{
+			dstRect.x -= sprite.frameSize;
+		}
+		SDL_RenderCopyEx(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect, 0.0, nullptr, flip);
 	}
 }
 
@@ -799,6 +872,8 @@ void MapEditorScene::ResetTools()
 	mShowTileSelection = false;
 	mShowSelectedUnitMovement = false;
 	mShowOverlay = false;
+	mMovementDirection = UM_IDLE;
+	mEditorState = EDITING_MAP;
 }
 
 Vec2D MapEditorScene::GetCursorMapRect()
@@ -1233,6 +1308,7 @@ void MapEditorScene::SelectUnit(Vec2D position)
 		{
 			if (mSelectedMapUnit != sprite)
 			{
+				//mEditorState = UNIT_SELECTED;
 				mSelectedMapUnit = sprite;
 				mShowSelectedUnitMovement = true;
 				mMovementPositions.clear();
@@ -1619,6 +1695,64 @@ bool MapEditorScene::CursorInSelectedUnitMovement(const Vec2D& mapPosition)
 			return true;
 		}
 	}
+
+	return false;
+}
+
+void MapEditorScene::SetUnitMovementPath(const Vec2D& destination)
+{
+	mUnitMovementPath.clear();
+
+	std::cout << "Finding path to: " << destination << std::endl;
+	if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(0, -1), destination, mSelectedMapUnit.movement)) {}
+	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(0, 1), destination, mSelectedMapUnit.movement)) {}
+	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(-1, 0), destination, mSelectedMapUnit.movement)) {}
+	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(1, 0), destination, mSelectedMapUnit.movement)) {}
+
+	std::cout << "Path length is: " << mUnitMovementPath.size() << std::endl;
+}
+
+bool MapEditorScene::CheckMovementPath(const Vec2D& oldPosition, const Vec2D& newPosition, const Vec2D& destination, const float& movement)
+{
+	if (oldPosition == newPosition) return false;
+	else if (newPosition == destination)
+	{
+		std::cout << "Path found" << std::endl;
+		mUnitMovementPath.push_back(newPosition);
+		std::cout << newPosition << " added to path" << std::endl;
+		return true;
+	}
+
+	float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+
+	if (movement - cost >= 0)
+	{
+		if (CheckMovementPath(newPosition, newPosition + Vec2D(0, -1), destination, movement - cost))
+		{
+			mUnitMovementPath.push_back(newPosition);
+			std::cout << newPosition << " added to path" << std::endl;
+			return true;
+		}
+		else if (CheckMovementPath(newPosition, newPosition + Vec2D(0, 1), destination, movement - cost))
+		{
+			mUnitMovementPath.push_back(newPosition);
+			std::cout << newPosition << " added to path" << std::endl;
+			return true;
+		}
+		else if (CheckMovementPath(newPosition, newPosition + Vec2D(1, 0), destination, movement - cost))
+		{
+			mUnitMovementPath.push_back(newPosition);
+			std::cout << newPosition << " added to path" << std::endl;
+			return true;
+		}
+		else if (CheckMovementPath(newPosition, newPosition + Vec2D(-1, 0), destination, movement - cost))
+		{
+			mUnitMovementPath.push_back(newPosition);
+			std::cout << newPosition << " added to path" << std::endl;
+			return true;
+		}
+	}
+	else if (movement - cost < 0) return false;
 
 	return false;
 }
