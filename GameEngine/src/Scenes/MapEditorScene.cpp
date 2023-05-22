@@ -202,7 +202,6 @@ void MapEditorScene::Input()
 									if (unit == mSelectedMapUnit)
 									{
 										unit.position = GetCursorMapRect();
-										std::cout << "unit new position: " << unit.position << std::endl;
 									}
 								}
 
@@ -424,10 +423,10 @@ void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 	for (const Vec2D& position : mMovementPositions)
 	{
 		Vec2D drawPosition = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE, SQUARE_RENDER_SIZE };
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE - 4, SQUARE_RENDER_SIZE - 4 };
 
 		SDL_RenderFillRect(renderer, &rect);
 	}
@@ -438,10 +437,10 @@ void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 	for (const Vec2D& position : mAttackPositions)
 	{
 		Vec2D drawPosition = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE, SQUARE_RENDER_SIZE };
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE - 4, SQUARE_RENDER_SIZE - 4 };
 
 		SDL_RenderFillRect(renderer, &rect);
 	}
@@ -581,6 +580,16 @@ void MapEditorScene::DrawGUI()
 			{
 				SetSelectedUnitClass(selectedUnitClassIndex);
 			}
+
+			static int newUnitAttackType = mNewUnitAttackType;
+			const char* attackTypes[] =
+			{
+				"Physical", "Ranged", "Magic", "None"
+			};
+			if (ImGui::Combo("Attack Type", &newUnitAttackType, attackTypes, IM_ARRAYSIZE(attackTypes)))
+			{
+				SetUnitAttackType(newUnitAttackType);
+			}
 			
 			ImGui::InputInt("Level", &mNewUnitLevel);
 			ImGui::InputInt("HP", &mNewUnitHP);
@@ -593,6 +602,7 @@ void MapEditorScene::DrawGUI()
 			ImGui::InputInt("Movement", &mNewUnitMovement);
 
 			std::string unitString = "Selected Unit: " + GetUnitTypeName(mSelectedMapUnit.unitTexture);
+			std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mSelectedMapUnit.attackType);
 			std::string levelString = "Selected Unit Level: " + std::to_string(mSelectedMapUnit.level);
 			std::string hpString = "Selected Unit HP: " + std::to_string(mSelectedMapUnit.hp);
 			std::string strengthString = "Selected Unit Strength: " + std::to_string(mSelectedMapUnit.strength);
@@ -604,6 +614,7 @@ void MapEditorScene::DrawGUI()
 			std::string modifierString = "Selected Unit Movement: " + std::to_string(mSelectedMapUnit.movement);
 
 			ImGui::Text(unitString.c_str());
+			ImGui::Text(unitAttackString.c_str());
 			ImGui::Text(levelString.c_str());
 			ImGui::Text(hpString.c_str());
 			ImGui::Text(strengthString.c_str());
@@ -637,8 +648,8 @@ bool MapEditorScene::TileInsideCamera(uint16_t x, uint16_t y)
 bool MapEditorScene::CursorInGUI()
 {
 	return
-		mCursorPosition.GetX() < 283 &&
-		mCursorPosition.GetY() < 728;
+		mCursorPosition.GetX() < 300 &&
+		mCursorPosition.GetY() < 980;
 }
 
 void MapEditorScene::InitMap()
@@ -900,6 +911,7 @@ void MapEditorScene::PaintUnit(Vec2D position)
 	animatedUnitSprite.unitTexture = mSelectedUnit;
 	animatedUnitSprite.startTime = SDL_GetTicks();
 
+	animatedUnitSprite.attackType = mNewUnitAttackType;
 	animatedUnitSprite.level = mNewUnitLevel;
 	animatedUnitSprite.hp = mNewUnitHP;
 	animatedUnitSprite.strength = mNewUnitStrength;
@@ -908,8 +920,6 @@ void MapEditorScene::PaintUnit(Vec2D position)
 	animatedUnitSprite.luck = mNewUnitLuck;
 	animatedUnitSprite.defense = mNewUnitDefense;
 	animatedUnitSprite.movement = mNewUnitMovement;
-
-	mSelectedMapUnit = animatedUnitSprite;
 
 	mAnimatedUnitSprites.push_back(animatedUnitSprite);
 }
@@ -937,6 +947,29 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 		break;
 	case NONE:
 		mSelectedUnit = NONE;
+		break;
+	default:
+		break;
+	}
+}
+
+void MapEditorScene::SetUnitAttackType(int unitAttackType)
+{
+	EAttackType attackType = static_cast<EAttackType>(unitAttackType);
+
+	switch (attackType)
+	{
+	case PHYSICAL:
+		mNewUnitAttackType = PHYSICAL;
+		break;
+	case RANGED:
+		mNewUnitAttackType = RANGED;
+		break;
+	case MAGIC:
+		mNewUnitAttackType = MAGIC;
+		break;
+	case AT_NONE:
+		mNewUnitAttackType = AT_NONE;
 		break;
 	default:
 		break;
@@ -978,6 +1011,7 @@ void MapEditorScene::SaveUnits()
 		for (AnimatedUnitSprite& uint : mAnimatedUnitSprites)
 		{
 			unitOutFile << ":unit " + std::to_string(uint.unitTexture) << std::endl;
+			unitOutFile << ":attackType " + std::to_string(static_cast<int>(uint.attackType)) << std::endl;
 			unitOutFile << ":x " + std::to_string(static_cast<int>(uint.position.GetX())) << std::endl;
 			unitOutFile << ":y " + std::to_string(static_cast<int>(uint.position.GetY())) << std::endl;
 			unitOutFile << ":level " + std::to_string(static_cast<int>(uint.level)) << std::endl;
@@ -1010,6 +1044,14 @@ void MapEditorScene::LoadUnits()
 			mLoadedUnits.push_back(FileCommandLoader::ReadInt(params));
 		};
 		fileLoader.AddCommand(unitTypeCommand);
+
+		Command unitAttackTypeCommand;
+		unitAttackTypeCommand.command = "attackType";
+		unitAttackTypeCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsAttackTypes.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitAttackTypeCommand);
 
 		Command unitXPositionCommand;
 		unitXPositionCommand.command = "x";
@@ -1110,6 +1152,7 @@ void MapEditorScene::InitUnits()
 		newUnit.position = { static_cast<float>(mLoadedUnitsXPositions[i]), static_cast<float>(mLoadedUnitsYPositions[i]) };
 		newUnit.startTime = SDL_GetTicks();
 
+		newUnit.attackType = static_cast<EAttackType>(mLoadedUnitsAttackTypes[i]);
 		newUnit.hp = mLoadedUnitsHP[i];
 		newUnit.strength = mLoadedUnitsStrength[i];
 		newUnit.magic = mLoadedUnitsMagic[i];
@@ -1165,6 +1208,23 @@ std::string MapEditorScene::GetUnitTypeName(EUnitClass unit)
 	return "";
 }
 
+std::string MapEditorScene::GetUnitAttackTypeName(EAttackType type)
+{
+	switch (type)
+	{
+	case PHYSICAL:
+		return "Physical";
+	case RANGED:
+		return "Ranged";
+	case MAGIC:
+		return "Magic";
+	case AT_NONE:
+		return "None";
+	default:
+		return "";
+	}
+}
+
 void MapEditorScene::SelectUnit(Vec2D position)
 {
 	for (const AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
@@ -1218,33 +1278,54 @@ void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D
 		CheckMovementPosition(newPosition, newPosition + Vec2D(1, 0), movement - cost, RIGHT);
 		CheckMovementPosition(newPosition, newPosition + Vec2D(-1, 0), movement - cost, LEFT);
 	}
-	else if (movement - cost <= 0)
+	else if (movement - cost < 0)
 	{
-		switch (direction)
+		SetAttackPositions(oldPosition, mSelectedMapUnit.attackType);
+
+		/*switch (mSelectedMapUnit.attackType)
 		{
-		case UP:
-			CheckAttackPosition(oldPosition, newPosition, mSelectedMapUnit.attackRange, UP);
+		case PHYSICAL:
+			switch (direction)
+			{
+			case UP:
+				CheckAttackPosition(oldPosition, newPosition, 1, UP);
+				return;
+			case DOWN:
+				CheckAttackPosition(oldPosition, newPosition, 1, DOWN);
+				return;
+			case LEFT:
+				CheckAttackPosition(oldPosition, newPosition, 1, LEFT);
+				return;
+			case RIGHT:
+				CheckAttackPosition(oldPosition, newPosition, 1, RIGHT);
+				return;
+			default:
+				return;
+			}
 			return;
-		case DOWN:
-			CheckAttackPosition(oldPosition, newPosition, mSelectedMapUnit.attackRange, DOWN);
+		case RANGED:
+			mAttackPositions.push_back(newPosition + Vec2D(0, -1));
+			mAttackPositions.push_back(newPosition + Vec2D(0, 1));
+			mAttackPositions.push_back(newPosition + Vec2D(1, 0));
+			mAttackPositions.push_back(newPosition + Vec2D(1, 0));
+
+			mAttackPositions.push_back(newPosition + Vec2D(2, 0));
+			mAttackPositions.push_back(newPosition + Vec2D(-2, 0));
+			mAttackPositions.push_back(newPosition + Vec2D(0, -2));
+			mAttackPositions.push_back(newPosition + Vec2D(0, 2));
+
+			mAttackPositions.push_back(newPosition + Vec2D(1, 1));
+			mAttackPositions.push_back(newPosition + Vec2D(1, -1));
+			mAttackPositions.push_back(newPosition + Vec2D(-1, 1));
+			mAttackPositions.push_back(newPosition + Vec2D(-11, -1));
 			return;
-		case LEFT:
-			CheckAttackPosition(oldPosition, newPosition, mSelectedMapUnit.attackRange, LEFT);
-			return;
-		case RIGHT:
-			CheckAttackPosition(oldPosition, newPosition, mSelectedMapUnit.attackRange, RIGHT);
-			return;
-		case UP_RIGHT:
+		case MAGIC:
 			break;
-		case UP_LEFT:
-			break;
-		case DOWN_RIGHT:
-			break;
-		case DOWN_LEFT:
+		case AT_NONE:
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 }
 
@@ -1277,6 +1358,7 @@ float MapEditorScene::GetTerrainMovementCost(const EUnitClass& unit, const ETerr
 	case CLIFF:
 		break;
 	case SEA:
+		return 10;
 		break;
 	case RIVER:
 		return 10;
@@ -1335,6 +1417,55 @@ void MapEditorScene::CheckAttackPosition(const Vec2D& oldPosition, const Vec2D& 
 		default:
 			break;
 		}
+	}
+}
+
+void MapEditorScene::SetAttackPositions(const Vec2D& attackingPosition, const EAttackType& attackType)
+{
+	switch (attackType)
+	{
+	case PHYSICAL:
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 0));
+		break;
+	case RANGED:
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 0));
+
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, 2));
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, -2));
+		mAttackPositions.push_back(attackingPosition + Vec2D(2, 0));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-2, 0));
+
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, 1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 1));
+		break;
+	case MAGIC:
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 0));
+
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, 2));
+		mAttackPositions.push_back(attackingPosition + Vec2D(0, -2));
+		mAttackPositions.push_back(attackingPosition + Vec2D(2, 0));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-2, 0));
+
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, 1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(1, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, -1));
+		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 1));
+		break;
+	case AT_NONE:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -1709,6 +1840,8 @@ void MapEditorScene::SaveMap()
 	{
 		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
 		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
+		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
+		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
 
 		for (int y = 0; y < mMapHeight; y++)
 		{
@@ -1756,6 +1889,22 @@ void MapEditorScene::LoadMap()
 			mMapHeight = FileCommandLoader::ReadInt(params);
 		};
 		fileLoader.AddCommand(mapHeightCommand);
+
+		Command mapXOffsetCommand;
+		mapXOffsetCommand.command = "xOffset";
+		mapXOffsetCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapXOffset = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(mapXOffsetCommand);
+
+		Command mapYOffsetCommand;
+		mapYOffsetCommand.command = "yOffset";
+		mapYOffsetCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapYOffset = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(mapYOffsetCommand);
 
 		Command spriteCommand;
 		spriteCommand.command = "tile";

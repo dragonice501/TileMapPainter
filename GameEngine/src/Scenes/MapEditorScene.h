@@ -59,16 +59,19 @@ public:
 	// Unit Functions
 	void PaintUnit(Vec2D position);
 	void SetSelectedUnitClass(int unitSelectionIndex);
+	void SetUnitAttackType(int unitAttackType);
 	void RemoveUnit(Vec2D position);
 	void SaveUnits();
 	void LoadUnits();
 	void InitUnits();
 	std::string GetUnitTypeName(EUnitClass unit);
+	std::string GetUnitAttackTypeName(EAttackType type);
 	void SelectUnit(Vec2D position);
 	void GetMovementPositions(const Vec2D& currentPosition, const float& movement);
 	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement, const EAttackDirection& direction);
 	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
 	void CheckAttackPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const int& attackRange, const EAttackDirection& direction);
+	void SetAttackPositions(const Vec2D& attackingPosition, const EAttackType& attackType);
 	void DeleteMovementPositionCopies();
 	void DeleteAttackPositionCopies();
 	void PrintTerrain(const ETerrainType& terrain);
@@ -119,6 +122,7 @@ private:
 	bool mShowSelectedUnitMovement = false;
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
 	std::vector<int> mLoadedUnits;
+	std::vector<int> mLoadedUnitsAttackTypes;
 	std::vector<int> mLoadedUnitsXPositions;
 	std::vector<int> mLoadedUnitsYPositions;
 	std::vector<int> mLoadedUnitsHP;
@@ -130,6 +134,7 @@ private:
 	std::vector<int> mLoadedUnitsDefense;
 	std::vector<int> mLoadedUnitsModifier;
 
+	EAttackType mNewUnitAttackType = AT_NONE;
 	int mNewUnitLevel = 1;
 	int mNewUnitHP = 1;
 	int mNewUnitStrength = 1;
