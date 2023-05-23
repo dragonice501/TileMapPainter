@@ -77,8 +77,9 @@ public:
 	void PrintTerrain(const ETerrainType& terrain);
 	bool MovementsAlreadyContainsPosition(const Vec2D& position);
 	bool CursorInSelectedUnitMovement(const Vec2D& mapPosition);
-	void SetUnitMovementPath(const Vec2D& destination);
+	bool SetUnitMovementPath(const Vec2D& destination);
 	bool CheckMovementPath(const Vec2D& oldPosition, const Vec2D& newPosition, const Vec2D& destination, const float& movement);
+	void ReverseMovementPath();
 
 	// Select Functions
 	void SetSelectionRect();

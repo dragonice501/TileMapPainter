@@ -13,6 +13,35 @@
 
 const Vec2D Vec2D::Zero;
 
+Vec2D Vec2D::Lerp(const Vec2D& start, const Vec2D& end, const float& rate)
+{
+	/*float x = start.mX + rate * start.mX > end.mX ? -1.0 : 1.0;
+	float y = start.mY + rate * start.mY > end.mY ? -1.0 : 1.0;*/
+
+	float x = start.mX + (end.mX - start.mX) * rate;
+	float y = start.mY + (end.mY - start.mY) * rate;
+
+	if (start.mX < end.mX)
+	{
+		x = Clamp(x, start.mX, end.mX);
+	}
+	else if (start.mX > end.mX)
+	{
+		x = Clamp(x, end.mX, start.mX);
+	}
+
+	if (start.mY < end.mY)
+	{
+		y = Clamp(y, start.mY, end.mY);
+	}
+	else if (start.mY > end.mY)
+	{
+		y = Clamp(y, end.mY, start.mY);
+	}
+
+	return Vec2D(x, y);
+}
+
 std::ostream& operator<<(std::ostream& consoleOut, const Vec2D& vec)
 {
 	std::cout << "X: " << vec.mX << ", Y: " << vec.mY;

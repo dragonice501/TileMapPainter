@@ -116,6 +116,9 @@ struct AnimatedUnitSprite
 	EUnitMovementDirection movementDirection = UM_IDLE;
 
 	std::vector<Vec2D> movementPath;
+	int currentPathGoalIndex;
+	float movementRate = 0.0f;
+	float movementSpeed = 5.0f;
 
 	bool operator!= (const AnimatedUnitSprite& other)
 	{
@@ -148,5 +151,35 @@ struct AnimatedUnitSprite
 			luck == other.luck &&
 			defense == other.defense &&
 			movement == other.movement;
+	}
+
+	void MoveThroughPath(float deltaTime)
+	{
+		if (position == movementPath[currentPathGoalIndex + 1])
+		{
+			movementRate = 0.0f;
+			currentPathGoalIndex++;
+			if (movementPath[currentPathGoalIndex] == movementPath.back())
+			{
+				unitState = US_IDLE;
+				movementDirection = UM_IDLE;
+				currentPathGoalIndex = 0;
+				return;
+			}
+			SetMovementDirection();
+		}
+		else
+		{
+			movementRate += movementSpeed * deltaTime;
+			position = Vec2D::Lerp(movementPath[currentPathGoalIndex], movementPath[currentPathGoalIndex + 1], movementRate);
+		}
+	}
+
+	void SetMovementDirection()
+	{
+		if (movementPath[currentPathGoalIndex].GetX() < movementPath[currentPathGoalIndex + 1].GetX()) movementDirection = UM_RIGHT;
+		else if (movementPath[currentPathGoalIndex].GetX() > movementPath[currentPathGoalIndex + 1].GetX()) movementDirection = UM_LEFT;
+		else if (movementPath[currentPathGoalIndex].GetY() < movementPath[currentPathGoalIndex + 1].GetY()) movementDirection = UM_DOWN;
+		else if (movementPath[currentPathGoalIndex].GetY() > movementPath[currentPathGoalIndex + 1].GetY()) movementDirection = UM_UP;
 	}
 };

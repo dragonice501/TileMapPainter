@@ -16,6 +16,8 @@ class Vec2D {
 
 	static const Vec2D Zero;
 
+    static Vec2D Lerp(const Vec2D& start, const Vec2D& end, const float& rate);
+
 	Vec2D(): Vec2D(0,0){}
     Vec2D(float x, float y): mX(x), mY(y){}
 
@@ -54,7 +56,6 @@ class Vec2D {
     float AngleBetween(const Vec2D& vec2) const;
 
     Vec2D Reflect(const Vec2D& normal) const;
-
 
     void Rotate(float angle, const Vec2D& aroundPoint);
     Vec2D RotationResult(float angle, const Vec2D& aroundPoint) const;
