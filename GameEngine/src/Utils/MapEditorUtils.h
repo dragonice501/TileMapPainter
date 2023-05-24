@@ -6,9 +6,16 @@
 
 enum EEditorState
 {
-	EDITING_MAP,
-	SELECTING_SPRITE,
-	UNIT_SELECTED
+	ES_EDITING_MAP,
+	ES_SELECTING_SPRITE,
+	ES_PLAYING_GAME
+};
+
+enum EGameState
+{
+	GS_PLAYER_IDLE,
+	GS_SELECTING_ACTION,
+	GS_ENEMY_PHASE
 };
 
 enum ESelectedTool
@@ -61,6 +68,7 @@ enum EUnitState
 {
 	US_IDLE,
 	US_MOVING,
+	US_SELECTING_ACTION,
 	US_ATTACKING
 };
 
@@ -176,6 +184,7 @@ struct AnimatedUnitSprite
 		{
 			movementRate += movementSpeed * deltaTime;
 			position = Vec2D::Lerp(movementPath[currentPathGoalIndex], movementPath[currentPathGoalIndex + 1], movementRate);
+			return;
 		}
 	}
 

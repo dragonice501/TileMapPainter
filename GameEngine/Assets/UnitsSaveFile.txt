@@ -1,7 +1,7 @@
 :unit 4
 :attackType 0
 :x 120
-:y 222
+:y 219
 :level 1
 :maxHP 15
 :currentHP 12
@@ -12,4 +12,19 @@
 :luck 1
 :defense 2
 :movement 4
+
+:unit 2
+:attackType 0
+:x 122
+:y 219
+:level 1
+:maxHP 20
+:currentHP 20
+:strength 5
+:magic 1
+:skill 1
+:speed 1
+:luck 1
+:defense 1
+:movement 5
 

@@ -68,6 +68,7 @@ public:
 	std::string GetUnitTypeName(EUnitClass unit);
 	std::string GetUnitAttackTypeName(EAttackType type);
 	void SelectUnit(Vec2D position);
+	void ClearSelectedUnit();
 	void GetMovementPositions(const Vec2D& currentPosition, const float& movement);
 	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement, const EAttackDirection& direction);
 	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
@@ -105,7 +106,7 @@ private:
 	uint32_t millisecondsPreviousFrame;
 
 	// Editor Variables
-	EEditorState mEditorState = EDITING_MAP;
+	EEditorState mEditorState = ES_EDITING_MAP;
 	ESelectedTool mSelectedTool = PAN_TOOL;
 
 	bool mMouseButtonDown = false;
