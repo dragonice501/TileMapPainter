@@ -374,6 +374,7 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 		if (mAnimatedUnitSprites.size() > 0)
 		{
 			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer);
 		}
 		break;
 	case UNIT_SELECTED:
@@ -496,6 +497,30 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
 
 		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
+	}
+}
+
+void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer)
+{
+	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+	{
+		Vec2D position = {
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+		SDL_Rect heatlhBackgroundRect = { position.GetX(), position.GetY() - 6.0f, sprite.frameSize * mMapZoom, 5.0f * mMapZoom };
+
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+		SDL_RenderFillRect(renderer, &heatlhBackgroundRect);
+
+		SDL_Rect healthRect = {
+			position.GetX(),
+			position.GetY() - 6.0f,
+			static_cast<float>(sprite.frameSize) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP))* mMapZoom,
+			5.0f * mMapZoom };
+
+		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
+		SDL_RenderFillRect(renderer, &healthRect);
 	}
 }
 
@@ -1001,6 +1026,7 @@ void MapEditorScene::PaintUnit(Vec2D position)
 	animatedUnitSprite.attackType = mNewUnitAttackType;
 	animatedUnitSprite.level = mNewUnitLevel;
 	animatedUnitSprite.maxHP = mNewUnitMaxHP;
+	animatedUnitSprite.currentHP = mNewUnitCurrentHP;
 	animatedUnitSprite.strength = mNewUnitStrength;
 	animatedUnitSprite.skill = mNewUnitSkill;
 	animatedUnitSprite.speed = mNewUnitSpeed;

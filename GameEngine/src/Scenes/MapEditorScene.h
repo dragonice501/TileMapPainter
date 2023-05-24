@@ -27,6 +27,7 @@ public:
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
+	void DrawUnitHealthBars(SDL_Renderer* renderer);
 	void DrawSelectedUnitMovement(SDL_Renderer* renderer);
 	void DrawSelectedUnitAttackRange(SDL_Renderer* renderer);
 	void DrawGUI();
