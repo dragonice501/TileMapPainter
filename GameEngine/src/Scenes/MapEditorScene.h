@@ -123,26 +123,31 @@ private:
 	AnimatedUnitSprite mSelectedMapUnit;
 	EUnitClass mSelectedUnit = NONE;
 	bool mShowSelectedUnitMovement = false;
+
+	// Unit Loading Variables
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
 	std::vector<int> mLoadedUnits;
 	std::vector<int> mLoadedUnitsAttackTypes;
 	std::vector<int> mLoadedUnitsXPositions;
 	std::vector<int> mLoadedUnitsYPositions;
-	std::vector<int> mLoadedUnitsHP;
+	std::vector<int> mLoadedUnitsLevel;
+	std::vector<int> mLoadedUnitsMaxHP;
+	std::vector<int> mLoadedUnitsCurrentHP;
 	std::vector<int> mLoadedUnitsStrength;
 	std::vector<int> mLoadedUnitsMagic;
 	std::vector<int> mLoadedUnitsSkill;
 	std::vector<int> mLoadedUnitsSpeed;
 	std::vector<int> mLoadedUnitsLuck;
 	std::vector<int> mLoadedUnitsDefense;
-	std::vector<int> mLoadedUnitsModifier;
+	std::vector<int> mLoadedUnitsMovement;
 
 	EUnitMovementDirection mMovementDirection = UM_IDLE;
 	Vec2D mDesiredUnitMovementDestination;
 
-	EAttackType mNewUnitAttackType = AT_NONE;
+	EAttackType mNewUnitAttackType = AT_PHYSICAL;
 	int mNewUnitLevel = 1;
-	int mNewUnitHP = 1;
+	int mNewUnitMaxHP = 1;
+	int mNewUnitCurrentHP = 1;
 	int mNewUnitStrength = 1;
 	int mNewUnitMagic = 1;
 	int mNewUnitSkill = 1;

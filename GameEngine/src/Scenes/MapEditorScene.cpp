@@ -80,7 +80,7 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	mOverlayTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	mUnitClassTextures.resize(EUnitClass::SWORD_ARMOUR + 1);
+	mUnitClassTextures.resize(EUnitClass::NONE);
 
 	surface = IMG_Load("./Assets/Bow_Fighter.png");
 	SDL_Texture* bowFighterTexture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -101,6 +101,18 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	surface = IMG_Load("./Assets/Sword_Armour.png");
 	SDL_Texture* swordArmourTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	mUnitClassTextures[SWORD_ARMOUR] = swordArmourTexture;
+
+	surface = IMG_Load("./Assets/Barbarian.png");
+	SDL_Texture* barbarianTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[BARBARIAN] = barbarianTexture;
+
+	surface = IMG_Load("./Assets/Barbarian_Archer.png");
+	SDL_Texture* barbarianArcherTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[BARBARIAN_ARCHER] = barbarianArcherTexture;
+
+	surface = IMG_Load("./Assets/Barbarian_Chief.png");
+	SDL_Texture* barbarianChiefTexture = SDL_CreateTextureFromSurface(renderer, surface);
+	mUnitClassTextures[BARBARIAN_CHIEF] = barbarianChiefTexture;
 
 	SDL_FreeSurface(surface);
 }
@@ -630,7 +642,8 @@ void MapEditorScene::DrawGUI()
 			{
 				mSelectedUnit = NONE;
 				mNewUnitLevel = 1;
-				mNewUnitHP = 1;
+				mNewUnitMaxHP = 1;
+				mNewUnitCurrentHP = 1;
 				mNewUnitStrength = 1;
 				mNewUnitMagic = 1;
 				mNewUnitSkill = 1;
@@ -643,7 +656,7 @@ void MapEditorScene::DrawGUI()
 			static int selectedUnitClassIndex = mSelectedUnit;
 			const char* classes[] =
 			{
-				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour", "None"
+				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour", "Barbarian", "Barbarian Archer", "Barbarian Chief", "None"
 			};
 			if (ImGui::Combo("Class", &selectedUnitClassIndex, classes, IM_ARRAYSIZE(classes)))
 			{
@@ -661,7 +674,8 @@ void MapEditorScene::DrawGUI()
 			}
 			
 			ImGui::InputInt("Level", &mNewUnitLevel);
-			ImGui::InputInt("HP", &mNewUnitHP);
+			ImGui::InputInt("HP", &mNewUnitMaxHP);
+			ImGui::InputInt("CurrentHP", &mNewUnitCurrentHP);
 			ImGui::InputInt("Strength", &mNewUnitStrength);
 			ImGui::InputInt("Magic", &mNewUnitMagic);
 			ImGui::InputInt("Skill", &mNewUnitSkill);
@@ -673,7 +687,8 @@ void MapEditorScene::DrawGUI()
 			std::string unitString = "Selected Unit: " + GetUnitTypeName(mSelectedMapUnit.unitTexture);
 			std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mSelectedMapUnit.attackType);
 			std::string levelString = "Selected Unit Level: " + std::to_string(mSelectedMapUnit.level);
-			std::string hpString = "Selected Unit HP: " + std::to_string(mSelectedMapUnit.hp);
+			std::string maxHPString = "Selected Unit Max HP: " + std::to_string(mSelectedMapUnit.maxHP);
+			std::string currentHPString = "Selected Unit Current HP: " + std::to_string(mSelectedMapUnit.currentHP);
 			std::string strengthString = "Selected Unit Strength: " + std::to_string(mSelectedMapUnit.strength);
 			std::string magicString = "Selected Unit magic: " + std::to_string(mSelectedMapUnit.magic);
 			std::string skillString = "Selected Unit Skill: " + std::to_string(mSelectedMapUnit.skill);
@@ -685,7 +700,8 @@ void MapEditorScene::DrawGUI()
 			ImGui::Text(unitString.c_str());
 			ImGui::Text(unitAttackString.c_str());
 			ImGui::Text(levelString.c_str());
-			ImGui::Text(hpString.c_str());
+			ImGui::Text(maxHPString.c_str());
+			ImGui::Text(currentHPString.c_str());
 			ImGui::Text(strengthString.c_str());
 			ImGui::Text(magicString.c_str());
 			ImGui::Text(skillString.c_str());
@@ -984,7 +1000,7 @@ void MapEditorScene::PaintUnit(Vec2D position)
 
 	animatedUnitSprite.attackType = mNewUnitAttackType;
 	animatedUnitSprite.level = mNewUnitLevel;
-	animatedUnitSprite.hp = mNewUnitHP;
+	animatedUnitSprite.maxHP = mNewUnitMaxHP;
 	animatedUnitSprite.strength = mNewUnitStrength;
 	animatedUnitSprite.skill = mNewUnitSkill;
 	animatedUnitSprite.speed = mNewUnitSpeed;
@@ -1016,6 +1032,15 @@ void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
 	case SWORD_ARMOUR:
 		mSelectedUnit = SWORD_ARMOUR;
 		break;
+	case BARBARIAN:
+		mSelectedUnit = BARBARIAN;
+		break;
+	case BARBARIAN_ARCHER:
+		mSelectedUnit = BARBARIAN_ARCHER;
+		break;
+	case BARBARIAN_CHIEF:
+		mSelectedUnit = BARBARIAN_CHIEF;
+		break;
 	case NONE:
 		mSelectedUnit = NONE;
 		break;
@@ -1030,14 +1055,14 @@ void MapEditorScene::SetUnitAttackType(int unitAttackType)
 
 	switch (attackType)
 	{
-	case PHYSICAL:
-		mNewUnitAttackType = PHYSICAL;
+	case AT_PHYSICAL:
+		mNewUnitAttackType = AT_PHYSICAL;
 		break;
-	case RANGED:
-		mNewUnitAttackType = RANGED;
+	case AT_RANGED:
+		mNewUnitAttackType = AT_RANGED;
 		break;
-	case MAGIC:
-		mNewUnitAttackType = MAGIC;
+	case AT_MAGIC:
+		mNewUnitAttackType = AT_MAGIC;
 		break;
 	case AT_NONE:
 		mNewUnitAttackType = AT_NONE;
@@ -1086,14 +1111,15 @@ void MapEditorScene::SaveUnits()
 			unitOutFile << ":x " + std::to_string(static_cast<int>(uint.position.GetX())) << std::endl;
 			unitOutFile << ":y " + std::to_string(static_cast<int>(uint.position.GetY())) << std::endl;
 			unitOutFile << ":level " + std::to_string(static_cast<int>(uint.level)) << std::endl;
-			unitOutFile << ":hp " + std::to_string(static_cast<int>(uint.hp)) << std::endl;
+			unitOutFile << ":maxHP " + std::to_string(static_cast<int>(uint.maxHP)) << std::endl;
+			unitOutFile << ":currentHP " + std::to_string(static_cast<int>(uint.currentHP)) << std::endl;
 			unitOutFile << ":strength " + std::to_string(static_cast<int>(uint.strength)) << std::endl;
 			unitOutFile << ":magic " + std::to_string(static_cast<int>(uint.magic)) << std::endl;
 			unitOutFile << ":skill " + std::to_string(static_cast<int>(uint.skill)) << std::endl;
 			unitOutFile << ":speed " + std::to_string(static_cast<int>(uint.speed)) << std::endl;
 			unitOutFile << ":luck " + std::to_string(static_cast<int>(uint.luck)) << std::endl;
 			unitOutFile << ":defense " + std::to_string(static_cast<int>(uint.defense)) << std::endl;
-			unitOutFile << ":modifier " + std::to_string(static_cast<int>(uint.movement)) << std::endl << std::endl;
+			unitOutFile << ":movement " + std::to_string(static_cast<int>(uint.movement)) << std::endl << std::endl;
 		}
 	}
 	unitOutFile.close();
@@ -1140,13 +1166,29 @@ void MapEditorScene::LoadUnits()
 		};
 		fileLoader.AddCommand(unitYPositionCommand);
 
+		Command unitLevelCommand;
+		unitLevelCommand.command = "level";
+		unitLevelCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsLevel.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitLevelCommand);
+
 		Command unitHPCommand;
-		unitHPCommand.command = "hp";
+		unitHPCommand.command = "maxHP";
 		unitHPCommand.parseFunc = [&](ParseFuncParams params)
 		{
-			mLoadedUnitsHP.push_back(FileCommandLoader::ReadInt(params));
+			mLoadedUnitsMaxHP.push_back(FileCommandLoader::ReadInt(params));
 		};
 		fileLoader.AddCommand(unitHPCommand);
+
+		Command unitCurrentHPCommand;
+		unitCurrentHPCommand.command = "currentHP";
+		unitCurrentHPCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedUnitsCurrentHP.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(unitCurrentHPCommand);
 
 		Command unitStengthCommand;
 		unitStengthCommand.command = "strength";
@@ -1196,13 +1238,13 @@ void MapEditorScene::LoadUnits()
 		};
 		fileLoader.AddCommand(unitDefenseCommand);
 
-		Command unitModifierCommand;
-		unitModifierCommand.command = "modifier";
-		unitModifierCommand.parseFunc = [&](ParseFuncParams params)
+		Command unitMovementCommand;
+		unitMovementCommand.command = "movement";
+		unitMovementCommand.parseFunc = [&](ParseFuncParams params)
 		{
-			mLoadedUnitsModifier.push_back(FileCommandLoader::ReadInt(params));
+			mLoadedUnitsMovement.push_back(FileCommandLoader::ReadInt(params));
 		};
-		fileLoader.AddCommand(unitModifierCommand);
+		fileLoader.AddCommand(unitMovementCommand);
 
 		fileLoader.LoadFile(unitsFilePath);
 	}
@@ -1224,14 +1266,16 @@ void MapEditorScene::InitUnits()
 		newUnit.startTime = SDL_GetTicks();
 
 		newUnit.attackType = static_cast<EAttackType>(mLoadedUnitsAttackTypes[i]);
-		newUnit.hp = mLoadedUnitsHP[i];
+		newUnit.level = mLoadedUnitsLevel[i];
+		newUnit.maxHP = mLoadedUnitsMaxHP[i];
+		newUnit.currentHP = mLoadedUnitsCurrentHP[i];
 		newUnit.strength = mLoadedUnitsStrength[i];
 		newUnit.magic = mLoadedUnitsMagic[i];
 		newUnit.skill = mLoadedUnitsSkill[i];
 		newUnit.speed = mLoadedUnitsSpeed[i];
 		newUnit.luck = mLoadedUnitsLuck[i];
 		newUnit.defense = mLoadedUnitsDefense[i];
-		newUnit.movement = mLoadedUnitsModifier[i];
+		newUnit.movement = mLoadedUnitsMovement[i];
 
 		mAnimatedUnitSprites.push_back(newUnit);
 	}
@@ -1239,14 +1283,15 @@ void MapEditorScene::InitUnits()
 	mLoadedUnits.clear();
 	mLoadedUnitsXPositions.clear();
 	mLoadedUnitsYPositions.clear();
-	mLoadedUnitsHP.clear();
+	mLoadedUnitsLevel.clear();
+	mLoadedUnitsMaxHP.clear();
 	mLoadedUnitsStrength.clear();
 	mLoadedUnitsMagic.clear();
 	mLoadedUnitsSkill.clear();
 	mLoadedUnitsSpeed.clear();
 	mLoadedUnitsLuck.clear();
 	mLoadedUnitsDefense.clear();
-	mLoadedUnitsModifier.clear();
+	mLoadedUnitsMovement.clear();
 }
 
 std::string MapEditorScene::GetUnitTypeName(EUnitClass unit)
@@ -1255,25 +1300,22 @@ std::string MapEditorScene::GetUnitTypeName(EUnitClass unit)
 	{
 	case BOW_FIGHTER:
 		return "Bow Fighter";
-		break;
 	case DANCER:
 		return "Dancer";
-		break;
 	case KNIGHT_LORD:
 		return "Knight Lord";
-		break;
 	case MAGE:
 		return "Mage";
-		break;
 	case SWORD_ARMOUR:
 		return "Sword Armour";
-		break;
+	case BARBARIAN:
+		return "Barbarian";
+	case BARBARIAN_ARCHER:
+		return "Barbarian Archer";
+	case BARBARIAN_CHIEF:
+		return "Barbarian Chief";
 	case NONE:
 		return "";
-		break;
-	default:
-		return "";
-		break;
 	}
 
 	return "";
@@ -1283,11 +1325,11 @@ std::string MapEditorScene::GetUnitAttackTypeName(EAttackType type)
 {
 	switch (type)
 	{
-	case PHYSICAL:
+	case AT_PHYSICAL:
 		return "Physical";
-	case RANGED:
+	case AT_RANGED:
 		return "Ranged";
-	case MAGIC:
+	case AT_MAGIC:
 		return "Magic";
 	case AT_NONE:
 		return "None";
@@ -1497,13 +1539,13 @@ void MapEditorScene::SetAttackPositions(const Vec2D& attackingPosition, const EA
 {
 	switch (attackType)
 	{
-	case PHYSICAL:
+	case AT_PHYSICAL:
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));
 		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 0));
 		break;
-	case RANGED:
+	case AT_RANGED:
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));
@@ -1519,7 +1561,7 @@ void MapEditorScene::SetAttackPositions(const Vec2D& attackingPosition, const EA
 		mAttackPositions.push_back(attackingPosition + Vec2D(-1, -1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(-1, 1));
 		break;
-	case MAGIC:
+	case AT_MAGIC:
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, 1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(0, -1));
 		mAttackPositions.push_back(attackingPosition + Vec2D(1, 0));

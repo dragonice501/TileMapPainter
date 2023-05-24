@@ -51,6 +51,9 @@ enum EUnitClass
 	KNIGHT_LORD,
 	MAGE,
 	SWORD_ARMOUR,
+	BARBARIAN,
+	BARBARIAN_ARCHER,
+	BARBARIAN_CHIEF,
 	NONE
 };
 
@@ -72,9 +75,9 @@ enum EUnitMovementDirection
 
 enum EAttackType
 {
-	PHYSICAL,
-	RANGED,
-	MAGIC,
+	AT_PHYSICAL,
+	AT_RANGED,
+	AT_MAGIC,
 	AT_NONE
 };
 
@@ -102,7 +105,8 @@ struct AnimatedUnitSprite
 	EUnitClass unitTexture = NONE;
 
 	uint8_t level = 1;
-	uint8_t hp = 1;
+	uint8_t maxHP = 1;
+	uint8_t currentHP = 1;
 	uint8_t strength = 1;
 	uint8_t magic = 1;
 	uint8_t skill = 1;
@@ -127,7 +131,7 @@ struct AnimatedUnitSprite
 			position.GetY() != other.position.GetY() ||
 			unitTexture != other.unitTexture ||
 			level != other.level ||
-			hp != other.hp ||
+			maxHP != other.maxHP ||
 			strength != other.strength ||
 			magic != other.magic ||
 			skill != other.skill ||
@@ -143,7 +147,7 @@ struct AnimatedUnitSprite
 			position.GetY() == other.position.GetY() &&
 			unitTexture == other.unitTexture &&
 			level == other.level &&
-			hp == other.hp &&
+			maxHP == other.maxHP &&
 			strength == other.strength &&
 			magic == other.magic &&
 			skill == other.skill &&
