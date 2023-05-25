@@ -381,53 +381,77 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 	}
 	case SDL_MOUSEBUTTONDOWN:
 		mMouseButtonDown = true;
-		if (!CursorInGUI())
+		if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 		{
-			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-			{
-				cursorMapPosition = GetCursorMapRect();
+			cursorMapPosition = GetCursorMapRect();
 
-				// Map Position contains unit
-				for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			// Map Position contains unit
+			for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			{
+				// Unit is enemy and selected unit is looking for attack target
+				if (mGameState == GS_SELECTING_TARGET)
 				{
-					if (cursorMapPosition == unit.position)
+					for (const AnimatedUnitSprite& targetUnit : mAnimatedUnitSprites)
 					{
-						// Unit has not been selected
-						if (mSelectedMapUnit != unit)
+						if (targetUnit.position == cursorMapPosition && UnitIsEnemy(targetUnit.unitTexture))
 						{
-							SelectUnit(cursorMapPosition);
+							mSelectedTargetUnit = targetUnit;
+							for (AnimatedUnitSprite& controlledUnit : mAnimatedUnitSprites)
+							{
+								if (controlledUnit == mSelectedMapUnit)
+								{
+									controlledUnit.SetAttackDirection(targetUnit.position);
+								}
+							}
+							break;
+						}
+					}
+					break;
+				}
+				else if (cursorMapPosition == unit.position)
+				{
+					// Unit has not been selected
+					if (mSelectedMapUnit != unit)
+					{
+						SelectUnit(cursorMapPosition);
+						return;
+					}
+					// Unit is already selected
+					else if (mSelectedMapUnit == unit)
+					{
+						mGameState = GS_SELECTING_ACTION;
+						unit.unitState = US_SELECTING_ACTION;
+					}
+				}
+			}
+
+			// Map Position contains selected unit movement position
+			if (CursorInSelectedUnitMovement(cursorMapPosition))
+			{
+				if (SetUnitMovementPath(cursorMapPosition))
+				{
+					for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+					{
+						if (unit == mSelectedMapUnit)
+						{
+							unit.movementPath = mUnitMovementPath;
+							unit.unitState = US_MOVING;
+							unit.currentPathGoalIndex = 0;
+							unit.SetMovementDirection();
+
+							mGameState = GS_UNIT_MOVING;
+
+							mMovementPositions.clear();
+							mAttackPositions.clear();
 							return;
 						}
-						// Unit is already selected
 					}
 				}
-
-				// Map Position contains selected unit movement position
-				if (CursorInSelectedUnitMovement(cursorMapPosition))
-				{
-					if (SetUnitMovementPath(cursorMapPosition))
-					{
-						for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-						{
-							if (unit == mSelectedMapUnit)
-							{
-								unit.movementPath = mUnitMovementPath;
-								unit.unitState = US_MOVING;
-								unit.currentPathGoalIndex = 0;
-								unit.SetMovementDirection();
-
-								mMovementPositions.clear();
-								mAttackPositions.clear();
-								return;
-							}
-						}
-					}
-				}
-
-				// Map Position contains nothing
-				ClearSelectedUnit();
-				return;
 			}
+
+			// Map Position contains nothing
+			ClearSelectedUnit();
+			return;
 		}
 		break;
 	case SDL_MOUSEBUTTONUP:
@@ -531,11 +555,6 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 {
 	DrawMap(renderer);
 
-	if (mAnimatedUnitSprites.size() > 0)
-	{
-		DrawAnimatedSprites(renderer);
-	}
-
 	switch (mGameState)
 	{
 	case GS_PLAYER_IDLE:
@@ -547,15 +566,16 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 		if (mShowSelectedUnitMovement)
 		{
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
 			DrawSelectedUnitMovement(renderer);
 
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 			DrawSelectedUnitAttackRange(renderer);
 		}
 		break;
 	case GS_SELECTING_ACTION:
 		DrawUnitActions();
+		break;
+	case GS_SELECTING_TARGET:
+		DrawSelectedUnitAttackRange(renderer);
 		break;
 	case GS_ATTACKING:
 		break;
@@ -563,6 +583,11 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 		break;
 	default:
 		break;
+	}
+
+	if (mAnimatedUnitSprites.size() > 0)
+	{
+		DrawAnimatedSprites(renderer);
 	}
 }
 
@@ -686,6 +711,8 @@ void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer)
 
 void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
+
 	for (const Vec2D& position : mMovementPositions)
 	{
 		Vec2D drawPosition = {
@@ -700,6 +727,8 @@ void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 
 void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 {
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+
 	for (const Vec2D& position : mAttackPositions)
 	{
 		Vec2D drawPosition = {
@@ -967,7 +996,18 @@ void MapEditorScene::DrawUnitActions()
 
 		if (ImGui::Button("Attack"))
 		{
-
+			if (EnemyInAttackRange(mSelectedMapUnit.position, mSelectedMapUnit.attackType))
+			{
+				mGameState = GS_SELECTING_TARGET;
+				for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+				{
+					if (unit == mSelectedMapUnit)
+					{
+						unit.unitState = US_SELECTING_TARGET;
+						break;
+					}
+				}
+			}
 		}
 		if (ImGui::Button("Wait"))
 		{
@@ -2114,6 +2154,39 @@ void MapEditorScene::ReverseMovementPath()
 	mUnitMovementPath.clear();
 	mUnitMovementPath = newPath;
 
+}
+
+bool MapEditorScene::EnemyInAttackRange(const Vec2D& startPosition, const EAttackType& attackType)
+{
+	SetAttackPositions(startPosition, attackType);
+
+	for (const Vec2D& position : mAttackPositions)
+	{
+		for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+		{
+			if (unit.position == position && UnitIsEnemy(unit.unitTexture))
+			{
+				return true;
+			}
+		}
+	}
+
+	mAttackPositions.clear();
+	return false;
+}
+
+bool MapEditorScene::UnitIsEnemy(const EUnitClass& unitClass)
+{
+	switch (unitClass)
+	{
+	case BARBARIAN:
+		return true;
+	case BARBARIAN_ARCHER:
+		return true;
+	case BARBARIAN_CHIEF:
+		return true;
+	}
+	return false;
 }
 
 void MapEditorScene::SetSelectionRect()

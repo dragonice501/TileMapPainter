@@ -98,6 +98,8 @@ public:
 	bool SetUnitMovementPath(const Vec2D& destination);
 	bool CheckMovementPath(const Vec2D& oldPosition, const Vec2D& newPosition, const Vec2D& destination, const float& movement);
 	void ReverseMovementPath();
+	bool EnemyInAttackRange(const Vec2D& startPosition, const EAttackType& attackType);
+	bool UnitIsEnemy(const EUnitClass& unitClass);
 
 	// Select Functions
 	void SetSelectionRect();
@@ -142,9 +144,15 @@ private:
 	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
 	int mSelectedUnitClassIndex = 0;
 	AnimatedUnitSprite mSelectedMapUnit;
+	AnimatedUnitSprite mHoveredUnit;
+	AnimatedUnitSprite mSelectedTargetUnit;
+
+	int mSelectedMapUnitIndex = -1;
+	int mHoveredUnitIndex = -1;
+	int mSelectedTargetUnitIndex = -1;
+
 	EUnitClass mSelectedUnit = NONE;
 	bool mShowSelectedUnitMovement = false;
-	AnimatedUnitSprite mHoveredUnit;
 	bool mUnitHovered = false;
 
 	// Unit Loading Variables

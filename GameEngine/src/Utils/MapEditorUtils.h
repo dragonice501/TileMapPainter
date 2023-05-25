@@ -15,7 +15,9 @@ enum EEditorState
 enum EGameState
 {
 	GS_PLAYER_IDLE,
+	GS_UNIT_MOVING,
 	GS_SELECTING_ACTION,
+	GS_SELECTING_TARGET,
 	GS_ATTACKING,
 	GS_ENEMY_PHASE
 };
@@ -71,6 +73,7 @@ enum EUnitState
 	US_IDLE,
 	US_MOVING,
 	US_SELECTING_ACTION,
+	US_SELECTING_TARGET,
 	US_ATTACKING
 };
 
@@ -128,6 +131,7 @@ struct AnimatedUnitSprite
 	EUnitState unitState = US_IDLE;
 	EAttackType attackType = AT_NONE;
 	EUnitMovementDirection movementDirection = UM_IDLE;
+	EUnitMovementDirection attackDirection = UM_IDLE;
 
 	std::vector<Vec2D> movementPath;
 	int currentPathGoalIndex;
@@ -205,5 +209,13 @@ struct AnimatedUnitSprite
 		else if (movementPath[currentPathGoalIndex].GetX() > movementPath[currentPathGoalIndex + 1].GetX()) movementDirection = UM_LEFT;
 		else if (movementPath[currentPathGoalIndex].GetY() < movementPath[currentPathGoalIndex + 1].GetY()) movementDirection = UM_DOWN;
 		else if (movementPath[currentPathGoalIndex].GetY() > movementPath[currentPathGoalIndex + 1].GetY()) movementDirection = UM_UP;
+	}
+
+	void SetAttackDirection(const Vec2D& targetPosition)
+	{
+		if (targetPosition.GetX() < position.GetX()) movementDirection = UM_LEFT;
+		else if (targetPosition.GetX() > position.GetX()) movementDirection = UM_RIGHT;
+		else if (targetPosition.GetY() < position.GetY()) movementDirection = UM_UP;
+		else if (targetPosition.GetY() > position.GetY()) movementDirection = UM_DOWN;
 	}
 };
