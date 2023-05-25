@@ -2,6 +2,7 @@
 
 #include "../Utils/Vec2D.h"
 
+#include <SDL.h>
 #include <stdint.h>
 
 enum EEditorState
@@ -15,6 +16,7 @@ enum EGameState
 {
 	GS_PLAYER_IDLE,
 	GS_SELECTING_ACTION,
+	GS_ATTACKING,
 	GS_ENEMY_PHASE
 };
 
@@ -132,6 +134,16 @@ struct AnimatedUnitSprite
 	float movementRate = 0.0f;
 	float movementSpeed = 5.0f;
 
+	void Update(const float& deltaTime)
+	{
+		currentFrame = static_cast<int>(((SDL_GetTicks() - startTime) * frameRate / 1000.0f)) % numFrames;
+
+		if (unitState == US_MOVING)
+		{
+			MoveThroughPath(deltaTime);
+		}
+	}
+
 	bool operator!= (const AnimatedUnitSprite& other)
 	{
 		return
@@ -173,9 +185,8 @@ struct AnimatedUnitSprite
 			currentPathGoalIndex++;
 			if (movementPath[currentPathGoalIndex] == movementPath.back())
 			{
-				unitState = US_IDLE;
-				movementDirection = UM_IDLE;
 				currentPathGoalIndex = 0;
+				unitState = US_SELECTING_ACTION;
 				return;
 			}
 			SetMovementDirection();

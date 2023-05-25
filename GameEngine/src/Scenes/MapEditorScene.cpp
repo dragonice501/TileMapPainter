@@ -132,202 +132,37 @@ void MapEditorScene::Input()
 		io.MousePos = ImVec2(mouseX, mouseY);
 		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-		//io.KeysDown[io.KeyMap[ImGuiKey_Backspace]] = SDL_BUTTON(SDL_SCANCODE_BACKSPACE);
 
 		Vec2D cursorMapPosition;
 
-		switch (sdlEvent.type)
+		switch (mEditorState)
 		{
-		case SDL_QUIT:
-			mIsRunning = false;
+		case ES_EDITING_MAP:
+			InputEditMode(sdlEvent, cursorMapPosition);
 			break;
-		case SDL_KEYDOWN:
-		{
-			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
-			{
-				if (mEditorState == ES_EDITING_MAP)
-					mIsRunning = false;
-				else if (mEditorState == ES_PLAYING_GAME)
-					mEditorState = ES_EDITING_MAP;
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_UP)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
-				{
-					MoveSelectionUp();
-				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
-				{
-					MoveSelectionRight();
-				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
-				{
-					MoveSelectionLeft();
-				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
-				{
-					MoveSelectionDown();
-				}
-			}
+		case ES_PLAYING_GAME:
+			InputPlayMode(sdlEvent, cursorMapPosition);
 			break;
-		}
-		case SDL_MOUSEBUTTONDOWN:
-			if (!CursorInGUI())
-			{
-				mMouseButtonDown = true;
-				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-				{
-					cursorMapPosition = GetCursorMapRect();
-					if (mEditorState == ES_EDITING_MAP)
-					{
-						switch (mSelectedTool)
-						{
-						case PAN_TOOL:
-							break;
-						case PAINT_TILE_TOOL:
-							CheckCursorInMap();
-							break;
-						case FILL_TILE_TOOL:
-							//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
-							break;
-						case SELECT_TILE_TOOL:
-							mSelectionRectStart = cursorMapPosition;
-							break;
-						case PAINT_UNIT_TOOL:
-							if (mSelectedUnit != NONE) PaintUnit(cursorMapPosition);
-							break;
-						case SELECT_UNIT_TOOL:
-							if (cursorMapPosition == mSelectedMapUnit.position)
-							{
-								ClearSelectedUnit();
-								break;
-							}
-
-							for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-							{
-								if (cursorMapPosition == unit.position)
-								{
-									SelectUnit(cursorMapPosition);
-									return;
-								}
-							}
-
-							if (mSelectedMapUnit != AnimatedUnitSprite())
-							{
-								for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-								{
-									if (mSelectedMapUnit == unit)
-									{
-										unit.position = cursorMapPosition;
-										ClearSelectedUnit();
-										return;
-									}
-								}
-							}
-						default:
-							break;
-						}
-					}
-					else if (mEditorState == ES_SELECTING_SPRITE)
-					{
-						mMouseButtonDown = false;
-						CheckCursorInSpriteSheet();
-					}
-				}
-				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
-				{
-					switch (mSelectedTool)
-					{
-					case PAN_TOOL:
-						break;
-					case PAINT_TILE_TOOL:
-						CopyMapRectSprite();
-						break;
-					case FILL_TILE_TOOL:
-						CopyMapRectSprite();
-						break;
-					case SELECT_TILE_TOOL:
-						mShowTileSelection = false;
-						break;
-					case PAINT_UNIT_TOOL:
-						RemoveUnit(GetCursorMapRect());
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			break;
-		case SDL_MOUSEBUTTONUP:
-		{
-			mMouseButtonDown = false;
-			if (mSelectedTool == SELECT_TILE_TOOL)
-			{
-				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-				{
-					mSelectionRectEnd = GetCursorMapRect();
-					SetSelectionRect();
-				}
-				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
-				{
-					mShowTileSelection = false;
-				}
-			}
-			break;
-		}
-		case SDL_MOUSEMOTION:
-		{
-			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
-			GetCursorMapRect();
-			if (mMouseButtonDown && !CursorInGUI())
-			{
-				switch (mSelectedTool)
-				{
-				case PAINT_TILE_TOOL:
-					break;
-				case PAN_TOOL:
-					mMapXOffset += sdlEvent.motion.xrel;
-					mMapYOffset += sdlEvent.motion.yrel;
-					SetMapRectPositions();
-					break;
-				case SELECT_TILE_TOOL:
-					break;
-				default:
-					break;
-				}
-			}
-			break;
-		}
 		default:
 			break;
 		}
 	}
 }
 
-void MapEditorScene::Update(float deltaTime)
+void MapEditorScene::Update(const float& deltaTime)
 {
-	if (mMouseButtonDown && mSelectedTool == PAINT_TILE_TOOL)
+	switch (mEditorState)
 	{
-		CheckCursorInMap();
-	}
-
-	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
-	{
-		sprite.currentFrame = static_cast<int>(((SDL_GetTicks() - sprite.startTime) * sprite.frameRate / 1000.0f)) % sprite.numFrames;
-
-		if (sprite.unitState == US_MOVING)
-		{
-			sprite.MoveThroughPath(deltaTime);
-		}
+	case ES_EDITING_MAP:
+		UpdateEditor(deltaTime);
+		break;
+	case ES_SELECTING_SPRITE:
+		break;
+	case ES_PLAYING_GAME:
+		UpdateGame(deltaTime);
+		break;
+	default:
+		break;
 	}
 }
 
@@ -339,27 +174,375 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 	switch (mEditorState)
 	{
 	case ES_EDITING_MAP:
-		DrawMap(renderer);
-
-		if (mShowSelectedUnitMovement)
-		{
-			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
-			DrawSelectedUnitMovement(renderer);
-
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
-			DrawSelectedUnitAttackRange(renderer);
-		}
-		if (mAnimatedUnitSprites.size() > 0)
-		{
-			DrawAnimatedSprites(renderer);
-		}
+		RenderEditorMode(renderer);
 		break;
 	case ES_SELECTING_SPRITE:
 		DrawTileMap(renderer);
 		break;
 	case ES_PLAYING_GAME:
-		DrawMap(renderer);
+		RenderPlayMode(renderer);
+		break;
+	default:
+		break;
+	}
+
+	SDL_RenderPresent(renderer);
+}
+
+void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition)
+{
+	switch (sdlEvent.type)
+	{
+	case SDL_QUIT:
+		mIsRunning = false;
+		break;
+	case SDL_KEYDOWN:
+	{
+		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+		{
+			mIsRunning = false;
+		}
+		else if (sdlEvent.key.keysym.sym == SDLK_UP)
+		{
+			if (mSelectedTool == SELECT_TILE_TOOL)
+			{
+				MoveSelectionUp();
+			}
+		}
+		else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
+		{
+			if (mSelectedTool == SELECT_TILE_TOOL)
+			{
+				MoveSelectionRight();
+			}
+		}
+		else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
+		{
+			if (mSelectedTool == SELECT_TILE_TOOL)
+			{
+				MoveSelectionLeft();
+			}
+		}
+		else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
+		{
+			if (mSelectedTool == SELECT_TILE_TOOL)
+			{
+				MoveSelectionDown();
+			}
+		}
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN:
+		if (!CursorInGUI())
+		{
+			mMouseButtonDown = true;
+			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			{
+				cursorMapPosition = GetCursorMapRect();
+				if (mEditorState == ES_EDITING_MAP)
+				{
+					switch (mSelectedTool)
+					{
+					case PAN_TOOL:
+						break;
+					case PAINT_TILE_TOOL:
+						CheckCursorInMap();
+						break;
+					case FILL_TILE_TOOL:
+						//FillTile(static_cast<uint16_t>(position.GetX()), static_cast<uint16_t>(position.GetY()));
+						break;
+					case SELECT_TILE_TOOL:
+						mSelectionRectStart = cursorMapPosition;
+						break;
+					case PAINT_UNIT_TOOL:
+						if (mSelectedUnit != NONE) PaintUnit(cursorMapPosition);
+						break;
+					case SELECT_UNIT_TOOL:
+						if (cursorMapPosition == mSelectedMapUnit.position)
+						{
+							ClearSelectedUnit();
+							break;
+						}
+
+						for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+						{
+							if (cursorMapPosition == unit.position)
+							{
+								SelectUnit(cursorMapPosition);
+								return;
+							}
+						}
+
+						if (mSelectedMapUnit != AnimatedUnitSprite())
+						{
+							for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+							{
+								if (mSelectedMapUnit == unit)
+								{
+									unit.position = cursorMapPosition;
+									ClearSelectedUnit();
+									return;
+								}
+							}
+						}
+					default:
+						break;
+					}
+				}
+				else if (mEditorState == ES_SELECTING_SPRITE)
+				{
+					mMouseButtonDown = false;
+					CheckCursorInSpriteSheet();
+				}
+			}
+			else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+			{
+				switch (mSelectedTool)
+				{
+				case PAN_TOOL:
+					break;
+				case PAINT_TILE_TOOL:
+					CopyMapRectSprite();
+					break;
+				case FILL_TILE_TOOL:
+					CopyMapRectSprite();
+					break;
+				case SELECT_TILE_TOOL:
+					mShowTileSelection = false;
+					break;
+				case PAINT_UNIT_TOOL:
+					RemoveUnit(GetCursorMapRect());
+					break;
+				default:
+					break;
+				}
+			}
+		}
+		break;
+	case SDL_MOUSEBUTTONUP:
+	{
+		mMouseButtonDown = false;
+		if (mSelectedTool == SELECT_TILE_TOOL)
+		{
+			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			{
+				mSelectionRectEnd = GetCursorMapRect();
+				SetSelectionRect();
+			}
+			else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+			{
+				mShowTileSelection = false;
+			}
+		}
+		break;
+	}
+	case SDL_MOUSEMOTION:
+	{
+		mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
+		GetCursorMapRect();
+		if (mMouseButtonDown && !CursorInGUI())
+		{
+			switch (mSelectedTool)
+			{
+			case PAINT_TILE_TOOL:
+				break;
+			case PAN_TOOL:
+				mMapXOffset += sdlEvent.motion.xrel;
+				mMapYOffset += sdlEvent.motion.yrel;
+				SetMapRectPositions();
+				break;
+			case SELECT_TILE_TOOL:
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition)
+{
+	switch (sdlEvent.type)
+	{
+	case SDL_QUIT:
+		mIsRunning = false;
+		break;
+	case SDL_KEYDOWN:
+	{
+		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+		{
+			mEditorState = ES_EDITING_MAP;
+		}
+		break;
+	}
+	case SDL_MOUSEBUTTONDOWN:
+		mMouseButtonDown = true;
+		if (!CursorInGUI())
+		{
+			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			{
+				cursorMapPosition = GetCursorMapRect();
+
+				// Map Position contains unit
+				for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+				{
+					if (cursorMapPosition == unit.position)
+					{
+						// Unit has not been selected
+						if (mSelectedMapUnit != unit)
+						{
+							SelectUnit(cursorMapPosition);
+							return;
+						}
+						// Unit is already selected
+					}
+				}
+
+				// Map Position contains selected unit movement position
+				if (CursorInSelectedUnitMovement(cursorMapPosition))
+				{
+					if (SetUnitMovementPath(cursorMapPosition))
+					{
+						for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+						{
+							if (unit == mSelectedMapUnit)
+							{
+								unit.movementPath = mUnitMovementPath;
+								unit.unitState = US_MOVING;
+								unit.currentPathGoalIndex = 0;
+								unit.SetMovementDirection();
+
+								mMovementPositions.clear();
+								mAttackPositions.clear();
+								return;
+							}
+						}
+					}
+				}
+
+				// Map Position contains nothing
+				ClearSelectedUnit();
+				return;
+			}
+		}
+		break;
+	case SDL_MOUSEBUTTONUP:
+	{
+		mMouseButtonDown = false;
+		break;
+	}
+	case SDL_MOUSEMOTION:
+	{
+		mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+bool MapEditorScene::CheckCursorIsHoveringUnit(const Vec2D& cursorMapPosition)
+{
+	for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+	{
+		if (unit.position == cursorMapPosition)
+		{
+			mHoveredUnit = unit;
+			return true;
+		}
+	}
+
+	mHoveredUnit = AnimatedUnitSprite();
+	return false;
+}
+
+void MapEditorScene::UpdateEditor(const float& deltaTime)
+{
+	if (mMouseButtonDown && mSelectedTool == PAINT_TILE_TOOL)
+	{
+		CheckCursorInMap();
+	}
+
+	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
+	{
+		sprite.Update(deltaTime);
+	}
+}
+
+void MapEditorScene::UpdateGame(const float& deltaTime)
+{
+	for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+	{
+		unit.Update(deltaTime);
+		if (unit.unitState == US_SELECTING_ACTION)
+		{
+			mSelectedMapUnit = unit;
+			mGameState = GS_SELECTING_ACTION;
+		}
+	}
+
+	switch (mGameState)
+	{
+	case GS_PLAYER_IDLE:
+		break;
+	case GS_SELECTING_ACTION:
+		break;
+	case GS_ATTACKING:
+		break;
+	case GS_ENEMY_PHASE:
+		break;
+	default:
+		break;
+	}
+
+	if (mEditorState == ES_PLAYING_GAME)
+	{
+		mUnitHovered = CheckCursorIsHoveringUnit(GetCursorMapRect());
+	}
+}
+
+void MapEditorScene::RenderEditorMode(SDL_Renderer* renderer)
+{
+	DrawMap(renderer);
+
+	if (mShowSelectedUnitMovement)
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
+		DrawSelectedUnitMovement(renderer);
+
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+		DrawSelectedUnitAttackRange(renderer);
+	}
+
+	if (mAnimatedUnitSprites.size() > 0)
+	{
+		DrawAnimatedSprites(renderer);
+	}
+
+	DrawGUI();
+}
+
+void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
+{
+	DrawMap(renderer);
+
+	if (mAnimatedUnitSprites.size() > 0)
+	{
+		DrawAnimatedSprites(renderer);
+	}
+
+	switch (mGameState)
+	{
+	case GS_PLAYER_IDLE:
+		if (mUnitHovered)
+		{
+			DrawHoveredUnitStats();
+		}
 
 		if (mShowSelectedUnitMovement)
 		{
@@ -370,20 +553,17 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 			DrawSelectedUnitAttackRange(renderer);
 		}
-		if (mAnimatedUnitSprites.size() > 0)
-		{
-			DrawAnimatedSprites(renderer);
-		}
+		break;
+	case GS_SELECTING_ACTION:
+		DrawUnitActions();
+		break;
+	case GS_ATTACKING:
+		break;
+	case GS_ENEMY_PHASE:
 		break;
 	default:
 		break;
 	}
-
-	if(mEditorState == ES_EDITING_MAP)
-		DrawGUI();
-
-
-	SDL_RenderPresent(renderer);
 }
 
 void MapEditorScene::DrawMap(SDL_Renderer* renderer)
@@ -726,6 +906,96 @@ void MapEditorScene::DrawGUI()
 
 	ImGui::Render();
 	ImGuiSDL::Render(ImGui::GetDrawData());
+}
+
+void MapEditorScene::DrawHoveredUnitStats()
+{
+	ImGui::NewFrame();
+
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration;
+
+	if (ImGui::Begin("Unit", NULL, windowFlags))
+	{
+		Vec2D position = GetCursorToScreenRect() - Vec2D(0, SQUARE_RENDER_SIZE * 2.5f);
+		ImVec2 windowPosition;
+		windowPosition.x = position.GetX();
+		windowPosition.y = position.GetY();
+
+		ImGui::SetWindowPos(windowPosition);
+		std::string unitString = GetUnitTypeName(mHoveredUnit.unitTexture);
+		std::string levelString = "Level: " + std::to_string(mHoveredUnit.level);
+		std::string hpString = "HP: " + std::to_string(mHoveredUnit.currentHP) + '/' + std::to_string(mHoveredUnit.maxHP);
+
+		ImGui::Text(unitString.c_str());
+		ImGui::Text(levelString.c_str());
+		ImGui::Text(hpString.c_str());
+	}
+	ImGui::End();
+
+	ImGui::Render();
+	ImGuiSDL::Render(ImGui::GetDrawData());
+}
+
+Vec2D MapEditorScene::GetCursorToScreenRect()
+{
+	Vec2D position = mCursorPosition;
+	int x = position.GetX();
+	int y = position.GetY();
+
+	int x0 = x % static_cast<int>(SQUARE_RENDER_SIZE);
+	int y0 = y % static_cast<int>(SQUARE_RENDER_SIZE);
+
+	position.SetX(x - x0);
+	position.SetY(y - y0);
+
+	return position;
+}
+
+void MapEditorScene::DrawUnitActions()
+{
+	ImGui::NewFrame();
+
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration;
+
+	if (ImGui::Begin("Unit Actions", NULL, windowFlags))
+	{
+		Vec2D position = GetUnitToScreenPosition(mSelectedMapUnit.position) + Vec2D(SQUARE_RENDER_SIZE * 2, -SQUARE_RENDER_SIZE);
+		ImVec2 windowPosition;
+		windowPosition.x = position.GetX();
+		windowPosition.y = position.GetY();
+		ImGui::SetWindowPos(windowPosition);
+
+		if (ImGui::Button("Attack"))
+		{
+
+		}
+		if (ImGui::Button("Wait"))
+		{
+			mGameState = GS_PLAYER_IDLE;
+			for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			{
+				if (unit == mSelectedMapUnit)
+				{
+					unit.unitState = US_IDLE;
+					unit.movementDirection = UM_IDLE;
+					mSelectedMapUnit = AnimatedUnitSprite();
+				}
+			}
+		}
+	}
+	ImGui::End();
+
+	ImGui::Render();
+	ImGuiSDL::Render(ImGui::GetDrawData());
+}
+
+Vec2D MapEditorScene::GetUnitToScreenPosition(const Vec2D& unitMapPosition)
+{
+	Vec2D position = {
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + unitMapPosition.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + unitMapPosition.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+
+	return position;
 }
 
 bool MapEditorScene::TileInsideCamera(uint16_t x, uint16_t y)

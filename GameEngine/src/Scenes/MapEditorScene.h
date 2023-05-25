@@ -21,9 +21,21 @@ public:
 	void Setup(SDL_Renderer* renderer);
 
 	void Input();
-	void Update(float deltaTime);
+	void Update(const float& deltaTime);
 	void Render(SDL_Renderer* renderer);
 
+	// Input
+	void InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
+	void InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
+	bool CheckCursorIsHoveringUnit(const Vec2D& cursorMapPosition);
+
+	// Update
+	void UpdateEditor(const float& deltaTime);
+	void UpdateGame(const float& deltaTime);
+
+	// Rendering
+	void RenderEditorMode(SDL_Renderer* renderer);
+	void RenderPlayMode(SDL_Renderer* renderer);
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
@@ -31,6 +43,10 @@ public:
 	void DrawSelectedUnitMovement(SDL_Renderer* renderer);
 	void DrawSelectedUnitAttackRange(SDL_Renderer* renderer);
 	void DrawGUI();
+	void DrawHoveredUnitStats();
+	Vec2D GetCursorToScreenRect();
+	void DrawUnitActions();
+	Vec2D GetUnitToScreenPosition(const Vec2D& unitMapPosition);
 
 	bool TileInsideCamera(uint16_t x, uint16_t y);
 	bool CursorInGUI();
@@ -115,6 +131,9 @@ private:
 
 	Vec2D mCursorPosition;
 
+	// Playing Game variables
+	EGameState mGameState = GS_PLAYER_IDLE;
+
 	// Paint Variables
 	uint16_t mSelectedSpriteIndex = 168;
 
@@ -125,6 +144,8 @@ private:
 	AnimatedUnitSprite mSelectedMapUnit;
 	EUnitClass mSelectedUnit = NONE;
 	bool mShowSelectedUnitMovement = false;
+	AnimatedUnitSprite mHoveredUnit;
+	bool mUnitHovered = false;
 
 	// Unit Loading Variables
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;

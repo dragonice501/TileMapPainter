@@ -1,7 +1,7 @@
 :width 256
 :height 256
-:xOffset 364.000000
-:yOffset -3105.000000
+:xOffset 376.000000
+:yOffset -3104.000000
 :tile 459
 :tile 459
 :tile 459
