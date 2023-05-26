@@ -258,31 +258,41 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						if (mSelectedUnit != NONE) PaintUnit(cursorMapPosition);
 						break;
 					case SELECT_UNIT_TOOL:
-						if (cursorMapPosition == mSelectedMapUnit.position)
+						// If a unit is already selected
+						if (mSelectedMapUnitIndex != -1)
 						{
-							ClearSelectedUnit();
-							break;
-						}
-
-						for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-						{
-							if (cursorMapPosition == unit.position)
+							// Clear selected unit if selected again
+							if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
 							{
-								SelectUnit(cursorMapPosition);
+								ClearSelectedUnit();
 								return;
 							}
-						}
 
-						if (mSelectedMapUnit != AnimatedUnitSprite())
-						{
-							for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+							// Change selected unit if another is selected
+							for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
 							{
-								if (mSelectedMapUnit == unit)
+								if (cursorMapPosition == mAnimatedUnitSprites[i].position)
 								{
-									unit.position = cursorMapPosition;
-									ClearSelectedUnit();
+									mSelectedMapUnitIndex = i;
+									SelectUnit(cursorMapPosition);
 									return;
 								}
+							}
+
+							// Move unit to cursor map position
+							mAnimatedUnitSprites[mSelectedMapUnitIndex].position = cursorMapPosition;
+							ClearSelectedUnit();
+							return;
+						}
+
+						// Select unit at cursor map position if one exists
+						for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+						{
+							if (cursorMapPosition == mAnimatedUnitSprites[i].position)
+							{
+								mSelectedMapUnitIndex = i;
+								SelectUnit(cursorMapPosition);
+								break;
 							}
 						}
 					default:
@@ -380,78 +390,139 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 		break;
 	}
 	case SDL_MOUSEBUTTONDOWN:
-		mMouseButtonDown = true;
 		if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 		{
+			mMouseButtonDown = true;
 			cursorMapPosition = GetCursorMapRect();
 
-			// Map Position contains unit
-			for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			// If a unit is already selected
+			if (mSelectedMapUnitIndex != -1)
 			{
 				// Unit is enemy and selected unit is looking for attack target
-				if (mGameState == GS_SELECTING_TARGET)
+
+				// Clear selected unit if selected again
+				if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
 				{
-					for (const AnimatedUnitSprite& targetUnit : mAnimatedUnitSprites)
-					{
-						if (targetUnit.position == cursorMapPosition && UnitIsEnemy(targetUnit.unitTexture))
-						{
-							mSelectedTargetUnit = targetUnit;
-							for (AnimatedUnitSprite& controlledUnit : mAnimatedUnitSprites)
-							{
-								if (controlledUnit == mSelectedMapUnit)
-								{
-									controlledUnit.SetAttackDirection(targetUnit.position);
-								}
-							}
-							break;
-						}
-					}
-					break;
+					ClearSelectedUnit();
+					return;
 				}
-				else if (cursorMapPosition == unit.position)
+
+				// Cursor position contains selected unit movement position
+				if (CursorInSelectedUnitMovement(cursorMapPosition))
 				{
-					// Unit has not been selected
-					if (mSelectedMapUnit != unit)
+					if (SetUnitMovementPath(cursorMapPosition))
 					{
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath = mUnitMovementPath;
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING;
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].currentPathGoalIndex = 0;
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].SetMovementDirection();
+
+						mGameState = GS_UNIT_MOVING;
+
+						mMovementPositions.clear();
+						mAttackPositions.clear();
+						return;
+					}
+				}
+
+				// Map Position contains unit
+				// Change selected unit if another is selected and it is not an enemy
+				for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+				{
+					if (cursorMapPosition == mAnimatedUnitSprites[i].position && !UnitIsEnemy(mAnimatedUnitSprites[i].unitTexture))
+					{
+						mSelectedMapUnitIndex = i;
 						SelectUnit(cursorMapPosition);
 						return;
 					}
-					// Unit is already selected
-					else if (mSelectedMapUnit == unit)
-					{
-						mGameState = GS_SELECTING_ACTION;
-						unit.unitState = US_SELECTING_ACTION;
-					}
 				}
+
+				return;
 			}
 
-			// Map Position contains selected unit movement position
-			if (CursorInSelectedUnitMovement(cursorMapPosition))
+			// Unit has not been selected
+			// Select unit at cursor map position if one exists
+			for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
 			{
-				if (SetUnitMovementPath(cursorMapPosition))
+				if (cursorMapPosition == mAnimatedUnitSprites[i].position)
 				{
-					for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-					{
-						if (unit == mSelectedMapUnit)
-						{
-							unit.movementPath = mUnitMovementPath;
-							unit.unitState = US_MOVING;
-							unit.currentPathGoalIndex = 0;
-							unit.SetMovementDirection();
-
-							mGameState = GS_UNIT_MOVING;
-
-							mMovementPositions.clear();
-							mAttackPositions.clear();
-							return;
-						}
-					}
+					mSelectedMapUnitIndex = i;
+					SelectUnit(cursorMapPosition);
+					return;
 				}
 			}
-
+			
 			// Map Position contains nothing
 			ClearSelectedUnit();
 			return;
+
+			//// Map Position contains unit
+			//for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			//{
+			//	// Unit is enemy and selected unit is looking for attack target
+			//	if (mGameState == GS_SELECTING_TARGET)
+			//	{
+			//		for (const AnimatedUnitSprite& targetUnit : mAnimatedUnitSprites)
+			//		{
+			//			if (targetUnit.position == cursorMapPosition && UnitIsEnemy(targetUnit.unitTexture))
+			//			{
+			//				mSelectedTargetUnit = targetUnit;
+			//				for (AnimatedUnitSprite& controlledUnit : mAnimatedUnitSprites)
+			//				{
+			//					if (controlledUnit == mSelectedMapUnit)
+			//					{
+			//						controlledUnit.SetAttackDirection(targetUnit.position);
+			//					}
+			//				}
+			//				break;
+			//			}
+			//		}
+			//		break;
+			//	}
+			//	else if (cursorMapPosition == unit.position)
+			//	{
+			//		// Unit has not been selected
+			//		if (mSelectedMapUnit != unit)
+			//		{
+			//			SelectUnit(cursorMapPosition);
+			//			return;
+			//		}
+			//		// Unit is already selected
+			//		else if (mSelectedMapUnit == unit)
+			//		{
+			//			mGameState = GS_SELECTING_ACTION;
+			//			unit.unitState = US_SELECTING_ACTION;
+			//		}
+			//	}
+			//}
+
+			//// Map Position contains selected unit movement position
+			//if (CursorInSelectedUnitMovement(cursorMapPosition))
+			//{
+			//	if (SetUnitMovementPath(cursorMapPosition))
+			//	{
+			//		for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			//		{
+			//			if (unit == mSelectedMapUnit)
+			//			{
+			//				unit.movementPath = mUnitMovementPath;
+			//				unit.unitState = US_MOVING;
+			//				unit.currentPathGoalIndex = 0;
+			//				unit.SetMovementDirection();
+
+			//				mGameState = GS_UNIT_MOVING;
+
+			//				mMovementPositions.clear();
+			//				mAttackPositions.clear();
+			//				return;
+			//			}
+			//		}
+			//	}
+			//}
+
+			//// Map Position contains nothing
+			//ClearSelectedUnit();
+			//return;
 		}
 		break;
 	case SDL_MOUSEBUTTONUP:
@@ -471,16 +542,16 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 
 bool MapEditorScene::CheckCursorIsHoveringUnit(const Vec2D& cursorMapPosition)
 {
-	for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+	for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
 	{
-		if (unit.position == cursorMapPosition)
+		if (mAnimatedUnitSprites[i].position == cursorMapPosition)
 		{
-			mHoveredUnit = unit;
+			mHoveredUnitIndex = i;
 			return true;
 		}
 	}
 
-	mHoveredUnit = AnimatedUnitSprite();
+	mHoveredUnitIndex = -1;
 	return false;
 }
 
@@ -504,7 +575,6 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 		unit.Update(deltaTime);
 		if (unit.unitState == US_SELECTING_ACTION)
 		{
-			mSelectedMapUnit = unit;
 			mGameState = GS_SELECTING_ACTION;
 		}
 	}
@@ -904,31 +974,34 @@ void MapEditorScene::DrawGUI()
 			ImGui::InputInt("Defense", &mNewUnitDefense);
 			ImGui::InputInt("Movement", &mNewUnitMovement);
 
-			std::string unitString = "Selected Unit: " + GetUnitTypeName(mSelectedMapUnit.unitTexture);
-			std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mSelectedMapUnit.attackType);
-			std::string levelString = "Selected Unit Level: " + std::to_string(mSelectedMapUnit.level);
-			std::string maxHPString = "Selected Unit Max HP: " + std::to_string(mSelectedMapUnit.maxHP);
-			std::string currentHPString = "Selected Unit Current HP: " + std::to_string(mSelectedMapUnit.currentHP);
-			std::string strengthString = "Selected Unit Strength: " + std::to_string(mSelectedMapUnit.strength);
-			std::string magicString = "Selected Unit magic: " + std::to_string(mSelectedMapUnit.magic);
-			std::string skillString = "Selected Unit Skill: " + std::to_string(mSelectedMapUnit.skill);
-			std::string speedString = "Selected Unit Speed: " + std::to_string(mSelectedMapUnit.speed);
-			std::string luckString = "Selected Unit Luck: " + std::to_string(mSelectedMapUnit.luck);
-			std::string defenseString = "Selected Unit Defense: " + std::to_string(mSelectedMapUnit.defense);
-			std::string movementString = "Selected Unit Movement: " + std::to_string(mSelectedMapUnit.movement);
+			if (mSelectedMapUnitIndex != -1)
+			{
+				std::string unitString = "Selected Unit: " + GetUnitTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture);
+				std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType);
+				std::string levelString = "Selected Unit Level: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].level);
+				std::string maxHPString = "Selected Unit Max HP: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].maxHP);
+				std::string currentHPString = "Selected Unit Current HP: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].currentHP);
+				std::string strengthString = "Selected Unit Strength: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].strength);
+				std::string magicString = "Selected Unit magic: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].magic);
+				std::string skillString = "Selected Unit Skill: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].skill);
+				std::string speedString = "Selected Unit Speed: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].speed);
+				std::string luckString = "Selected Unit Luck: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].luck);
+				std::string defenseString = "Selected Unit Defense: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].defense);
+				std::string movementString = "Selected Unit Movement: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement);
 
-			ImGui::Text(unitString.c_str());
-			ImGui::Text(unitAttackString.c_str());
-			ImGui::Text(levelString.c_str());
-			ImGui::Text(maxHPString.c_str());
-			ImGui::Text(currentHPString.c_str());
-			ImGui::Text(strengthString.c_str());
-			ImGui::Text(magicString.c_str());
-			ImGui::Text(skillString.c_str());
-			ImGui::Text(speedString.c_str());
-			ImGui::Text(luckString.c_str());
-			ImGui::Text(defenseString.c_str());
-			ImGui::Text(movementString.c_str());
+				ImGui::Text(unitString.c_str());
+				ImGui::Text(unitAttackString.c_str());
+				ImGui::Text(levelString.c_str());
+				ImGui::Text(maxHPString.c_str());
+				ImGui::Text(currentHPString.c_str());
+				ImGui::Text(strengthString.c_str());
+				ImGui::Text(magicString.c_str());
+				ImGui::Text(skillString.c_str());
+				ImGui::Text(speedString.c_str());
+				ImGui::Text(luckString.c_str());
+				ImGui::Text(defenseString.c_str());
+				ImGui::Text(movementString.c_str());
+			}
 		}
 	}
 	ImGui::End();
@@ -951,9 +1024,13 @@ void MapEditorScene::DrawHoveredUnitStats()
 		windowPosition.y = position.GetY();
 
 		ImGui::SetWindowPos(windowPosition);
-		std::string unitString = GetUnitTypeName(mHoveredUnit.unitTexture);
-		std::string levelString = "Level: " + std::to_string(mHoveredUnit.level);
-		std::string hpString = "HP: " + std::to_string(mHoveredUnit.currentHP) + '/' + std::to_string(mHoveredUnit.maxHP);
+		std::string unitString = GetUnitTypeName(mAnimatedUnitSprites[mHoveredUnitIndex].unitTexture);
+		std::string levelString = "Level: " + std::to_string(mAnimatedUnitSprites[mHoveredUnitIndex].level);
+		std::string hpString = 
+			"HP: " + 
+			std::to_string(mAnimatedUnitSprites[mHoveredUnitIndex].currentHP) + 
+			'/' + 
+			std::to_string(mAnimatedUnitSprites[mHoveredUnitIndex].maxHP);
 
 		ImGui::Text(unitString.c_str());
 		ImGui::Text(levelString.c_str());
@@ -988,7 +1065,7 @@ void MapEditorScene::DrawUnitActions()
 
 	if (ImGui::Begin("Unit Actions", NULL, windowFlags))
 	{
-		Vec2D position = GetUnitToScreenPosition(mSelectedMapUnit.position) + Vec2D(SQUARE_RENDER_SIZE * 2, -SQUARE_RENDER_SIZE);
+		Vec2D position = GetUnitToScreenPosition(mAnimatedUnitSprites[mSelectedMapUnitIndex].position) + Vec2D(SQUARE_RENDER_SIZE * 2, -SQUARE_RENDER_SIZE);
 		ImVec2 windowPosition;
 		windowPosition.x = position.GetX();
 		windowPosition.y = position.GetY();
@@ -996,31 +1073,18 @@ void MapEditorScene::DrawUnitActions()
 
 		if (ImGui::Button("Attack"))
 		{
-			if (EnemyInAttackRange(mSelectedMapUnit.position, mSelectedMapUnit.attackType))
+			if (EnemyInAttackRange(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType))
 			{
 				mGameState = GS_SELECTING_TARGET;
-				for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-				{
-					if (unit == mSelectedMapUnit)
-					{
-						unit.unitState = US_SELECTING_TARGET;
-						break;
-					}
-				}
+				mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_SELECTING_TARGET;
 			}
 		}
 		if (ImGui::Button("Wait"))
 		{
 			mGameState = GS_PLAYER_IDLE;
-			for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
-			{
-				if (unit == mSelectedMapUnit)
-				{
-					unit.unitState = US_IDLE;
-					unit.movementDirection = UM_IDLE;
-					mSelectedMapUnit = AnimatedUnitSprite();
-				}
-			}
+			mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_IDLE;
+			mAnimatedUnitSprites[mSelectedMapUnitIndex].movementDirection = UM_IDLE;
+			mSelectedMapUnitIndex = -1;
 		}
 	}
 	ImGui::End();
@@ -1408,7 +1472,7 @@ void MapEditorScene::RemoveUnit(Vec2D position)
 		}
 	}
 
-	mSelectedMapUnit = AnimatedUnitSprite();
+	mSelectedMapUnitIndex = -1;
 }
 
 void MapEditorScene::SaveUnits()
@@ -1662,42 +1726,24 @@ std::string MapEditorScene::GetUnitAttackTypeName(EAttackType type)
 
 void MapEditorScene::SelectUnit(Vec2D position)
 {
-	for (const AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
-	{
-		if (sprite.position == position)
-		{
-			if (mSelectedMapUnit != sprite)
-			{
-				//mEditorState = UNIT_SELECTED;
-				mSelectedMapUnit = sprite;
-
-				mShowSelectedUnitMovement = true;
-				mMovementPositions.clear();
-				mAttackPositions.clear();
-
-				mMovementPositions.push_back(mSelectedMapUnit.position);
-				GetMovementPositions(mSelectedMapUnit.position, static_cast<float>(mSelectedMapUnit.movement));
-				DeleteMovementPositionCopies();
-				
-				DeleteAttackPositionCopies();
-				return;
-			}
-			else if (mSelectedMapUnit == sprite) return;
-		}
-	}
-
+	mShowSelectedUnitMovement = true;
 	mMovementPositions.clear();
 	mAttackPositions.clear();
-	mShowSelectedUnitMovement = false;
-	mSelectedMapUnit = AnimatedUnitSprite();
+
+	mMovementPositions.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
+	GetMovementPositions(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
+	
+	DeleteMovementPositionCopies();
+	DeleteAttackPositionCopies();
+	return;
 }
 
 void MapEditorScene::ClearSelectedUnit()
 {
+	mSelectedMapUnitIndex = -1;
 	mMovementPositions.clear();
 	mAttackPositions.clear();
 	mShowSelectedUnitMovement = false;
-	mSelectedMapUnit = AnimatedUnitSprite();
 }
 
 void MapEditorScene::GetMovementPositions(const Vec2D& currentPosition, const float& movement)
@@ -1712,7 +1758,7 @@ void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D
 {
 	if (oldPosition == newPosition) return;
 
-	float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+	float cost = GetTerrainMovementCost(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
 
 	if (movement - cost >= 0)
 	{
@@ -1725,52 +1771,7 @@ void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D
 	}
 	else if (movement - cost < 0)
 	{
-		SetAttackPositions(oldPosition, mSelectedMapUnit.attackType);
-
-		/*switch (mSelectedMapUnit.attackType)
-		{
-		case PHYSICAL:
-			switch (direction)
-			{
-			case UP:
-				CheckAttackPosition(oldPosition, newPosition, 1, UP);
-				return;
-			case DOWN:
-				CheckAttackPosition(oldPosition, newPosition, 1, DOWN);
-				return;
-			case LEFT:
-				CheckAttackPosition(oldPosition, newPosition, 1, LEFT);
-				return;
-			case RIGHT:
-				CheckAttackPosition(oldPosition, newPosition, 1, RIGHT);
-				return;
-			default:
-				return;
-			}
-			return;
-		case RANGED:
-			mAttackPositions.push_back(newPosition + Vec2D(0, -1));
-			mAttackPositions.push_back(newPosition + Vec2D(0, 1));
-			mAttackPositions.push_back(newPosition + Vec2D(1, 0));
-			mAttackPositions.push_back(newPosition + Vec2D(1, 0));
-
-			mAttackPositions.push_back(newPosition + Vec2D(2, 0));
-			mAttackPositions.push_back(newPosition + Vec2D(-2, 0));
-			mAttackPositions.push_back(newPosition + Vec2D(0, -2));
-			mAttackPositions.push_back(newPosition + Vec2D(0, 2));
-
-			mAttackPositions.push_back(newPosition + Vec2D(1, 1));
-			mAttackPositions.push_back(newPosition + Vec2D(1, -1));
-			mAttackPositions.push_back(newPosition + Vec2D(-1, 1));
-			mAttackPositions.push_back(newPosition + Vec2D(-11, -1));
-			return;
-		case MAGIC:
-			break;
-		case AT_NONE:
-			break;
-		default:
-			break;
-		}*/
+		SetAttackPositions(oldPosition, mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType);
 	}
 }
 
@@ -2050,7 +2051,7 @@ bool MapEditorScene::MovementsAlreadyContainsPosition(const Vec2D& position)
 
 bool MapEditorScene::CursorInSelectedUnitMovement(const Vec2D& mapPosition)
 {
-	for (const Vec2D& position : mMovementPositions)
+	/*for (const Vec2D& position : mMovementPositions)
 	{
 		if (position == mapPosition)
 		{
@@ -2063,6 +2064,18 @@ bool MapEditorScene::CursorInSelectedUnitMovement(const Vec2D& mapPosition)
 			}
 			return true;
 		}
+	}*/
+
+	for (const Vec2D& position : mMovementPositions)
+	{
+		if (position == mapPosition)
+		{
+			if (mAnimatedUnitSprites[mSelectedMapUnitIndex].position == mapPosition)
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 
 	return false;
@@ -2072,31 +2085,31 @@ bool MapEditorScene::SetUnitMovementPath(const Vec2D& destination)
 {
 	mUnitMovementPath.clear();
 
-	if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(0, -1), destination, mSelectedMapUnit.movement))
+	if (CheckMovementPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(0, -1), destination, mAnimatedUnitSprites[mSelectedMapUnitIndex].movement))
 	{
-		mUnitMovementPath.push_back(mSelectedMapUnit.position + Vec2D(0, -1));
-		mUnitMovementPath.push_back(mSelectedMapUnit.position);
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(0, -1));
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 		ReverseMovementPath();
 		return true;
 	}
-	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(0, 1), destination, mSelectedMapUnit.movement))
+	else if (CheckMovementPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(0, 1), destination, mAnimatedUnitSprites[mSelectedMapUnitIndex].movement))
 	{
-		mUnitMovementPath.push_back(mSelectedMapUnit.position + Vec2D(0, 1));
-		mUnitMovementPath.push_back(mSelectedMapUnit.position);
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(0, 1));
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 		ReverseMovementPath();
 		return true;
 	}
-	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(-1, 0), destination, mSelectedMapUnit.movement))
+	else if (CheckMovementPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(-1, 0), destination, mAnimatedUnitSprites[mSelectedMapUnitIndex].movement))
 	{
-		mUnitMovementPath.push_back(mSelectedMapUnit.position + Vec2D(1, 0));
-		mUnitMovementPath.push_back(mSelectedMapUnit.position);
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(1, 0));
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 		ReverseMovementPath();
 		return true;
 	}
-	else if (CheckMovementPath(mSelectedMapUnit.position, mSelectedMapUnit.position + Vec2D(1, 0), destination, mSelectedMapUnit.movement))
+	else if (CheckMovementPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(1, 0), destination, mAnimatedUnitSprites[mSelectedMapUnitIndex].movement))
 	{
-		mUnitMovementPath.push_back(mSelectedMapUnit.position + Vec2D(-1, 0));
-		mUnitMovementPath.push_back(mSelectedMapUnit.position);
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position + Vec2D(-1, 0));
+		mUnitMovementPath.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 		ReverseMovementPath();
 		return true;
 	}
@@ -2112,7 +2125,7 @@ bool MapEditorScene::CheckMovementPath(const Vec2D& oldPosition, const Vec2D& ne
 		return true;
 	}
 
-	float cost = GetTerrainMovementCost(mSelectedMapUnit.unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+	float cost = GetTerrainMovementCost(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
 
 	if (movement - cost >= 0)
 	{

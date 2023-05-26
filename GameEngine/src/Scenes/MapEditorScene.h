@@ -143,8 +143,6 @@ private:
 	std::vector<SDL_Texture*> mUnitClassTextures;
 	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
 	int mSelectedUnitClassIndex = 0;
-	AnimatedUnitSprite mSelectedMapUnit;
-	AnimatedUnitSprite mHoveredUnit;
 	AnimatedUnitSprite mSelectedTargetUnit;
 
 	int mSelectedMapUnitIndex = -1;
