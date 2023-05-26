@@ -18,9 +18,11 @@ enum EGameState
 	GS_UNIT_MOVING,
 	GS_SELECTING_ACTION,
 	GS_SELECTING_TARGET,
+	GS_BEFORE_ENCOUNTER_BUFFER,
 	GS_PLAYER_ATTACKING,
+	GS_ATTACK_BUFFER,
 	GS_ENEMY_ATTACKING,
-	GS_ENEMY_PHASE
+	GS_ENCOUNTER_BUFFER
 };
 
 enum ESelectedTool
@@ -161,6 +163,7 @@ struct AnimatedUnitSprite
 				if (movementCounter == 1)
 				{
 					movementCounter = 0;
+					movementRate = 0;
 					unitState = US_ATTACK_FINISHED;
 					return;
 				}

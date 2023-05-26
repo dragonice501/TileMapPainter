@@ -368,12 +368,11 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						{
 							if (mAttackPositions[i] == mAnimatedUnitSprites[j].position && UnitIsEnemy(mAnimatedUnitSprites[j].unitTexture))
 							{
-								mGameState = GS_PLAYER_ATTACKING;
-
 								mSelectedTargetUnitIndex = j;
 								SetUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-
 								mAttackPositions.clear();
+
+								mGameState = GS_BEFORE_ENCOUNTER_BUFFER;
 								return;
 							}
 						}
@@ -477,32 +476,63 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 			mUnitMovementPath.clear();
 			mGameState = GS_SELECTING_ACTION;
 		}
-		else if (unit.unitState == US_ATTACKING)
-		{
-			unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
-		}
-		else if (unit.unitState == US_ATTACK_FINISHED && mGameState == GS_PLAYER_ATTACKING)
-		{
-			mGameState = GS_PLAYER_IDLE;
 
-			ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+		switch (mGameState)
+		{
+		case GS_PLAYER_IDLE:
+			break;
+		case GS_SELECTING_ACTION:
+			break;
+		case GS_BEFORE_ENCOUNTER_BUFFER:
+			waitTime -= 1.0f * deltaTime;
+			if (waitTime <= 0.0f)
+			{
+				waitTime = 1.0f;
+				mGameState = GS_PLAYER_ATTACKING;
+				mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING_TO_ATTACK;
+			}
+			break;
+		case GS_PLAYER_ATTACKING:
+			if (unit.unitState == US_ATTACKING)
+			{
+				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
+			}
+			else if (unit.unitState == US_ATTACK_FINISHED && mGameState == GS_PLAYER_ATTACKING)
+			{
+				mGameState = GS_ATTACK_BUFFER;
+			}
+			break;
+		case GS_ATTACK_BUFFER:
+			waitTime -= 1.0f * deltaTime;
+			if (waitTime <= 0.0f)
+			{
+				waitTime = 1.0f;
+				mGameState = GS_ENEMY_ATTACKING;
+				mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+			}
+			break;
+		case GS_ENEMY_ATTACKING:
+			if (unit.unitState == US_ATTACKING)
+			{
+				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
+			}
+			else if (unit.unitState == US_ATTACK_FINISHED && UnitIsEnemy(unit.unitTexture))
+			{
+				mGameState = GS_ENCOUNTER_BUFFER;
+			}
+			break;
+		case GS_ENCOUNTER_BUFFER:
+			waitTime -= 1.0f * deltaTime;
+			if (waitTime <= 0.0f)
+			{
+				waitTime = 1.0f;
+				mGameState = GS_PLAYER_IDLE;
+				ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			}
+			break;
+		default:
+			break;
 		}
-	}
-
-	switch (mGameState)
-	{
-	case GS_PLAYER_IDLE:
-		break;
-	case GS_SELECTING_ACTION:
-		break;
-	case GS_PLAYER_ATTACKING:
-		break;
-	case GS_ENEMY_ATTACKING:
-		break;
-	case GS_ENEMY_PHASE:
-		break;
-	default:
-		break;
 	}
 
 	if (mEditorState == ES_PLAYING_GAME)
@@ -598,8 +628,6 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 		DrawSelectedUnitAttackRange(renderer);
 		break;
 	case GS_PLAYER_ATTACKING:
-		break;
-	case GS_ENEMY_PHASE:
 		break;
 	default:
 		break;
@@ -2141,16 +2169,14 @@ bool MapEditorScene::UnitIsEnemy(const EUnitClass& unitClass)
 void MapEditorScene::SetUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit)
 {
 	// Set Player Unit Attack
-	playerUnit.unitState = US_MOVING_TO_ATTACK;
 	playerUnit.attackStartPosition = playerUnit.position;
 	playerUnit.SetAttackDirection(enemyUnit.position);
 	playerUnit.SetAttackMovementPosition();
 
 	// Set Enemy Unit Attack
-	/*enemyUnit.unitState = US_MOVING_TO_ATTACK;
 	enemyUnit.attackStartPosition = enemyUnit.position;
 	enemyUnit.SetAttackDirection(playerUnit.position);
-	enemyUnit.SetAttackMovementPosition();*/
+	enemyUnit.SetAttackMovementPosition();
 }
 
 void MapEditorScene::ClearUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit)
@@ -2159,9 +2185,9 @@ void MapEditorScene::ClearUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUn
 	playerUnit.movementDirection = UM_IDLE;
 	playerUnit.movementPath.clear();
 
-	/*enemyUnit.unitState = US_IDLE;
+	enemyUnit.unitState = US_IDLE;
 	enemyUnit.movementDirection = UM_IDLE;
-	enemyUnit.movementPath.clear();*/
+	enemyUnit.movementPath.clear();
 
 	mSelectedMapUnitIndex = -1;
 	mSelectedTargetUnitIndex = -1;

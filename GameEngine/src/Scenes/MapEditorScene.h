@@ -127,6 +127,7 @@ private:
 
 	// Playing Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
+	float waitTime = 1.0f;
 
 	// Paint Variables
 	uint16_t mSelectedSpriteIndex = 168;
