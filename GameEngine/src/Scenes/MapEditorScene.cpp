@@ -412,9 +412,92 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 				}
 			}
 
+				return;
+			}
+
+			// Unit has not been selected
+			// Select unit at cursor map position if one exists
+			for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+			{
+				if (cursorMapPosition == mAnimatedUnitSprites[i].position)
+				{
+					mSelectedMapUnitIndex = i;
+					SelectUnit(cursorMapPosition);
+					return;
+				}
+			}
+			
 			// Map Position contains nothing
 			ClearSelectedUnit();
 			return;
+
+			//// Map Position contains unit
+			//for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			//{
+			//	// Unit is enemy and selected unit is looking for attack target
+			//	if (mGameState == GS_SELECTING_TARGET)
+			//	{
+			//		for (const AnimatedUnitSprite& targetUnit : mAnimatedUnitSprites)
+			//		{
+			//			if (targetUnit.position == cursorMapPosition && UnitIsEnemy(targetUnit.unitTexture))
+			//			{
+			//				mSelectedTargetUnit = targetUnit;
+			//				for (AnimatedUnitSprite& controlledUnit : mAnimatedUnitSprites)
+			//				{
+			//					if (controlledUnit == mSelectedMapUnit)
+			//					{
+			//						controlledUnit.SetAttackDirection(targetUnit.position);
+			//					}
+			//				}
+			//				break;
+			//			}
+			//		}
+			//		break;
+			//	}
+			//	else if (cursorMapPosition == unit.position)
+			//	{
+			//		// Unit has not been selected
+			//		if (mSelectedMapUnit != unit)
+			//		{
+			//			SelectUnit(cursorMapPosition);
+			//			return;
+			//		}
+			//		// Unit is already selected
+			//		else if (mSelectedMapUnit == unit)
+			//		{
+			//			mGameState = GS_SELECTING_ACTION;
+			//			unit.unitState = US_SELECTING_ACTION;
+			//		}
+			//	}
+			//}
+
+			//// Map Position contains selected unit movement position
+			//if (CursorInSelectedUnitMovement(cursorMapPosition))
+			//{
+			//	if (SetUnitMovementPath(cursorMapPosition))
+			//	{
+			//		for (AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			//		{
+			//			if (unit == mSelectedMapUnit)
+			//			{
+			//				unit.movementPath = mUnitMovementPath;
+			//				unit.unitState = US_MOVING;
+			//				unit.currentPathGoalIndex = 0;
+			//				unit.SetMovementDirection();
+
+			//				mGameState = GS_UNIT_MOVING;
+
+			//				mMovementPositions.clear();
+			//				mAttackPositions.clear();
+			//				return;
+			//			}
+			//		}
+			//	}
+			//}
+
+			//// Map Position contains nothing
+			//ClearSelectedUnit();
+			//return;
 		}
 		break;
 	case SDL_MOUSEBUTTONUP:
@@ -1992,6 +2075,18 @@ bool MapEditorScene::CursorInSelectedUnitMovement(const Vec2D& mapPosition)
 				{
 					return false;
 				}
+			}
+			return true;
+		}
+	}*/
+
+	for (const Vec2D& position : mMovementPositions)
+	{
+		if (position == mapPosition)
+		{
+			if (mAnimatedUnitSprites[mSelectedMapUnitIndex].position == mapPosition)
+			{
+				return false;
 			}
 			return true;
 		}
