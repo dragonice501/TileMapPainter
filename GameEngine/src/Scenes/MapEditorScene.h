@@ -7,7 +7,6 @@
 #include <SDL.h>
 #include <stdint.h>
 #include <vector>
-#include <memory>
 
 class MapEditorScene
 {
@@ -15,25 +14,26 @@ public:
 	MapEditorScene();
 	~MapEditorScene();
 
+	// Initialize
 	bool Init(SDL_Renderer* renderer);
-	void Destroy();
-
 	void Setup(SDL_Renderer* renderer);
 
-	void Input();
-	void Update(const float& deltaTime);
-	void Render(SDL_Renderer* renderer);
+	// Destroy
+	void Destroy();
 
 	// Input
+	void Input();
 	void InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
 	void InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
 	bool CheckCursorIsHoveringUnit(const Vec2D& cursorMapPosition);
 
 	// Update
+	void Update(const float& deltaTime);
 	void UpdateEditor(const float& deltaTime);
 	void UpdateGame(const float& deltaTime);
 
-	// Rendering
+	// Render
+	void Render(SDL_Renderer* renderer);
 	void RenderEditorMode(SDL_Renderer* renderer);
 	void RenderPlayMode(SDL_Renderer* renderer);
 	void DrawMap(SDL_Renderer* renderer);
@@ -58,9 +58,8 @@ public:
 	void SetMapTerrainIndeces();
 	ETerrainType GetTerrainType(uint32_t mapSpriteIndex);
 
-	// SpriteShet Functions
+	// SpriteSheet Functions
 	void InitSpriteSheet();
-
 	void ResetTools();
 
 	// Tile Functions
@@ -114,15 +113,6 @@ public:
 	bool mIsRunning;
 
 private:
-
-	SDL_Window* mWindow;
-	SDL_Renderer* mRenderer;
-
-	uint32_t mWindowWidth = 1024;
-	uint32_t mWindowHeight = 1024;
-
-	uint32_t millisecondsPreviousFrame;
-
 	// Editor Variables
 	EEditorState mEditorState = ES_EDITING_MAP;
 	ESelectedTool mSelectedTool = PAN_TOOL;
@@ -143,9 +133,6 @@ private:
 	std::vector<SDL_Texture*> mUnitClassTextures;
 	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
 	int mSelectedUnitClassIndex = 0;
-	AnimatedUnitSprite mSelectedMapUnit;
-	AnimatedUnitSprite mHoveredUnit;
-	AnimatedUnitSprite mSelectedTargetUnit;
 
 	int mSelectedMapUnitIndex = -1;
 	int mHoveredUnitIndex = -1;
@@ -154,6 +141,10 @@ private:
 	EUnitClass mSelectedUnit = NONE;
 	bool mShowSelectedUnitMovement = false;
 	bool mUnitHovered = false;
+
+	std::vector<Vec2D> mMovementPositions;
+	std::vector<Vec2D> mAttackPositions;
+	std::vector<Vec2D> mUnitMovementPath;
 
 	// Unit Loading Variables
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
@@ -172,9 +163,7 @@ private:
 	std::vector<int> mLoadedUnitsDefense;
 	std::vector<int> mLoadedUnitsMovement;
 
-	EUnitMovementDirection mMovementDirection = UM_IDLE;
-	Vec2D mDesiredUnitMovementDestination;
-
+	// Paint Unit Variables
 	EAttackType mNewUnitAttackType = AT_PHYSICAL;
 	int mNewUnitLevel = 1;
 	int mNewUnitMaxHP = 1;
@@ -186,10 +175,6 @@ private:
 	int mNewUnitLuck = 1;
 	int mNewUnitDefense = 1;
 	int mNewUnitMovement = 1;
-
-	std::vector<Vec2D> mMovementPositions;
-	std::vector<Vec2D> mAttackPositions;
-	std::vector<Vec2D> mUnitMovementPath;
 
 	// Select Tool Variables
 	SDL_Rect mSelectionRect;
