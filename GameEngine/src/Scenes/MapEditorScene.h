@@ -99,6 +99,8 @@ public:
 	void ReverseMovementPath();
 	bool EnemyInAttackRange(const Vec2D& startPosition, const EAttackType& attackType);
 	bool UnitIsEnemy(const EUnitClass& unitClass);
+	void SetUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit);
+	void ClearUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit);
 
 	// Select Functions
 	void SetSelectionRect();

@@ -15,9 +15,6 @@ const Vec2D Vec2D::Zero;
 
 Vec2D Vec2D::Lerp(const Vec2D& start, const Vec2D& end, const float& rate)
 {
-	/*float x = start.mX + rate * start.mX > end.mX ? -1.0 : 1.0;
-	float y = start.mY + rate * start.mY > end.mY ? -1.0 : 1.0;*/
-
 	float x = start.mX + (end.mX - start.mX) * rate;
 	float y = start.mY + (end.mY - start.mY) * rate;
 

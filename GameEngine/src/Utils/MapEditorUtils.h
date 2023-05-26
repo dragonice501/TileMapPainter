@@ -18,7 +18,8 @@ enum EGameState
 	GS_UNIT_MOVING,
 	GS_SELECTING_ACTION,
 	GS_SELECTING_TARGET,
-	GS_ATTACKING,
+	GS_PLAYER_ATTACKING,
+	GS_ENEMY_ATTACKING,
 	GS_ENEMY_PHASE
 };
 
@@ -74,7 +75,10 @@ enum EUnitState
 	US_MOVING,
 	US_SELECTING_ACTION,
 	US_SELECTING_TARGET,
-	US_ATTACKING
+	US_MOVING_TO_ATTACK,
+	US_ATTACKING,
+	US_MOVING_AWAY_FROM_ATTACK,
+	US_ATTACK_FINISHED
 };
 
 enum EUnitMovementDirection
@@ -138,6 +142,10 @@ struct AnimatedUnitSprite
 	float movementRate = 0.0f;
 	float movementSpeed = 5.0f;
 
+	Vec2D attackStartPosition;
+	Vec2D attackMovementTargetPosition;
+	int movementCounter = 0;
+
 	void Update(const float& deltaTime)
 	{
 		currentFrame = static_cast<int>(((SDL_GetTicks() - startTime) * frameRate / 1000.0f)) % numFrames;
@@ -145,6 +153,31 @@ struct AnimatedUnitSprite
 		if (unitState == US_MOVING)
 		{
 			MoveThroughPath(deltaTime);
+		}
+		else if (unitState == US_MOVING_TO_ATTACK || unitState == US_MOVING_AWAY_FROM_ATTACK)
+		{
+			if (position == attackMovementTargetPosition)
+			{
+				if (movementCounter == 1)
+				{
+					movementCounter = 0;
+					unitState = US_ATTACK_FINISHED;
+					return;
+				}
+
+				unitState = US_ATTACKING;
+				Vec2D temp = attackStartPosition;
+				attackStartPosition = attackMovementTargetPosition;
+				attackMovementTargetPosition = temp;
+				movementCounter++;
+				movementRate = 0;
+			}
+			else
+			{
+				movementRate += movementSpeed * 2 * deltaTime;
+				position = Vec2D::Lerp(attackStartPosition, attackMovementTargetPosition, movementRate);
+				return;
+			}
 		}
 	}
 
@@ -213,9 +246,46 @@ struct AnimatedUnitSprite
 
 	void SetAttackDirection(const Vec2D& targetPosition)
 	{
-		if (targetPosition.GetX() < position.GetX()) movementDirection = UM_LEFT;
-		else if (targetPosition.GetX() > position.GetX()) movementDirection = UM_RIGHT;
-		else if (targetPosition.GetY() < position.GetY()) movementDirection = UM_UP;
-		else if (targetPosition.GetY() > position.GetY()) movementDirection = UM_DOWN;
+		if (targetPosition.GetX() < position.GetX())
+		{
+			movementDirection = UM_LEFT;
+			attackDirection = UM_LEFT;
+		}
+		else if (targetPosition.GetX() > position.GetX())
+		{
+			movementDirection = UM_RIGHT;
+			attackDirection = UM_RIGHT;
+		}
+		else if (targetPosition.GetY() < position.GetY())
+		{
+			movementDirection = UM_UP;
+			attackDirection = UM_UP;
+		}
+		else if (targetPosition.GetY() > position.GetY())
+		{
+			movementDirection = UM_DOWN;
+			attackDirection = UM_DOWN;
+		}
+	}
+
+	void SetAttackMovementPosition()
+	{
+		switch (attackDirection)
+		{
+		case UM_UP:
+			attackMovementTargetPosition = position + Vec2D(0, -1) * 0.5f;
+			break;
+		case UM_DOWN:
+			attackMovementTargetPosition = position + Vec2D(0, 1) * 0.5f;
+			break;
+		case UM_LEFT:
+			attackMovementTargetPosition = position + Vec2D(-1, 0) * 0.5f;
+			break;
+		case UM_RIGHT:
+			attackMovementTargetPosition = position + Vec2D(1, 0) * 0.5f;
+			break;
+		default:
+			break;
+		}
 	}
 };
