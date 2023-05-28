@@ -495,6 +495,8 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 		case GS_PLAYER_ATTACKING:
 			if (unit.unitState == US_ATTACKING)
 			{
+				ApplyDamage(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+
 				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
 			}
 			else if (unit.unitState == US_ATTACK_FINISHED && mGameState == GS_PLAYER_ATTACKING)
@@ -507,13 +509,22 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 			if (waitTime <= 0.0f)
 			{
 				waitTime = 1.0f;
-				mGameState = GS_ENEMY_ATTACKING;
-				mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+				if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+				{
+					mGameState = GS_ENEMY_ATTACKING;
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+				}
+				else
+				{
+					mGameState = GS_UNIT_DYING;
+				}
 			}
 			break;
 		case GS_ENEMY_ATTACKING:
 			if (unit.unitState == US_ATTACKING)
 			{
+				ApplyDamage(mAnimatedUnitSprites[mSelectedTargetUnitIndex], mAnimatedUnitSprites[mSelectedMapUnitIndex]);
+
 				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
 			}
 			else if (unit.unitState == US_ATTACK_FINISHED && UnitIsEnemy(unit.unitTexture))
@@ -526,8 +537,52 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 			if (waitTime <= 0.0f)
 			{
 				waitTime = 1.0f;
+
+				if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+				{
+					mGameState = GS_PLAYER_IDLE;
+					ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+					ClearActiveUnits();
+				}
+				else
+				{
+					mGameState = GS_UNIT_DYING;
+				}
+			}
+			break;
+		case GS_UNIT_DYING:
+			waitTime -= 0.5f * deltaTime;
+			if (waitTime <= 0.0f) waitTime = 0.0f;
+
+			dyingUnitBlend = static_cast<uint8_t>(255 * (waitTime / 2.0f));
+
+			if (waitTime == 0.0f)
+			{
+				if (mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState == US_DEAD)
+				{
+					DeleteUnit(mSelectedMapUnitIndex);
+
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_IDLE;
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementDirection = UM_IDLE;
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath.clear();
+
+					ClearActiveUnits();
+				}
+				else
+				{
+					DeleteUnit(mSelectedTargetUnitIndex);
+
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementDirection = UM_IDLE;
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementPath.clear();
+
+					ClearActiveUnits();
+				}
+
+				waitTime = 1.0f;
 				mGameState = GS_PLAYER_IDLE;
-				ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
 			}
 			break;
 		default:
@@ -608,11 +663,6 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 	switch (mGameState)
 	{
 	case GS_PLAYER_IDLE:
-		if (mUnitHovered && !mShowSelectedUnitMovement)
-		{
-			DrawHoveredUnitStats();
-		}
-
 		if (mShowSelectedUnitMovement)
 		{
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -620,22 +670,51 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 
 			DrawSelectedUnitAttackRange(renderer);
 		}
+
+		DrawAnimatedSprites(renderer);
+
+		if (mUnitHovered)
+		{
+			DrawHoveredUnitStats();
+		}
+		break;
+	case GS_UNIT_MOVING:
+		DrawAnimatedSprites(renderer);
 		break;
 	case GS_SELECTING_ACTION:
+		DrawAnimatedSprites(renderer);
 		DrawUnitActions();
 		break;
 	case GS_SELECTING_TARGET:
 		DrawSelectedUnitAttackRange(renderer);
+		DrawAnimatedSprites(renderer);
+		break;
+	case GS_BEFORE_ENCOUNTER_BUFFER:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
 		break;
 	case GS_PLAYER_ATTACKING:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+		break;
+	case GS_ATTACK_BUFFER:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+		break;
+	case GS_ENEMY_ATTACKING:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+		break;
+	case GS_ENCOUNTER_BUFFER:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+		break;
+	case GS_UNIT_DYING:
+		DrawAnimatedSprites(renderer);
+		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
 		break;
 	default:
 		break;
-	}
-
-	if (mAnimatedUnitSprites.size() > 0)
-	{
-		DrawAnimatedSprites(renderer);
 	}
 }
 
@@ -729,36 +808,50 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, directionIndex * sprite.frameSize, sprite.frameSize, sprite.frameSize };
 		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
 
+		if (sprite.unitState == US_DEAD)
+		{
+			SDL_SetTextureAlphaMod(mUnitClassTextures[sprite.unitTexture], dyingUnitBlend);
+		}
+		else
+		{
+			SDL_SetTextureAlphaMod(mUnitClassTextures[sprite.unitTexture], 255);
+		}
+
 		SDL_RenderCopy(renderer, mUnitClassTextures[sprite.unitTexture], &srcRect, &dstRect);
 	}
 }
 
-void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer)
+void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer, const AnimatedUnitSprite& playerUnit, const AnimatedUnitSprite& enemyUnit)
 {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	for (AnimatedUnitSprite& sprite : mAnimatedUnitSprites)
 	{
-		Vec2D position = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+		if (sprite == playerUnit || sprite == enemyUnit)
+		{
+			Vec2D position = {
+					static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+					static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect heatlhBackgroundRect = { position.GetX(), position.GetY() - 6.0f, sprite.frameSize * mMapZoom, 5.0f * mMapZoom };
+			SDL_Rect heatlhBackgroundRect = { position.GetX() + 2.0f, position.GetY() - 6.0f, (sprite.frameSize - 2.0f) * mMapZoom, 5.0f * mMapZoom };
 
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
-		SDL_RenderFillRect(renderer, &heatlhBackgroundRect);
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+			SDL_RenderFillRect(renderer, &heatlhBackgroundRect);
 
-		SDL_Rect healthRect = {
-			position.GetX(),
-			position.GetY() - 6.0f,
-			static_cast<float>(sprite.frameSize) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP)) * mMapZoom,
-			5.0f * mMapZoom };
+			SDL_Rect healthRect = {
+				position.GetX() + 2.0f,
+				position.GetY() - 6.0f,
+				(static_cast<float>(sprite.frameSize) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP)) - 2.0f) * mMapZoom,
+				5.0f * mMapZoom };
 
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
-		SDL_RenderFillRect(renderer, &healthRect);
+			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
+			SDL_RenderFillRect(renderer, &healthRect);
+		}
 	}
 }
 
 void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 100);
 
 	for (const Vec2D& position : mMovementPositions)
@@ -775,6 +868,7 @@ void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 
 void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 {
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 
 	for (const Vec2D& position : mAttackPositions)
@@ -2188,9 +2282,28 @@ void MapEditorScene::ClearUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUn
 	enemyUnit.unitState = US_IDLE;
 	enemyUnit.movementDirection = UM_IDLE;
 	enemyUnit.movementPath.clear();
+}
 
+void MapEditorScene::ClearActiveUnits()
+{
 	mSelectedMapUnitIndex = -1;
 	mSelectedTargetUnitIndex = -1;
+}
+
+void MapEditorScene::DeleteUnit(const int& unitIndex)
+{
+	for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+	{
+		if (i == unitIndex)
+		{
+			AnimatedUnitSprite temp = mAnimatedUnitSprites.back();
+			mAnimatedUnitSprites.back() = mAnimatedUnitSprites[unitIndex];
+			mAnimatedUnitSprites[unitIndex] = temp;
+
+			mAnimatedUnitSprites.pop_back();
+			return;;
+		}
+	}
 }
 
 void MapEditorScene::SetSelectionRect()
@@ -2490,4 +2603,16 @@ void MapEditorScene::LoadMap()
 	}
 
 	testFile.close();
+}
+
+void MapEditorScene::ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit)
+{
+	int damage = attackingUnit.strength - attackedUnit.defense;
+	if (attackedUnit.currentHP - damage <= 0)
+	{
+		attackedUnit.unitState = US_DEAD;
+		attackedUnit.currentHP = 0;
+		return;
+	}
+	attackedUnit.currentHP -= static_cast<uint8_t>(damage);
 }

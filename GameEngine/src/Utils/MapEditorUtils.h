@@ -22,6 +22,7 @@ enum EGameState
 	GS_PLAYER_ATTACKING,
 	GS_ATTACK_BUFFER,
 	GS_ENEMY_ATTACKING,
+	GS_UNIT_DYING,
 	GS_ENCOUNTER_BUFFER
 };
 
@@ -80,7 +81,8 @@ enum EUnitState
 	US_MOVING_TO_ATTACK,
 	US_ATTACKING,
 	US_MOVING_AWAY_FROM_ATTACK,
-	US_ATTACK_FINISHED
+	US_ATTACK_FINISHED,
+	US_DEAD,
 };
 
 enum EUnitMovementDirection
@@ -150,7 +152,8 @@ struct AnimatedUnitSprite
 
 	void Update(const float& deltaTime)
 	{
-		currentFrame = static_cast<int>(((SDL_GetTicks() - startTime) * frameRate / 1000.0f)) % numFrames;
+		if(unitState != US_DEAD)
+			currentFrame = static_cast<int>(((SDL_GetTicks() - startTime) * frameRate / 1000.0f)) % numFrames;
 
 		if (unitState == US_MOVING)
 		{

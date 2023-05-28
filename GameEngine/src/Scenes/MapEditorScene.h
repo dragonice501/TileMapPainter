@@ -39,7 +39,7 @@ public:
 	void DrawMap(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
-	void DrawUnitHealthBars(SDL_Renderer* renderer);
+	void DrawUnitHealthBars(SDL_Renderer* renderer, const AnimatedUnitSprite& playerUnit, const AnimatedUnitSprite& enemyUnit);
 	void DrawSelectedUnitMovement(SDL_Renderer* renderer);
 	void DrawSelectedUnitAttackRange(SDL_Renderer* renderer);
 	void DrawGUI();
@@ -101,6 +101,8 @@ public:
 	bool UnitIsEnemy(const EUnitClass& unitClass);
 	void SetUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit);
 	void ClearUnitAttacks(AnimatedUnitSprite& playerUnit, AnimatedUnitSprite& enemyUnit);
+	void ClearActiveUnits();
+	void DeleteUnit(const int& unitIndex);
 
 	// Select Functions
 	void SetSelectionRect();
@@ -111,6 +113,9 @@ public:
 
 	void SaveMap();
 	void LoadMap();
+
+	// Game Functions
+	void ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit);
 
 	bool mIsRunning;
 
@@ -128,6 +133,7 @@ private:
 	// Playing Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
 	float waitTime = 1.0f;
+	uint8_t dyingUnitBlend = 255;
 
 	// Paint Variables
 	uint16_t mSelectedSpriteIndex = 168;
