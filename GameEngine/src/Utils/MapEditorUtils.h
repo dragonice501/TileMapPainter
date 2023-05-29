@@ -127,7 +127,7 @@ struct AnimatedUnitSprite
 
 	uint8_t level = 1;
 	uint8_t maxHP = 1;
-	uint8_t currentHP = 1;
+	uint8_t currentHP = maxHP;
 	uint8_t strength = 1;
 	uint8_t magic = 1;
 	uint8_t skill = 1;

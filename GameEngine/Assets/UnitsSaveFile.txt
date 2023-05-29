@@ -3,7 +3,7 @@
 :x 117
 :y 222
 :level 1
-:maxHP 5
+:maxHP 7
 :currentHP 5
 :strength 3
 :magic 1
@@ -17,10 +17,10 @@
 :attackType 0
 :x 120
 :y 222
-:level 1
-:maxHP 10
+:level 2
+:maxHP 15
 :currentHP 10
-:strength 6
+:strength 3
 :magic 1
 :skill 1
 :speed 1

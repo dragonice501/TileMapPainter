@@ -215,7 +215,7 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						mSelectionRectStart = cursorMapPosition;
 						break;
 					case PAINT_UNIT_TOOL:
-						if (mSelectedUnit != NONE) PaintUnit(cursorMapPosition);
+						if (mNewSelectedUnit != NONE) PaintUnit(cursorMapPosition);
 						break;
 					case SELECT_UNIT_TOOL:
 						// If a unit is already selected
@@ -543,7 +543,7 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 					mGameState = GS_PLAYER_IDLE;
 					ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
 
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
 					ClearActiveUnits();
 				}
 				else
@@ -907,6 +907,7 @@ void MapEditorScene::DrawGUI()
 
 			if (ImGui::Button("New Map"))
 			{
+				ResetTools();
 				InitMap();
 				mShowOverlay = false;
 				mShowTileSelection = false;
@@ -1002,10 +1003,9 @@ void MapEditorScene::DrawGUI()
 			}
 			if (ImGui::Button("Reset Stats"))
 			{
-				mSelectedUnit = NONE;
+				mNewSelectedUnit = NONE;
 				mNewUnitLevel = 1;
 				mNewUnitMaxHP = 1;
-				mNewUnitCurrentHP = 1;
 				mNewUnitStrength = 1;
 				mNewUnitMagic = 1;
 				mNewUnitSkill = 1;
@@ -1015,7 +1015,7 @@ void MapEditorScene::DrawGUI()
 				mNewUnitMovement = 1;
 			}
 
-			static int selectedUnitClassIndex = mSelectedUnit;
+			static int selectedUnitClassIndex = mNewSelectedUnit;
 			const char* classes[] =
 			{
 				"Bow Fighter", "Dancer", "Knight Lord", "Mage", "Sword Armour", "Barbarian", "Barbarian Archer", "Barbarian Chief", "None"
@@ -1035,18 +1035,53 @@ void MapEditorScene::DrawGUI()
 				SetUnitAttackType(newUnitAttackType);
 			}
 
-			ImGui::InputInt("Level", &mNewUnitLevel);
-			ImGui::InputInt("HP", &mNewUnitMaxHP);
-			ImGui::InputInt("CurrentHP", &mNewUnitCurrentHP);
-			ImGui::InputInt("Strength", &mNewUnitStrength);
-			ImGui::InputInt("Magic", &mNewUnitMagic);
-			ImGui::InputInt("Skill", &mNewUnitSkill);
-			ImGui::InputInt("Speed", &mNewUnitSpeed);
-			ImGui::InputInt("Luck", &mNewUnitLuck);
-			ImGui::InputInt("Defense", &mNewUnitDefense);
-			ImGui::InputInt("Movement", &mNewUnitMovement);
+			if (ImGui::InputInt("Level", &mNewUnitLevel))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitLevel = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].level = mNewUnitLevel;
+			}
+			if (ImGui::InputInt("HP", &mNewUnitMaxHP))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitMaxHP = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].maxHP = mNewUnitMaxHP;
+			}
+			if (ImGui::InputInt("Strength", &mNewUnitStrength))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitStrength = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].strength = mNewUnitStrength;
+			}
+			if (ImGui::InputInt("Magic", &mNewUnitMagic))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitMagic = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].magic = mNewUnitMagic;
+			}
+			if (ImGui::InputInt("Skill", &mNewUnitSkill))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitSkill = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].skill = mNewUnitSkill;
+			}
+			if (ImGui::InputInt("Speed", &mNewUnitSpeed))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitSpeed = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].speed = mNewUnitSpeed;
+			}
+			if (ImGui::InputInt("Luck", &mNewUnitLuck))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitLuck = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].luck = mNewUnitLuck;
+			}
+			if (ImGui::InputInt("Defense", &mNewUnitDefense))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitDefense = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].defense = mNewUnitDefense;
+			}
+			if (ImGui::InputInt("Movement", &mNewUnitMovement))
+			{
+				if (mNewUnitLevel <= 0) mNewUnitMovement = 1;
+				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].movement = mNewUnitMovement;
+			}
 
-			if (mSelectedMapUnitIndex != -1)
+			/*if (mSelectedMapUnitIndex != -1)
 			{
 				std::string unitString = "Selected Unit: " + GetUnitTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture);
 				std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType);
@@ -1073,7 +1108,7 @@ void MapEditorScene::DrawGUI()
 				ImGui::Text(luckString.c_str());
 				ImGui::Text(defenseString.c_str());
 				ImGui::Text(movementString.c_str());
-			}
+			}*/
 		}
 	}
 	ImGui::End();
@@ -1344,6 +1379,9 @@ void MapEditorScene::ResetTools()
 	mShowSelectedUnitMovement = false;
 	mShowOverlay = false;
 	mEditorState = ES_EDITING_MAP;
+	mSelectedMapUnitIndex = -1;
+	mSelectedTargetUnitIndex = -1;
+	mSelectedSpriteIndex = 0;
 }
 
 Vec2D MapEditorScene::GetCursorMapRect()
@@ -1453,13 +1491,12 @@ void MapEditorScene::PaintUnit(Vec2D position)
 
 	AnimatedUnitSprite animatedUnitSprite;
 	animatedUnitSprite.position = position;
-	animatedUnitSprite.unitTexture = mSelectedUnit;
+	animatedUnitSprite.unitTexture = mNewSelectedUnit;
 	animatedUnitSprite.startTime = SDL_GetTicks();
 
 	animatedUnitSprite.attackType = mNewUnitAttackType;
 	animatedUnitSprite.level = mNewUnitLevel;
 	animatedUnitSprite.maxHP = mNewUnitMaxHP;
-	animatedUnitSprite.currentHP = mNewUnitCurrentHP;
 	animatedUnitSprite.strength = mNewUnitStrength;
 	animatedUnitSprite.skill = mNewUnitSkill;
 	animatedUnitSprite.speed = mNewUnitSpeed;
@@ -1470,41 +1507,46 @@ void MapEditorScene::PaintUnit(Vec2D position)
 	mAnimatedUnitSprites.push_back(animatedUnitSprite);
 }
 
-void MapEditorScene::SetSelectedUnitClass(int unitSelectionIndex)
+void MapEditorScene::SetSelectedUnitClass(int& unitSelectionIndex)
 {
 	EUnitClass unit = static_cast<EUnitClass>(unitSelectionIndex);
 
 	switch (unit)
 	{
 	case BOW_FIGHTER:
-		mSelectedUnit = BOW_FIGHTER;
+		mNewSelectedUnit = BOW_FIGHTER;
 		break;
 	case DANCER:
-		mSelectedUnit = DANCER;
+		mNewSelectedUnit = DANCER;
 		break;
 	case KNIGHT_LORD:
-		mSelectedUnit = KNIGHT_LORD;
+		mNewSelectedUnit = KNIGHT_LORD;
 		break;
 	case MAGE:
-		mSelectedUnit = MAGE;
+		mNewSelectedUnit = MAGE;
 		break;
 	case SWORD_ARMOUR:
-		mSelectedUnit = SWORD_ARMOUR;
+		mNewSelectedUnit = SWORD_ARMOUR;
 		break;
 	case BARBARIAN:
-		mSelectedUnit = BARBARIAN;
+		mNewSelectedUnit = BARBARIAN;
 		break;
 	case BARBARIAN_ARCHER:
-		mSelectedUnit = BARBARIAN_ARCHER;
+		mNewSelectedUnit = BARBARIAN_ARCHER;
 		break;
 	case BARBARIAN_CHIEF:
-		mSelectedUnit = BARBARIAN_CHIEF;
+		mNewSelectedUnit = BARBARIAN_CHIEF;
 		break;
 	case NONE:
-		mSelectedUnit = NONE;
+		mNewSelectedUnit = NONE;
 		break;
 	default:
 		break;
+	}
+
+	if (mSelectedMapUnitIndex != -1)
+	{
+		mNewSelectedUnit = mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture;
 	}
 }
 
@@ -1727,7 +1769,7 @@ void MapEditorScene::InitUnits()
 		newUnit.attackType = static_cast<EAttackType>(mLoadedUnitsAttackTypes[i]);
 		newUnit.level = mLoadedUnitsLevel[i];
 		newUnit.maxHP = mLoadedUnitsMaxHP[i];
-		newUnit.currentHP = mLoadedUnitsCurrentHP[i];
+		newUnit.currentHP = newUnit.maxHP;
 		newUnit.strength = mLoadedUnitsStrength[i];
 		newUnit.magic = mLoadedUnitsMagic[i];
 		newUnit.skill = mLoadedUnitsSkill[i];
@@ -1799,6 +1841,17 @@ std::string MapEditorScene::GetUnitAttackTypeName(EAttackType type)
 
 void MapEditorScene::SelectUnit(Vec2D position)
 {
+	mNewUnitAttackType = mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType;
+	mNewUnitLevel = mAnimatedUnitSprites[mSelectedMapUnitIndex].level;
+	mNewUnitMaxHP = mAnimatedUnitSprites[mSelectedMapUnitIndex].maxHP;
+	mNewUnitStrength = mAnimatedUnitSprites[mSelectedMapUnitIndex].strength;
+	mNewUnitSkill = mAnimatedUnitSprites[mSelectedMapUnitIndex].skill;
+	mNewUnitSpeed = mAnimatedUnitSprites[mSelectedMapUnitIndex].speed;
+	mNewUnitMagic = mAnimatedUnitSprites[mSelectedMapUnitIndex].magic;
+	mNewUnitLuck = mAnimatedUnitSprites[mSelectedMapUnitIndex].luck;
+	mNewUnitDefense = mAnimatedUnitSprites[mSelectedMapUnitIndex].defense;
+	mNewUnitMovement = mAnimatedUnitSprites[mSelectedMapUnitIndex].movement;
+
 	mShowSelectedUnitMovement = true;
 	mMovementPositions.clear();
 	mAttackPositions.clear();

@@ -74,7 +74,7 @@ public:
 
 	// Unit Functions
 	void PaintUnit(Vec2D position);
-	void SetSelectedUnitClass(int unitSelectionIndex);
+	void SetSelectedUnitClass(int& unitSelectionIndex);
 	void SetUnitAttackType(int unitAttackType);
 	void RemoveUnit(Vec2D position);
 	void SaveUnits();
@@ -130,7 +130,7 @@ private:
 
 	Vec2D mCursorPosition;
 
-	// Playing Game variables
+	// Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
 	float waitTime = 1.0f;
 	uint8_t dyingUnitBlend = 255;
@@ -147,7 +147,6 @@ private:
 	int mHoveredUnitIndex = -1;
 	int mSelectedTargetUnitIndex = -1;
 
-	EUnitClass mSelectedUnit = NONE;
 	bool mShowSelectedUnitMovement = false;
 	bool mUnitHovered = false;
 
@@ -173,10 +172,10 @@ private:
 	std::vector<int> mLoadedUnitsMovement;
 
 	// Paint Unit Variables
+	EUnitClass mNewSelectedUnit = NONE;
 	EAttackType mNewUnitAttackType = AT_PHYSICAL;
 	int mNewUnitLevel = 1;
 	int mNewUnitMaxHP = 1;
-	int mNewUnitCurrentHP = 1;
 	int mNewUnitStrength = 1;
 	int mNewUnitMagic = 1;
 	int mNewUnitSkill = 1;
