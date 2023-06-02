@@ -1,27 +1,12 @@
 #include "Application.h"
-#include "../Utils/FileCommandLoader.h"
-#include "../_App/ECSMapTest.h"
 #include "../Scenes/MapEditorScene.h"
-
-#include "../Systems/MovementSystem.h"
-#include "../Systems/RenderSystem.h"
-#include "../Systems/AnimationSystem.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/RigidbodyComponent.h"
-#include "../Components/SpriteComponent.h"
-#include "../Components/AnimationComponent.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
 
 uint32_t Application::mWindowWidth = 0;
 uint32_t Application::mWindowHeight = 0;
 
 Application::Application(): mIsRunning(false)
 {
-	mRegistry = std::make_unique<Registry>();
-	mAssetStore = std::make_unique<AssetStore>();
+	
 }
 
 Application::~Application()

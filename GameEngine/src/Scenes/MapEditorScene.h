@@ -138,6 +138,9 @@ private:
 	// Paint Variables
 	uint16_t mSelectedSpriteIndex = 168;
 
+	// Map Save/Load Variables
+	char mFileName[16];
+
 	// Unit Variables
 	std::vector<SDL_Texture*> mUnitClassTextures;
 	std::vector<AnimatedUnitSprite> mAnimatedUnitSprites;
@@ -153,6 +156,11 @@ private:
 	std::vector<Vec2D> mMovementPositions;
 	std::vector<Vec2D> mAttackPositions;
 	std::vector<Vec2D> mUnitMovementPath;
+
+	const float UNIT_HEALTH_BAR_X_OFFSET = 2.0f;
+	const float UNIT_HEALTH_BAR_X_PADDING = 4.0f;
+	const float UNIT_HEALTH_BAR_Y_OFFSET = 6.0f;
+	const float UNIT_HEALTH_BAR_HEIGHT = 5.0f;
 
 	// Unit Loading Variables
 	std::vector<AnimatedUnitSprite> mLoadedUnitSprites;
@@ -171,7 +179,7 @@ private:
 	std::vector<int> mLoadedUnitsDefense;
 	std::vector<int> mLoadedUnitsMovement;
 
-	// Paint Unit Variables
+	// Paint Unit Tool Variables
 	EUnitClass mNewSelectedUnit = NONE;
 	EAttackType mNewUnitAttackType = AT_PHYSICAL;
 	int mNewUnitLevel = 1;
@@ -184,7 +192,7 @@ private:
 	int mNewUnitDefense = 1;
 	int mNewUnitMovement = 1;
 
-	// Select Tool Variables
+	// Tile Select Tool Variables
 	SDL_Rect mSelectionRect;
 	Vec2D mSelectionRectStart;
 	Vec2D mSelectionRectEnd;

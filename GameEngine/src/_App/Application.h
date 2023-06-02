@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../ECS/ESC.h"
-#include "../AssetStore/AssetStore.h"
-
 #include <SDL.h>
 #include <stdint.h>
 
@@ -26,9 +23,6 @@ private:
 
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
-
-	std::unique_ptr<Registry> mRegistry;
-	std::unique_ptr<AssetStore> mAssetStore;
 
 	bool mIsRunning;
 

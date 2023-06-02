@@ -36,7 +36,7 @@ public:
 	void AddCommand(const Command& command);
 	bool LoadFile(const std::string& filePath);
 
-	static Color ReadColor(const ParseFuncParams& params);
+	//static Color ReadColor(const ParseFuncParams& params);
 	static Vec2D ReadSize(const ParseFuncParams& params);
 	static int ReadInt(const ParseFuncParams& params);
 	static std::string ReadString(const ParseFuncParams& params);

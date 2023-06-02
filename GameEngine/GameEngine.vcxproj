@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\libs\imgui;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\libs;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\SDL2\include;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Utils;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Systems;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Shapes;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Scenes;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Input;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Graphics;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Games;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\ECS;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Components;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\AssetStore;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\App;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\_App;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\ECS;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\AssetStore;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\SDL2\include;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\libs\imgui;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\libs;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\_App;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Scenes;C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\src\Utils;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\narga\Desktop\Visual Studio Stuff\GameEngine\GameEngine\SDL2\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -139,38 +139,12 @@
     <ClCompile Include="libs\imgui\imgui_impl_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\App\App.cpp" />
-    <ClCompile Include="src\App\Button.cpp" />
-    <ClCompile Include="src\AssetStore\AssetStore.cpp" />
-    <ClCompile Include="src\ECS\ESC.cpp" />
-    <ClCompile Include="src\Graphics\AnimatedSprite.cpp" />
-    <ClCompile Include="src\Graphics\Animation.cpp" />
-    <ClCompile Include="src\Graphics\AnimationPlayer.cpp" />
-    <ClCompile Include="src\Graphics\BitmapFont.cpp" />
-    <ClCompile Include="src\Graphics\BMPImage.cpp" />
-    <ClCompile Include="src\Graphics\Color.cpp" />
-    <ClCompile Include="src\Graphics\Screen.cpp" />
-    <ClCompile Include="src\Graphics\ScreenBuffer.cpp" />
-    <ClCompile Include="src\Graphics\SpriteSheet.cpp" />
-    <ClCompile Include="src\Input\GameController.cpp" />
-    <ClCompile Include="src\Input\InputController.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Scenes\ArcadeScene.cpp" />
-    <ClCompile Include="src\Scenes\ButtonOptionsScene.cpp" />
-    <ClCompile Include="src\Scenes\GameScene.cpp" />
     <ClCompile Include="src\Scenes\MapEditorScene.cpp" />
-    <ClCompile Include="src\Scenes\NotImplementedScene.cpp" />
-    <ClCompile Include="src\Shapes\AARectangle.cpp" />
-    <ClCompile Include="src\Shapes\Circle.cpp" />
-    <ClCompile Include="src\Shapes\Line2D.cpp" />
-    <ClCompile Include="src\Shapes\Shape.cpp" />
-    <ClCompile Include="src\Shapes\Star2D.cpp" />
-    <ClCompile Include="src\Shapes\Triangle.cpp" />
     <ClCompile Include="src\Utils\FileCommandLoader.cpp" />
     <ClCompile Include="src\Utils\Utils.cpp" />
     <ClCompile Include="src\Utils\Vec2D.cpp" />
     <ClCompile Include="src\_App\Application.cpp" />
-    <ClCompile Include="src\_App\ECSMapTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs\glm\common.hpp" />
@@ -542,39 +516,7 @@
     <ClInclude Include="libs\sol\variadic_results.hpp" />
     <ClInclude Include="libs\sol\version.hpp" />
     <ClInclude Include="libs\sol\wrapper.hpp" />
-    <ClInclude Include="src\App\App.h" />
-    <ClInclude Include="src\App\Button.h" />
-    <ClInclude Include="src\AssetStore\AssetStore.h" />
-    <ClInclude Include="src\Components\AnimationComponent.h" />
-    <ClInclude Include="src\Components\RigidbodyComponent.h" />
-    <ClInclude Include="src\Components\SpriteComponent.h" />
-    <ClInclude Include="src\Components\TransformComponent.h" />
-    <ClInclude Include="src\ECS\ESC.h" />
-    <ClInclude Include="src\Games\Game.h" />
-    <ClInclude Include="src\Graphics\AnimatedSprite.h" />
-    <ClInclude Include="src\Graphics\Animation.h" />
-    <ClInclude Include="src\Graphics\AnimationPlayer.h" />
-    <ClInclude Include="src\Graphics\BitmapFont.h" />
-    <ClInclude Include="src\Graphics\BMPImage.h" />
-    <ClInclude Include="src\Graphics\Color.h" />
-    <ClInclude Include="src\Graphics\Screen.h" />
-    <ClInclude Include="src\Graphics\ScreenBuffer.h" />
-    <ClInclude Include="src\Graphics\SpriteSheet.h" />
-    <ClInclude Include="src\Input\GameController.h" />
-    <ClInclude Include="src\Input\InputAction.h" />
-    <ClInclude Include="src\Input\InputController.h" />
-    <ClInclude Include="src\Scenes\ArcadeScene.h" />
-    <ClInclude Include="src\Scenes\ButtonOptionsScene.h" />
-    <ClInclude Include="src\Scenes\GameScene.h" />
     <ClInclude Include="src\Scenes\MapEditorScene.h" />
-    <ClInclude Include="src\Scenes\NotImplementedScene.h" />
-    <ClInclude Include="src\Scenes\Scene.h" />
-    <ClInclude Include="src\Shapes\AARectangle.h" />
-    <ClInclude Include="src\Shapes\Circle.h" />
-    <ClInclude Include="src\Shapes\Line2D.h" />
-    <ClInclude Include="src\Shapes\Shape.h" />
-    <ClInclude Include="src\Shapes\Star2D.h" />
-    <ClInclude Include="src\Shapes\Triangle.h" />
     <ClInclude Include="src\Systems\AnimationSystem.h" />
     <ClInclude Include="src\Systems\MovementSystem.h" />
     <ClInclude Include="src\Systems\RenderSystem.h" />
@@ -583,8 +525,6 @@
     <ClInclude Include="src\Utils\Utils.h" />
     <ClInclude Include="src\Utils\Vec2D.h" />
     <ClInclude Include="src\_App\Application.h" />
-    <ClInclude Include="src\_App\ECSMapTest.h" />
-    <ClInclude Include="src\_App\ECSScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl" />

@@ -1,11 +1,6 @@
 #include "MapEditorScene.h"
 #include "../_App/Application.h"
-#include "../ECS/ESC.h"
 #include "../Utils/FileCommandLoader.h"
-#include "../Systems/AnimationSystem.h"
-#include "../Systems/RenderSystem.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/RigidbodyComponent.h"
 
 #include <iostream>
 #include <fstream>
@@ -832,16 +827,20 @@ void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer, const AnimatedUn
 					static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
 					static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-			SDL_Rect heatlhBackgroundRect = { position.GetX() + 2.0f, position.GetY() - 6.0f, (sprite.frameSize - 2.0f) * mMapZoom, 5.0f * mMapZoom };
+			SDL_Rect heatlhBackgroundRect = {
+				position.GetX() + UNIT_HEALTH_BAR_X_OFFSET,
+				position.GetY() - UNIT_HEALTH_BAR_Y_OFFSET,
+				(sprite.frameSize - UNIT_HEALTH_BAR_X_PADDING) * mMapZoom,
+				UNIT_HEALTH_BAR_HEIGHT * mMapZoom };
 
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 			SDL_RenderFillRect(renderer, &heatlhBackgroundRect);
 
 			SDL_Rect healthRect = {
-				position.GetX() + 2.0f,
-				position.GetY() - 6.0f,
-				(static_cast<float>(sprite.frameSize) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP)) - 2.0f) * mMapZoom,
-				5.0f * mMapZoom };
+				position.GetX() + UNIT_HEALTH_BAR_X_OFFSET,
+				position.GetY() - UNIT_HEALTH_BAR_Y_OFFSET,
+				(static_cast<float>(sprite.frameSize - UNIT_HEALTH_BAR_X_PADDING) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP))) * mMapZoom,
+				UNIT_HEALTH_BAR_HEIGHT * mMapZoom };
 
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
 			SDL_RenderFillRect(renderer, &healthRect);
@@ -902,9 +901,6 @@ void MapEditorScene::DrawGUI()
 			ImGui::Text("Map coordinates (x=%.1f, y=%.1f)", static_cast<float>(cursorRect.GetX()), static_cast<float>(cursorRect.GetY()));
 			ImGui::Text("Map offset (x=%.1f, y=%.1f)", -mMapXOffset, -mMapYOffset);
 
-			static char mapName[16];
-			ImGui::InputText("File Name", mapName, IM_ARRAYSIZE(mapName));
-
 			if (ImGui::Button("New Map"))
 			{
 				ResetTools();
@@ -914,6 +910,8 @@ void MapEditorScene::DrawGUI()
 
 				mAnimatedUnitSprites.clear();
 			}
+
+			ImGui::InputText("File Name", mFileName, IM_ARRAYSIZE(mFileName));
 
 			if (ImGui::Button("Save Map"))
 			{
@@ -1033,6 +1031,15 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Combo("Attack Type", &newUnitAttackType, attackTypes, IM_ARRAYSIZE(attackTypes)))
 			{
 				SetUnitAttackType(newUnitAttackType);
+			}
+
+			if (mSelectedMapUnitIndex != -1)
+			{
+				std::string unitString = "Selected Unit: " + GetUnitTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture);
+				std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType);
+
+				ImGui::Text(unitString.c_str());
+				ImGui::Text(unitAttackString.c_str());
 			}
 
 			if (ImGui::InputInt("Level", &mNewUnitLevel))
@@ -2561,6 +2568,7 @@ void MapEditorScene::MoveSelectionRight()
 
 void MapEditorScene::SaveMap()
 {
+	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
 	std::string tileMapPath = "./Assets/MapSaveFile.txt";
 	std::ifstream tileMapInFile;
 	tileMapInFile.open(tileMapPath);

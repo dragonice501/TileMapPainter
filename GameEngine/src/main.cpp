@@ -1,4 +1,3 @@
-#include "App/App.h"
 #include "_App/Application.h"
 
 int main(int argc, char** args)

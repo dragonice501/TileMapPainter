@@ -4,7 +4,7 @@
 :y 222
 :level 1
 :maxHP 7
-:currentHP 5
+:currentHP 7
 :strength 3
 :magic 1
 :skill 1
@@ -19,7 +19,7 @@
 :y 222
 :level 2
 :maxHP 15
-:currentHP 10
+:currentHP 15
 :strength 3
 :magic 1
 :skill 1

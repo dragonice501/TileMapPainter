@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 #include <stdint.h>
+#include <vector>
 
 enum EEditorState
 {

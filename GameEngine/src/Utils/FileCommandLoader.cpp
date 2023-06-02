@@ -1,5 +1,4 @@
 #include "FileCommandLoader.h"
-#include "../Graphics/Color.h"
 #include "../Utils/Vec2D.h"
 
 #include <fstream>
@@ -90,20 +89,20 @@ bool FileCommandLoader::LoadFile(const std::string& filePath)
 	return true;
 }
 
-Color FileCommandLoader::ReadColor(const ParseFuncParams& params)
-{
-	size_t nextSpacePos = params.line.find_first_of(" ", params.dimlimitPos + 1);
-	int r = std::stoi(params.line.substr(params.dimlimitPos, (nextSpacePos - params.dimlimitPos)));
-
-	size_t lastSpacePos = nextSpacePos;
-	nextSpacePos = params.line.find_first_of(" ", lastSpacePos + 1);
-	int g = std::stoi(params.line.substr(lastSpacePos + 1, nextSpacePos - lastSpacePos));
-	lastSpacePos = params.line.find_first_of(" ", lastSpacePos + 1);
-	int b = std::stoi(params.line.substr(lastSpacePos + 1, nextSpacePos - lastSpacePos));
-	int a = std::stoi(params.line.substr(nextSpacePos + 1));
-
-	return Color(r, g, b, a);
-}
+//Color FileCommandLoader::ReadColor(const ParseFuncParams& params)
+//{
+//	size_t nextSpacePos = params.line.find_first_of(" ", params.dimlimitPos + 1);
+//	int r = std::stoi(params.line.substr(params.dimlimitPos, (nextSpacePos - params.dimlimitPos)));
+//
+//	size_t lastSpacePos = nextSpacePos;
+//	nextSpacePos = params.line.find_first_of(" ", lastSpacePos + 1);
+//	int g = std::stoi(params.line.substr(lastSpacePos + 1, nextSpacePos - lastSpacePos));
+//	lastSpacePos = params.line.find_first_of(" ", lastSpacePos + 1);
+//	int b = std::stoi(params.line.substr(lastSpacePos + 1, nextSpacePos - lastSpacePos));
+//	int a = std::stoi(params.line.substr(nextSpacePos + 1));
+//
+//	return Color(r, g, b, a);
+//}
 
 Vec2D FileCommandLoader::ReadSize(const ParseFuncParams& params)
 {
