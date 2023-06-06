@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <stdint.h>
 #include <vector>
+#include <map>
 
 class MapEditorScene
 {
@@ -24,6 +25,7 @@ public:
 	// Input
 	void Input();
 	void InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
+	void InputSelectingSpriteMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
 	void InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPosition);
 	bool CheckCursorIsHoveringUnit(const Vec2D& cursorMapPosition);
 
@@ -57,6 +59,7 @@ public:
 	void SetMapSpriteIndeces();
 	void SetMapTerrainIndeces();
 	ETerrainType GetTerrainType(uint32_t mapSpriteIndex);
+	bool InMapBounds(const Vec2D& position);
 
 	// SpriteSheet Functions
 	void InitSpriteSheet();
@@ -70,7 +73,7 @@ public:
 	void CopyMapRectSprite();
 
 	// Fill Function
-	void FillTile(uint16_t xIndex, uint16_t yIndex);
+	void FillTile(const Vec2D& start);
 
 	// Unit Functions
 	void PaintUnit(Vec2D position);
@@ -84,6 +87,12 @@ public:
 	std::string GetUnitAttackTypeName(EAttackType type);
 	void SelectUnit(Vec2D position);
 	void ClearSelectedUnit();
+
+	void TestFloodFill(const Vec2D& currentPosition, const float& movement);
+	void TestDijkstra(const Vec2D& startPosition, const float& movement);
+
+	bool PositionAlreadyChecked(const Vec2D& position, const std::vector<Vec2D>& movementStack);
+
 	void GetMovementPositions(const Vec2D& currentPosition, const float& movement);
 	void CheckMovementPosition(const Vec2D& oldPosition, const Vec2D& newPosition, const float& movement, const EAttackDirection& direction);
 	float GetTerrainMovementCost(const EUnitClass& unit, const ETerrainType& terrain);
@@ -91,6 +100,7 @@ public:
 	void SetAttackPositions(const Vec2D& attackingPosition, const EAttackType& attackType);
 	void DeleteMovementPositionCopies();
 	void DeleteAttackPositionCopies();
+
 	void PrintTerrain(const ETerrainType& terrain);
 	bool MovementsAlreadyContainsPosition(const Vec2D& position);
 	bool CursorInSelectedUnitMovement(const Vec2D& mapPosition);
@@ -139,6 +149,7 @@ private:
 	uint16_t mSelectedSpriteIndex = 168;
 
 	// Map Save/Load Variables
+	int mFileNameSize = 0;
 	char mFileName[16];
 
 	// Unit Variables
@@ -223,6 +234,14 @@ private:
 	ETerrainType** mMapTerrainIndeces;
 
 	std::vector<uint32_t> mLoadedSpriteIndeces;
+
+	Vec2D Directions[4] =
+	{
+		Vec2D(0.0f, -1.0f),
+		Vec2D(1.0f, 0.0f),
+		Vec2D(0.0f, 1.0f),
+		Vec2D(-1.0f, 0.0f)
+	};
 
 	// Terrain Indeces
 	uint16_t mRoadIndeces[47] =
