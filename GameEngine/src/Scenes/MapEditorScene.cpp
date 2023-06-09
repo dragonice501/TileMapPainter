@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
+#include <map>
 
 #include <SDL_image.h>
 #include <imgui.h>
@@ -41,6 +42,7 @@ void MapEditorScene::Destroy()
 	ImGui::DestroyContext();
 
 	SDL_DestroyTexture(mSpriteSheet);
+
 	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
 	{
 		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
@@ -52,8 +54,12 @@ void MapEditorScene::Destroy()
 	for (uint32_t i = 0; i < mMapWidth; i++)
 	{
 		delete[] mMapRects[i];
+		delete[] mMapSpriteIndeces[i];
+		delete[] mMapTerrainIndeces[i];
 	}
 	delete[] mMapRects;
+	delete[] mMapSpriteIndeces;
+	delete[] mMapTerrainIndeces;
 
 	for (SDL_Texture* texture : mUnitClassTextures)
 	{
@@ -222,6 +228,8 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						if (mNewSelectedUnit != NONE) PaintUnit(cursorMapPosition);
 						break;
 					case SELECT_UNIT_TOOL:
+					{
+						GetTerrainMovementCost(KNIGHT_LORD, mMapTerrainIndeces[static_cast<int>(cursorMapPosition.GetX())][static_cast<int>(cursorMapPosition.GetX())]);
 						// If a unit is already selected
 						if (mSelectedMapUnitIndex != -1)
 						{
@@ -261,6 +269,7 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						}
 					default:
 						break;
+					}
 					}
 				}
 			}
@@ -406,7 +415,19 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 				// Cursor position contains selected unit movement position
 				if (CursorInSelectedUnitMovement(cursorMapPosition))
 				{
-					if (SetUnitMovementPath(cursorMapPosition))
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath =
+						DijkstraGetPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, GetCursorMapRect(), mAnimatedUnitSprites[mSelectedMapUnitIndex].movement);
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING;
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].currentPathGoalIndex = 0;
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].SetMovementDirection();
+
+					mGameState = GS_UNIT_MOVING;
+
+					mMovementPositions.clear();
+					mAttackPositions.clear();
+					return;
+
+					/*if (SetUnitMovementPath(cursorMapPosition))
 					{
 						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath = mUnitMovementPath;
 						mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING;
@@ -418,7 +439,7 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						mMovementPositions.clear();
 						mAttackPositions.clear();
 						return;
-					}
+					}*/
 				}
 				return;
 			}
@@ -878,10 +899,10 @@ void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 	for (const Vec2D& position : mMovementPositions)
 	{
 		Vec2D drawPosition = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 * mMapZoom + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE - 4, SQUARE_RENDER_SIZE - 4 };
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), (SQUARE_RENDER_SIZE - 4) * mMapZoom, (SQUARE_RENDER_SIZE - 4) * mMapZoom };
 
 		SDL_RenderFillRect(renderer, &rect);
 	}
@@ -977,7 +998,6 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::Button("Pan"))
 			{
 				mSelectedTool = PAN_TOOL;
-				ResetTools();
 			}
 			if (ImGui::Button("Show Overlay"))
 			{
@@ -1107,7 +1127,11 @@ void MapEditorScene::DrawGUI()
 			if (ImGui::InputInt("Movement", &mNewUnitMovement))
 			{
 				if (mNewUnitLevel <= 0) mNewUnitMovement = 1;
-				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].movement = mNewUnitMovement;
+				if (mSelectedMapUnitIndex != -1)
+				{
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].movement = mNewUnitMovement;
+					SelectUnit(GetCursorMapRect());
+				}
 			}
 
 			/*if (mSelectedMapUnitIndex != -1)
@@ -1328,12 +1352,8 @@ void MapEditorScene::SetMapTerrainIndeces()
 	{
 		for (uint16_t x = 0; x < mMapWidth; x++)
 		{
+			//std::cout << x << ' ' << y << ' ';
 			mMapTerrainIndeces[x][y] = GetTerrainType(static_cast<uint32_t>(mMapSpriteIndeces[x][y]));
-			/*if (x >= 111 && x <= 131 && y >= 210 && y <= 213)
-			{
-				std::cout << static_cast<int>(x) << ',' << static_cast<int>(y) << ' ';
-				PrintTerrain(mMapTerrainIndeces[x][y]);
-			}*/
 		}
 	}
 }
@@ -1342,42 +1362,74 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 {
 	for (const uint32_t& index : mSeaIndeces)
 	{
-		if (mapSpriteIndex == index) return SEA;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "SEA" << std::endl;
+			return SEA;
+		}
 	}
 
 	for (const uint32_t& index : mRiverIndeces)
 	{
-		if (mapSpriteIndex == index) return RIVER;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "RIVER" << std::endl;
+			return RIVER;
+		}
 	}
 
 	for (const uint32_t& index : mRoadIndeces)
 	{
-		if (mapSpriteIndex == index) return ROAD;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "ROAD" << std::endl;
+			return ROAD;
+		}
 	}
 
 	for (const uint32_t& index : mPlainIndeces)
 	{
-		if (mapSpriteIndex == index) return PLAIN;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "PLAIN" << std::endl;
+			return PLAIN;
+		}
 	}
 
 	for (const uint32_t& index : mForestIndeces)
 	{
-		if (mapSpriteIndex == index) return FOREST;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "FOREST" << std::endl;
+			return FOREST;
+		}
 	}
 
 	for (const uint32_t& index : mMountainIndeces)
 	{
-		if (mapSpriteIndex == index) return MOUNTAIN;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "MOUNTAIN" << std::endl;
+			return MOUNTAIN;
+		}
 	}
 
 	for (const uint32_t& index : mVillageIndeces)
 	{
-		if (mapSpriteIndex == index) return VILLAGE;
+		if (mapSpriteIndex == index)
+		{
+			//std::cout << "VILLAGE" << std::endl;
+			return VILLAGE;
+		}
 	}
 
 	for (const uint32_t& index : mCastleDefenseIndeces)
 	{
-		if (mapSpriteIndex == index) return CASTLE_DEFENSE;
+		if(mapSpriteIndex == index)
+		{
+			//std::cout << "CASTLE_DEFENSE" << std::endl;
+			return CASTLE_DEFENSE;
+		}
 	}
 
 	return UNDEFINED;
@@ -1443,6 +1495,7 @@ void MapEditorScene::CheckCursorInMap()
 			if (SquareContainsCursorPosition(mMapRects[x][y]))
 			{
 				mMapSpriteIndeces[x][y] = mSelectedSpriteIndex;
+				mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
 				return;
 			}
 		}
@@ -1919,13 +1972,13 @@ void MapEditorScene::SelectUnit(Vec2D position)
 	mAttackPositions.clear();
 
 	//TestFloodFill(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
-	//TestDijkstra(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
+	TestDijkstra(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
 
-	mMovementPositions.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
+	/*mMovementPositions.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 	GetMovementPositions(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
 	
 	DeleteMovementPositionCopies();
-	DeleteAttackPositionCopies();
+	DeleteAttackPositionCopies();*/
 	return;
 }
 
@@ -1969,10 +2022,10 @@ void MapEditorScene::TestFloodFill(const Vec2D& currentPosition, const float& mo
 void MapEditorScene::TestDijkstra(const Vec2D& startPosition, const float& movement)
 {
 	std::queue<Vec2D> frontier;
-	std::unordered_map<float, float> costSoFar;
+	std::unordered_map<Vec2D, float> costSoFar;
 
 	frontier.push(startPosition);
-	costSoFar.emplace(startPosition.GetX() / startPosition.GetY(), 0.0f);
+	costSoFar.emplace(startPosition, 0.0f);
 
 	while (!frontier.empty())
 	{
@@ -1980,25 +2033,76 @@ void MapEditorScene::TestDijkstra(const Vec2D& startPosition, const float& movem
 		frontier.pop();
 
 		mMovementPositions.push_back(current);
-		//std::cout << current << std::endl;
 
-		for (const Vec2D& direction : Directions)
+		for (const Vec2D direction : Directions)
+		{
+			Vec2D nextPosition = current + direction;
+
+			if (costSoFar.find(nextPosition) != costSoFar.end()) continue;
+
+			float newCost =
+				costSoFar.find(current)->second +
+				GetTerrainMovementCost(
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture,
+					mMapTerrainIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetY())]);
+
+			if (newCost > movement) continue;
+
+			frontier.emplace(nextPosition);
+			costSoFar.emplace(nextPosition, newCost);
+		}
+	}
+}
+
+std::vector<Vec2D> MapEditorScene::DijkstraGetPath(const Vec2D& startPosition, const Vec2D& goalPosition, const float& movement)
+{
+	std::queue<Vec2D> frontier;
+	std::map<float, float> costSoFar;
+	std::unordered_map<Vec2D, Vec2D> cameFrom;
+
+	frontier.push(startPosition);
+	costSoFar.emplace(startPosition.GetX() / startPosition.GetY(), 0.0f);
+
+	Vec2D current;
+	while (!frontier.empty())
+	{
+		current = frontier.front();
+		frontier.pop();
+
+		if (current == goalPosition) break;
+
+		mMovementPositions.push_back(current);
+
+		for (const Vec2D direction : Directions)
 		{
 			Vec2D nextPosition = current + direction;
 
 			if (costSoFar.find(nextPosition.GetX() / nextPosition.GetY()) != costSoFar.end()) continue;
 
 			float newCost =
-				costSoFar.find(nextPosition.GetX() / nextPosition.GetY())->second +
-				GetTerrainMovementCost(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture,
-					mMapTerrainIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetX())]);
+				costSoFar.find(current.GetX() / current.GetY())->second +
+				GetTerrainMovementCost(
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture,
+					mMapTerrainIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetY())]);
 
 			if (newCost > movement) continue;
 
 			frontier.emplace(nextPosition);
 			costSoFar.emplace(nextPosition.GetX() / nextPosition.GetY(), newCost);
+			cameFrom.emplace(nextPosition, current);
 		}
 	}
+
+	current = goalPosition;
+	std::vector<Vec2D> path;
+	while (current != startPosition)
+	{
+		path.insert(path.begin(), current);
+		current = cameFrom[current];
+	}
+	path.insert(path.begin(), startPosition);
+
+	return path;
 }
 
 bool MapEditorScene::PositionAlreadyChecked(const Vec2D& position, const std::vector<Vec2D>& movementStack)
@@ -2023,7 +2127,9 @@ void MapEditorScene::CheckMovementPosition(const Vec2D& oldPosition, const Vec2D
 {
 	if (oldPosition == newPosition) return;
 
-	float cost = GetTerrainMovementCost(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture, mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
+	float cost = GetTerrainMovementCost(
+		mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture,
+		mMapTerrainIndeces[static_cast<int>(newPosition.GetX())][static_cast<int>(newPosition.GetY())]);
 
 	if (movement - cost >= 0)
 	{
@@ -2069,10 +2175,10 @@ float MapEditorScene::GetTerrainMovementCost(const EUnitClass& unit, const ETerr
 	case CLIFF:
 		break;
 	case SEA:
-		return 7;
+		return 99;
 		break;
 	case RIVER:
-		return 7;
+		return 99;
 		break;
 	case DESERT:
 		break;
@@ -2743,9 +2849,11 @@ void MapEditorScene::LoadMap()
 			{
 				delete[] mMapRects[i];
 				delete[] mMapSpriteIndeces[i];
+				delete[] mMapTerrainIndeces[i];
 			}
 			delete[] mMapRects;
 			delete[] mMapSpriteIndeces;
+			delete[] mMapTerrainIndeces;
 		}
 
 		FileCommandLoader fileLoader;

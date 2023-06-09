@@ -52,12 +52,19 @@ Vec2D operator*(float scalar, const Vec2D& vec)
 
 bool Vec2D::operator==(const Vec2D& vec2) const
 {
-	return IsEqual(mX, vec2.mX) && IsEqual(mY, vec2.mY);
+	return mX == vec2.mX && mY == vec2.mY;
 }
 
 bool Vec2D::operator!=(const Vec2D& vec2) const
 {
 	return !(*this == vec2);
+}
+
+Vec2D& Vec2D::operator=(const Vec2D& vec2D)
+{
+	this->mX = vec2D.mX;
+	this->mY = vec2D.mY;
+	return *this;
 }
 
 Vec2D Vec2D::operator-() const

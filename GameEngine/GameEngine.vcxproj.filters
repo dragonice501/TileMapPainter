@@ -54,9 +54,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\ESC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Utils\FileCommandLoader.h">
@@ -1193,7 +1190,7 @@
     <ClInclude Include="src\Systems\RenderSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\ESC.h">
+    <ClInclude Include="src\Utils\Vec2DHash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

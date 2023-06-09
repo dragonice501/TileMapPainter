@@ -90,6 +90,7 @@ public:
 
 	void TestFloodFill(const Vec2D& currentPosition, const float& movement);
 	void TestDijkstra(const Vec2D& startPosition, const float& movement);
+	std::vector<Vec2D> DijkstraGetPath(const Vec2D& startPosition, const Vec2D& goalPosition, const float& movement);
 
 	bool PositionAlreadyChecked(const Vec2D& position, const std::vector<Vec2D>& movementStack);
 
