@@ -6,9 +6,7 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include <queue>
 #include <unordered_map>
-#include <map>
 
 #include <SDL_image.h>
 #include <imgui.h>
@@ -217,9 +215,9 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						CheckCursorInMap();
 						break;
 					case FILL_TILE_TOOL:
-						/*if (!mMouseButtonDown) return;
+						if (!mMouseButtonDown) return;
 						FillTile(cursorMapPosition);
-						mMouseButtonDown = false;*/
+						mMouseButtonDown = false;
 						break;
 					case SELECT_TILE_TOOL:
 						mSelectionRectStart = cursorMapPosition;
@@ -916,10 +914,10 @@ void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 	for (const Vec2D& position : mAttackPositions)
 	{
 		Vec2D drawPosition = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 * mMapZoom + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
 
-		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE - 4, SQUARE_RENDER_SIZE - 4 };
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), (SQUARE_RENDER_SIZE - 4) * mMapZoom, (SQUARE_RENDER_SIZE - 4) * mMapZoom };
 
 		SDL_RenderFillRect(renderer, &rect);
 	}
@@ -1439,9 +1437,9 @@ bool MapEditorScene::InMapBounds(const Vec2D& position)
 {
 	return
 		position.GetX() >= 0 &&
-		position.GetX() < 512 &&
+		position.GetX() < mMapWidth &&
 		position.GetY() >= 0 &&
-		position.GetY() < 512;
+		position.GetY() < mMapHeight;
 }
 
 void MapEditorScene::InitSpriteSheet()
@@ -1545,49 +1543,38 @@ void MapEditorScene::CopyMapRectSprite()
 
 void MapEditorScene::FillTile(const Vec2D& start)
 {
-	std::vector<Vec2D> fillStack;
-	fillStack.push_back(start);
+	std::queue<Vec2D> fillQueue;
+	std::vector<Vec2D> checkedPositions;
+	fillQueue.push(start);
+	checkedPositions.push_back(start);
 
 	uint16_t selectedSprite = mMapSpriteIndeces[static_cast<int>(start.GetX())][static_cast<int>(start.GetY())];
 
-	bool first = true;
-
-	while (!fillStack.empty())
+	while (!fillQueue.empty())
 	{
-		Vec2D current = fillStack.back();
-		//fillStack.pop_back();
-
-		if (!InMapBounds(current)) continue;
-
-		if (PositionAlreadyChecked(current, fillStack)) continue;
-
-		if (first) first = false;
-		else
-		{
-			if (mMapSpriteIndeces[static_cast<int>(current.GetX())][static_cast<int>(current.GetY())] != selectedSprite) continue;
-		}
-
-		fillStack.push_back(current);
+		Vec2D current = fillQueue.front();
+		fillQueue.pop();
 
 		for (const Vec2D pos : Directions)
 		{
-			Vec2D coordinate = current + pos;
+			Vec2D nextPosition = current + pos;
 
-			if (PositionAlreadyChecked(coordinate, fillStack)) continue;
+			if (!InMapBounds(nextPosition)) continue;
 
-			if (mMapSpriteIndeces[static_cast<int>(coordinate.GetX())][static_cast<int>(coordinate.GetY())] != selectedSprite) continue;
+			if (PositionAlreadyChecked(nextPosition, checkedPositions)) continue;
 
-			fillStack.push_back(coordinate);
-			std::cout << coordinate << std::endl;
+			if (mMapSpriteIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetY())] != selectedSprite) continue;
+
+			fillQueue.push(nextPosition);
+			checkedPositions.push_back(nextPosition);
 		}
 	}
 
-	for (const Vec2D& pos : fillStack)
+	for (const Vec2D& pos : checkedPositions)
 	{
 		mMapSpriteIndeces[static_cast<int>(pos.GetX())][static_cast<int>(pos.GetY())] = mSelectedSpriteIndex;
 		mMapTerrainIndeces[static_cast<int>(pos.GetX())][static_cast<int>(pos.GetY())] = GetTerrainType(mSelectedSpriteIndex);
 	}
-	fillStack.clear();
 }
 
 void MapEditorScene::PaintUnit(Vec2D position)
@@ -1973,6 +1960,7 @@ void MapEditorScene::SelectUnit(Vec2D position)
 
 	//TestFloodFill(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
 	TestDijkstra(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
+	DeleteAttackPositionCopies();
 
 	/*mMovementPositions.push_back(mAnimatedUnitSprites[mSelectedMapUnitIndex].position);
 	GetMovementPositions(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, static_cast<float>(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement));
@@ -1990,41 +1978,12 @@ void MapEditorScene::ClearSelectedUnit()
 	mShowSelectedUnitMovement = false;
 }
 
-void MapEditorScene::TestFloodFill(const Vec2D& currentPosition, const float& movement)
-{
-	std::vector<Vec2D> movementStack;
-	movementStack.push_back(currentPosition);
-
-	while (!movementStack.empty())
-	{
-		Vec2D current = movementStack.back();
-		movementStack.pop_back();
-
-		if (!InMapBounds(current)) continue;
-
-		if (PositionAlreadyChecked(current, mMovementPositions)) continue;
-
-		if (currentPosition.Distance(current) > movement) continue;
-
-		mMovementPositions.push_back(current);
-
-		for (const Vec2D pos : Directions)
-		{
-			Vec2D coordinate = current + pos;
-
-			if (PositionAlreadyChecked(coordinate, mMovementPositions)) continue;
-
-			movementStack.push_back(coordinate);
-		}
-	}
-}
-
 void MapEditorScene::TestDijkstra(const Vec2D& startPosition, const float& movement)
 {
 	std::queue<Vec2D> frontier;
 	std::unordered_map<Vec2D, float> costSoFar;
 
-	frontier.push(startPosition);
+	frontier.emplace(startPosition);
 	costSoFar.emplace(startPosition, 0.0f);
 
 	while (!frontier.empty())
@@ -2046,11 +2005,64 @@ void MapEditorScene::TestDijkstra(const Vec2D& startPosition, const float& movem
 					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture,
 					mMapTerrainIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetY())]);
 
-			if (newCost > movement) continue;
+			if (newCost > movement)
+			{
+				GetAttackPositions(current);
+				continue;
+			}
 
 			frontier.emplace(nextPosition);
 			costSoFar.emplace(nextPosition, newCost);
 		}
+	}
+}
+
+void MapEditorScene::GetAttackPositions(const Vec2D& currentPosition)
+{
+	switch (mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType)
+	{
+	case AT_PHYSICAL:
+		mAttackPositions.push_back(currentPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(currentPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, 0));
+		break;
+	case AT_RANGED:
+		mAttackPositions.push_back(currentPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(currentPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, 0));
+
+		mAttackPositions.push_back(currentPosition + Vec2D(0, 2));
+		mAttackPositions.push_back(currentPosition + Vec2D(0, -2));
+		mAttackPositions.push_back(currentPosition + Vec2D(2, 0));
+		mAttackPositions.push_back(currentPosition + Vec2D(-2, 0));
+
+		mAttackPositions.push_back(currentPosition + Vec2D(1, 1));
+		mAttackPositions.push_back(currentPosition + Vec2D(1, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, 1));
+		break;
+	case AT_MAGIC:
+		mAttackPositions.push_back(currentPosition + Vec2D(0, 1));
+		mAttackPositions.push_back(currentPosition + Vec2D(0, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(1, 0));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, 0));
+
+		mAttackPositions.push_back(currentPosition + Vec2D(0, 2));
+		mAttackPositions.push_back(currentPosition + Vec2D(0, -2));
+		mAttackPositions.push_back(currentPosition + Vec2D(2, 0));
+		mAttackPositions.push_back(currentPosition + Vec2D(-2, 0));
+
+		mAttackPositions.push_back(currentPosition + Vec2D(1, 1));
+		mAttackPositions.push_back(currentPosition + Vec2D(1, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, -1));
+		mAttackPositions.push_back(currentPosition + Vec2D(-1, 1));
+		break;
+	case AT_NONE:
+		break;
+	default:
+		break;
 	}
 }
 

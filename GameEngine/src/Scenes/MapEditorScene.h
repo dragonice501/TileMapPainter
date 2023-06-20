@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <stdint.h>
 #include <vector>
+#include <queue>
 #include <map>
 
 class MapEditorScene
@@ -88,8 +89,8 @@ public:
 	void SelectUnit(Vec2D position);
 	void ClearSelectedUnit();
 
-	void TestFloodFill(const Vec2D& currentPosition, const float& movement);
 	void TestDijkstra(const Vec2D& startPosition, const float& movement);
+	void GetAttackPositions(const Vec2D& currentPosition);
 	std::vector<Vec2D> DijkstraGetPath(const Vec2D& startPosition, const Vec2D& goalPosition, const float& movement);
 
 	bool PositionAlreadyChecked(const Vec2D& position, const std::vector<Vec2D>& movementStack);
