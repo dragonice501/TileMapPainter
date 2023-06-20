@@ -1544,9 +1544,9 @@ void MapEditorScene::CopyMapRectSprite()
 void MapEditorScene::FillTile(const Vec2D& start)
 {
 	std::queue<Vec2D> fillQueue;
-	std::vector<Vec2D> checkedPositions;
+	std::unordered_map<Vec2D, int> fillRange;
 	fillQueue.push(start);
-	checkedPositions.push_back(start);
+	fillRange.emplace(start, 0);
 
 	uint16_t selectedSprite = mMapSpriteIndeces[static_cast<int>(start.GetX())][static_cast<int>(start.GetY())];
 
@@ -1561,19 +1561,22 @@ void MapEditorScene::FillTile(const Vec2D& start)
 
 			if (!InMapBounds(nextPosition)) continue;
 
-			if (PositionAlreadyChecked(nextPosition, checkedPositions)) continue;
+			if (fillRange.find(nextPosition) != fillRange.end()) continue;
 
 			if (mMapSpriteIndeces[static_cast<int>(nextPosition.GetX())][static_cast<int>(nextPosition.GetY())] != selectedSprite) continue;
 
+			int newCost = fillRange.find(current)->second + 1;
+			if (newCost > mMaxFillRange) continue;
+
 			fillQueue.push(nextPosition);
-			checkedPositions.push_back(nextPosition);
+			fillRange.emplace(nextPosition, newCost);
 		}
 	}
 
-	for (const Vec2D& pos : checkedPositions)
+	for (auto& pos : fillRange)
 	{
-		mMapSpriteIndeces[static_cast<int>(pos.GetX())][static_cast<int>(pos.GetY())] = mSelectedSpriteIndex;
-		mMapTerrainIndeces[static_cast<int>(pos.GetX())][static_cast<int>(pos.GetY())] = GetTerrainType(mSelectedSpriteIndex);
+		mMapSpriteIndeces[static_cast<int>(pos.first.GetX())][static_cast<int>(pos.first.GetY())] = mSelectedSpriteIndex;
+		mMapTerrainIndeces[static_cast<int>(pos.first.GetX())][static_cast<int>(pos.first.GetY())] = GetTerrainType(mSelectedSpriteIndex);
 	}
 }
 
@@ -2088,6 +2091,11 @@ std::vector<Vec2D> MapEditorScene::DijkstraGetPath(const Vec2D& startPosition, c
 		for (const Vec2D direction : Directions)
 		{
 			Vec2D nextPosition = current + direction;
+
+			for (const AnimatedUnitSprite& unit : mAnimatedUnitSprites)
+			{
+				if (unit.position == nextPosition) continue;
+			}
 
 			if (costSoFar.find(nextPosition.GetX() / nextPosition.GetY()) != costSoFar.end()) continue;
 

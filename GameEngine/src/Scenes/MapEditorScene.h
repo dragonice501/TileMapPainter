@@ -215,6 +215,9 @@ private:
 	uint16_t mSelectionWidth;
 	uint16_t mSelectionHeight;
 
+	// Fill Tile Tool Variables
+	int mMaxFillRange = 20;
+
 	// Map Variables
 	float mMapXOffset = 0;
 	float mMapYOffset = 0;
