@@ -16,8 +16,8 @@ public:
 	void Run();
 	void Destroy();
 
-	static const uint32_t GetWindowWidth() { return mWindowWidth; }
-	static const uint32_t GetWindowHeight() { return mWindowHeight; }
+	static const uint32_t GetWindowWidth() { return mWindowWidth; } const
+	static const uint32_t GetWindowHeight() { return mWindowHeight; } const
 
 private:
 

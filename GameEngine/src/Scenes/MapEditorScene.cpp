@@ -68,8 +68,6 @@ void MapEditorScene::Destroy()
 
 void MapEditorScene::Setup(SDL_Renderer* renderer)
 {
-	//LoadMap();
-	//LoadUnits();
 	InitMap();
 	InitSpriteSheet();
 
@@ -156,188 +154,192 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 {
 	switch (sdlEvent.type)
 	{
-	case SDL_QUIT:
-	{
-		mIsRunning = false;
-		break;
-	}
-	case SDL_KEYDOWN:
-	{
-		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+		case SDL_QUIT:
 		{
 			mIsRunning = false;
+			break;
 		}
-		else if (sdlEvent.key.keysym.sym == SDLK_UP)
+		case SDL_KEYDOWN:
 		{
-			if (mSelectedTool == SELECT_TILE_TOOL)
+			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 			{
-				MoveSelectionUp();
+				mIsRunning = false;
 			}
-		}
-		else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
-		{
-			if (mSelectedTool == SELECT_TILE_TOOL)
+			else if (sdlEvent.key.keysym.sym == SDLK_UP)
 			{
-				MoveSelectionRight();
+				if (mSelectedTool == SELECT_TILE_TOOL)
+				{
+					MoveSelectionUp();
+				}
 			}
-		}
-		else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
-		{
-			if (mSelectedTool == SELECT_TILE_TOOL)
+			else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
 			{
-				MoveSelectionLeft();
+				if (mSelectedTool == SELECT_TILE_TOOL)
+				{
+					MoveSelectionRight();
+				}
 			}
-		}
-		else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
-		{
-			if (mSelectedTool == SELECT_TILE_TOOL)
+			else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
 			{
-				MoveSelectionDown();
+				if (mSelectedTool == SELECT_TILE_TOOL)
+				{
+					MoveSelectionLeft();
+				}
 			}
-		}
-		break;
-	}
-	case SDL_MOUSEBUTTONDOWN:
-	{
-		if (!CursorInGUI())
-		{
-			mMouseButtonDown = true;
-			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
 			{
-				cursorMapPosition = GetCursorMapRect();
-				if (mEditorState == ES_EDITING_MAP)
+				if (mSelectedTool == SELECT_TILE_TOOL)
+				{
+					MoveSelectionDown();
+				}
+			}
+			break;
+		}
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			if (!CursorInGUI())
+			{
+				mMouseButtonDown = true;
+				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+				{
+					cursorMapPosition = GetCursorMapRect();
+					if (mEditorState == ES_EDITING_MAP)
+					{
+						switch (mSelectedTool)
+						{
+							case PAN_TOOL:
+								break;
+							case PAINT_TILE_TOOL:
+							{
+								CheckCursorInMap();
+								break;
+							}
+							case FILL_TILE_TOOL:
+							{
+								if (!mMouseButtonDown) return;
+								FillTile(cursorMapPosition);
+								mMouseButtonDown = false;
+								break;
+							}
+							case SELECT_TILE_TOOL:
+							{
+								mSelectionRectStart = cursorMapPosition;
+								break;
+							}
+							case PAINT_UNIT_TOOL:
+							{
+								if (mNewSelectedUnit != NONE) PaintUnit(cursorMapPosition);
+								break;
+							}
+							case SELECT_UNIT_TOOL:
+							{
+								GetTerrainMovementCost(KNIGHT_LORD, mMapTerrainIndeces[static_cast<int>(cursorMapPosition.GetX())][static_cast<int>(cursorMapPosition.GetX())]);
+								// If a unit is already selected
+								if (mSelectedMapUnitIndex != -1)
+								{
+									// Clear selected unit if selected again
+									if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
+									{
+										ClearSelectedUnit();
+										return;
+									}
+
+									// Change selected unit if another is selected
+									for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+									{
+										if (cursorMapPosition == mAnimatedUnitSprites[i].position)
+										{
+											mSelectedMapUnitIndex = i;
+											SelectUnit(cursorMapPosition);
+											return;
+										}
+									}
+
+									// Move unit to cursor map position
+									mAnimatedUnitSprites[mSelectedMapUnitIndex].position = cursorMapPosition;
+									ClearSelectedUnit();
+									return;
+								}
+
+								// Select unit at cursor map position if one exists
+								for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+								{
+									if (cursorMapPosition == mAnimatedUnitSprites[i].position)
+									{
+										mSelectedMapUnitIndex = i;
+										SelectUnit(cursorMapPosition);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
 				{
 					switch (mSelectedTool)
 					{
 					case PAN_TOOL:
 						break;
 					case PAINT_TILE_TOOL:
-						CheckCursorInMap();
+						CopyMapRectSprite();
 						break;
 					case FILL_TILE_TOOL:
-						if (!mMouseButtonDown) return;
-						FillTile(cursorMapPosition);
-						mMouseButtonDown = false;
+						CopyMapRectSprite();
 						break;
 					case SELECT_TILE_TOOL:
-						mSelectionRectStart = cursorMapPosition;
+						mShowTileSelection = false;
 						break;
 					case PAINT_UNIT_TOOL:
-						if (mNewSelectedUnit != NONE) PaintUnit(cursorMapPosition);
+						RemoveUnit(GetCursorMapRect());
 						break;
-					case SELECT_UNIT_TOOL:
-					{
-						GetTerrainMovementCost(KNIGHT_LORD, mMapTerrainIndeces[static_cast<int>(cursorMapPosition.GetX())][static_cast<int>(cursorMapPosition.GetX())]);
-						// If a unit is already selected
-						if (mSelectedMapUnitIndex != -1)
-						{
-							// Clear selected unit if selected again
-							if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
-							{
-								ClearSelectedUnit();
-								return;
-							}
-
-							// Change selected unit if another is selected
-							for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
-							{
-								if (cursorMapPosition == mAnimatedUnitSprites[i].position)
-								{
-									mSelectedMapUnitIndex = i;
-									SelectUnit(cursorMapPosition);
-									return;
-								}
-							}
-
-							// Move unit to cursor map position
-							mAnimatedUnitSprites[mSelectedMapUnitIndex].position = cursorMapPosition;
-							ClearSelectedUnit();
-							return;
-						}
-
-						// Select unit at cursor map position if one exists
-						for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
-						{
-							if (cursorMapPosition == mAnimatedUnitSprites[i].position)
-							{
-								mSelectedMapUnitIndex = i;
-								SelectUnit(cursorMapPosition);
-								break;
-							}
-						}
 					default:
 						break;
 					}
-					}
 				}
 			}
-			else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+			break;
+		}
+		case SDL_MOUSEBUTTONUP:
+		{
+			mMouseButtonDown = false;
+			if (mSelectedTool == SELECT_TILE_TOOL)
+			{
+				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+				{
+					mSelectionRectEnd = GetCursorMapRect();
+					SetSelectionRect();
+				}
+				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+				{
+					mShowTileSelection = false;
+				}
+			}
+			break;
+		}
+		case SDL_MOUSEMOTION:
+		{
+			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
+			GetCursorMapRect();
+			if (mMouseButtonDown && !CursorInGUI())
 			{
 				switch (mSelectedTool)
 				{
-				case PAN_TOOL:
-					break;
-				case PAINT_TILE_TOOL:
-					CopyMapRectSprite();
-					break;
-				case FILL_TILE_TOOL:
-					CopyMapRectSprite();
-					break;
-				case SELECT_TILE_TOOL:
-					mShowTileSelection = false;
-					break;
-				case PAINT_UNIT_TOOL:
-					RemoveUnit(GetCursorMapRect());
-					break;
-				default:
-					break;
+					case PAINT_TILE_TOOL:
+						break;
+					case PAN_TOOL:
+					{
+						mMapXOffset += sdlEvent.motion.xrel;
+						mMapYOffset += sdlEvent.motion.yrel;
+						SetMapRectPositions();
+						break;
+					}
+					case SELECT_TILE_TOOL:
+						break;
 				}
 			}
+			break;
 		}
-		break;
-	}
-	case SDL_MOUSEBUTTONUP:
-	{
-		mMouseButtonDown = false;
-		if (mSelectedTool == SELECT_TILE_TOOL)
-		{
-			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-			{
-				mSelectionRectEnd = GetCursorMapRect();
-				SetSelectionRect();
-			}
-			else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
-			{
-				mShowTileSelection = false;
-			}
-		}
-		break;
-	}
-	case SDL_MOUSEMOTION:
-	{
-		mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
-		GetCursorMapRect();
-		if (mMouseButtonDown && !CursorInGUI())
-		{
-			switch (mSelectedTool)
-			{
-			case PAINT_TILE_TOOL:
-				break;
-			case PAN_TOOL:
-				mMapXOffset += sdlEvent.motion.xrel;
-				mMapYOffset += sdlEvent.motion.yrel;
-				SetMapRectPositions();
-				break;
-			case SELECT_TILE_TOOL:
-				break;
-			default:
-				break;
-			}
-		}
-		break;
-	}
-	default:
-		break;
 	}
 }
 
@@ -345,16 +347,19 @@ void MapEditorScene::InputSelectingSpriteMode(const SDL_Event& sdlEvent, Vec2D& 
 {
 	switch (sdlEvent.type)
 	{
-	case SDL_QUIT:
-		mIsRunning = false;
-		break;
-
-	case SDL_MOUSEBUTTONDOWN:
-		if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+		case SDL_QUIT:
 		{
-			CheckCursorInSpriteSheet();
+			mIsRunning = false;
+			break;
 		}
-		break;
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+			{
+				CheckCursorInSpriteSheet();
+			}
+			break;
+		}
 	}
 }
 
@@ -362,72 +367,61 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 {
 	switch (sdlEvent.type)
 	{
-	case SDL_QUIT:
-		mIsRunning = false;
-		break;
-	case SDL_KEYDOWN:
-	{
-		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
+		case SDL_QUIT:
 		{
-			mEditorState = ES_EDITING_MAP;
+			mIsRunning = false;
+			break;
 		}
-		break;
-	}
-	case SDL_MOUSEBUTTONDOWN:
-	{
-		if (sdlEvent.button.button == SDL_BUTTON_LEFT && (mGameState == GS_PLAYER_IDLE || mGameState == GS_SELECTING_TARGET))
+		case SDL_KEYDOWN:
 		{
-			mMouseButtonDown = true;
-			cursorMapPosition = GetCursorMapRect();
-
-			// If a unit is already selected
-			if (mSelectedMapUnitIndex != -1)
+			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 			{
-				// Unit is enemy and selected unit is looking for attack target
-				if (mGameState == GS_SELECTING_TARGET)
-				{
-					for (int i = 0; i < mAttackPositions.size(); i++)
-					{
-						for (int j = 0; j < mAnimatedUnitSprites.size(); j++)
-						{
-							if (mAttackPositions[i] == mAnimatedUnitSprites[j].position && UnitIsEnemy(mAnimatedUnitSprites[j].unitTexture))
-							{
-								mSelectedTargetUnitIndex = j;
-								SetUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-								mAttackPositions.clear();
+				mEditorState = ES_EDITING_MAP;
+			}
+			break;
+		}
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			if (sdlEvent.button.button == SDL_BUTTON_LEFT && (mGameState == GS_PLAYER_IDLE || mGameState == GS_SELECTING_TARGET))
+			{
+				mMouseButtonDown = true;
+				cursorMapPosition = GetCursorMapRect();
 
-								mGameState = GS_BEFORE_ENCOUNTER_BUFFER;
-								return;
+				// If a unit is already selected
+				if (mSelectedMapUnitIndex != -1)
+				{
+					// Unit is enemy and selected unit is looking for attack target
+					if (mGameState == GS_SELECTING_TARGET)
+					{
+						for (int i = 0; i < mAttackPositions.size(); i++)
+						{
+							for (int j = 0; j < mAnimatedUnitSprites.size(); j++)
+							{
+								if (mAttackPositions[i] == mAnimatedUnitSprites[j].position && UnitIsEnemy(mAnimatedUnitSprites[j].unitTexture))
+								{
+									mSelectedTargetUnitIndex = j;
+									SetUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+									mAttackPositions.clear();
+
+									mGameState = GS_BEFORE_ENCOUNTER_BUFFER;
+									return;
+								}
 							}
 						}
 					}
-				}
 
-				// Clear selected unit if selected again
-				if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
-				{
-					ClearSelectedUnit();
-					return;
-				}
-
-				// Cursor position contains selected unit movement position
-				if (CursorInSelectedUnitMovement(cursorMapPosition))
-				{
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath =
-						DijkstraGetPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, GetCursorMapRect(), mAnimatedUnitSprites[mSelectedMapUnitIndex].movement);
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING;
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].currentPathGoalIndex = 0;
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].SetMovementDirection();
-
-					mGameState = GS_UNIT_MOVING;
-
-					mMovementPositions.clear();
-					mAttackPositions.clear();
-					return;
-
-					/*if (SetUnitMovementPath(cursorMapPosition))
+					// Clear selected unit if selected again
+					if (cursorMapPosition == mAnimatedUnitSprites[mSelectedMapUnitIndex].position)
 					{
-						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath = mUnitMovementPath;
+						ClearSelectedUnit();
+						return;
+					}
+
+					// Cursor position contains selected unit movement position
+					if (CursorInSelectedUnitMovement(cursorMapPosition))
+					{
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath =
+							DijkstraGetPath(mAnimatedUnitSprites[mSelectedMapUnitIndex].position, GetCursorMapRect(), mAnimatedUnitSprites[mSelectedMapUnitIndex].movement);
 						mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING;
 						mAnimatedUnitSprites[mSelectedMapUnitIndex].currentPathGoalIndex = 0;
 						mAnimatedUnitSprites[mSelectedMapUnitIndex].SetMovementDirection();
@@ -437,38 +431,35 @@ void MapEditorScene::InputPlayMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						mMovementPositions.clear();
 						mAttackPositions.clear();
 						return;
-					}*/
+					}
+					return;
 				}
-				return;
-			}
-			else
-			{
-				// Map Position contains unit
-				// Change selected unit if another is selected and it is not an enemy
-				for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
+				else
 				{
-					if (cursorMapPosition == mAnimatedUnitSprites[i].position && !UnitIsEnemy(mAnimatedUnitSprites[i].unitTexture))
+					// Map Position contains unit
+					// Change selected unit if another is selected and it is not an enemy
+					for (int i = 0; i < mAnimatedUnitSprites.size(); i++)
 					{
-						mSelectedMapUnitIndex = i;
-						SelectUnit(cursorMapPosition);
-						return;
+						if (cursorMapPosition == mAnimatedUnitSprites[i].position && !UnitIsEnemy(mAnimatedUnitSprites[i].unitTexture))
+						{
+							mSelectedMapUnitIndex = i;
+							SelectUnit(cursorMapPosition);
+							return;
+						}
 					}
 				}
 			}
 		}
-	}
-	case SDL_MOUSEBUTTONUP:
-	{
-		mMouseButtonDown = false;
-		break;
-	}
-	case SDL_MOUSEMOTION:
-	{
-		mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
-		break;
-	}
-	default:
-		break;
+		case SDL_MOUSEBUTTONUP:
+		{
+			mMouseButtonDown = false;
+			break;
+		}
+		case SDL_MOUSEMOTION:
+		{
+			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
+			break;
+		}
 	}
 }
 
@@ -476,16 +467,20 @@ void MapEditorScene::Update(const float& deltaTime)
 {
 	switch (mEditorState)
 	{
-	case ES_EDITING_MAP:
-		UpdateEditor(deltaTime);
-		break;
-	case ES_SELECTING_SPRITE:
-		break;
-	case ES_PLAYING_GAME:
-		UpdateGame(deltaTime);
-		break;
-	default:
-		break;
+		case ES_EDITING_MAP:
+		{
+			UpdateEditor(deltaTime);
+			break;
+		}
+		case ES_SELECTING_SPRITE:
+		{
+			break;
+		}
+		case ES_PLAYING_GAME:
+		{
+			UpdateGame(deltaTime);
+			break;
+		}
 	}
 }
 
@@ -515,114 +510,128 @@ void MapEditorScene::UpdateGame(const float& deltaTime)
 
 		switch (mGameState)
 		{
-		case GS_PLAYER_IDLE:
-			break;
-		case GS_SELECTING_ACTION:
-			break;
-		case GS_BEFORE_ENCOUNTER_BUFFER:
-			waitTime -= 1.0f * deltaTime;
-			if (waitTime <= 0.0f)
+			case GS_PLAYER_IDLE:
 			{
-				waitTime = 1.0f;
-				mGameState = GS_PLAYER_ATTACKING;
-				mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING_TO_ATTACK;
+				break;
 			}
-			break;
-		case GS_PLAYER_ATTACKING:
-			if (unit.unitState == US_ATTACKING)
+			case GS_SELECTING_ACTION:
 			{
-				ApplyDamage(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-
-				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
+				break;
 			}
-			else if (unit.unitState == US_ATTACK_FINISHED && mGameState == GS_PLAYER_ATTACKING)
+			case GS_BEFORE_ENCOUNTER_BUFFER:
 			{
-				mGameState = GS_ATTACK_BUFFER;
-			}
-			break;
-		case GS_ATTACK_BUFFER:
-			waitTime -= 1.0f * deltaTime;
-			if (waitTime <= 0.0f)
-			{
-				waitTime = 1.0f;
-				if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+				waitTime -= 1.0f * deltaTime;
+				if (waitTime <= 0.0f)
 				{
-					mGameState = GS_ENEMY_ATTACKING;
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+					waitTime = 1.0f;
+					mGameState = GS_PLAYER_ATTACKING;
+					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_MOVING_TO_ATTACK;
 				}
-				else
+				break;
+			}
+			case GS_PLAYER_ATTACKING:
+			{
+				if (unit.unitState == US_ATTACKING)
 				{
-					mGameState = GS_UNIT_DYING;
+					ApplyDamage(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+
+					unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
 				}
-			}
-			break;
-		case GS_ENEMY_ATTACKING:
-			if (unit.unitState == US_ATTACKING)
-			{
-				ApplyDamage(mAnimatedUnitSprites[mSelectedTargetUnitIndex], mAnimatedUnitSprites[mSelectedMapUnitIndex]);
-
-				unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
-			}
-			else if (unit.unitState == US_ATTACK_FINISHED && UnitIsEnemy(unit.unitTexture))
-			{
-				mGameState = GS_ENCOUNTER_BUFFER;
-			}
-			break;
-		case GS_ENCOUNTER_BUFFER:
-			waitTime -= 1.0f * deltaTime;
-			if (waitTime <= 0.0f)
-			{
-				waitTime = 1.0f;
-
-				if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+				else if (unit.unitState == US_ATTACK_FINISHED && mGameState == GS_PLAYER_ATTACKING)
 				{
+					mGameState = GS_ATTACK_BUFFER;
+				}
+				break;
+			}
+			case GS_ATTACK_BUFFER:
+			{
+				waitTime -= 1.0f * deltaTime;
+				if (waitTime <= 0.0f)
+				{
+					waitTime = 1.0f;
+					if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+					{
+						mGameState = GS_ENEMY_ATTACKING;
+						mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_MOVING_TO_ATTACK;
+					}
+					else
+					{
+						mGameState = GS_UNIT_DYING;
+					}
+				}
+				break;
+			}
+			case GS_ENEMY_ATTACKING:
+			{
+				if (unit.unitState == US_ATTACKING)
+				{
+					ApplyDamage(mAnimatedUnitSprites[mSelectedTargetUnitIndex], mAnimatedUnitSprites[mSelectedMapUnitIndex]);
+
+					unit.unitState = US_MOVING_AWAY_FROM_ATTACK;
+				}
+				else if (unit.unitState == US_ATTACK_FINISHED && UnitIsEnemy(unit.unitTexture))
+				{
+					mGameState = GS_ENCOUNTER_BUFFER;
+				}
+				break;
+			}
+			case GS_ENCOUNTER_BUFFER:
+			{
+				waitTime -= 1.0f * deltaTime;
+				if (waitTime <= 0.0f)
+				{
+					waitTime = 1.0f;
+
+					if (mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState != US_DEAD)
+					{
+						mGameState = GS_PLAYER_IDLE;
+						ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+
+						mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
+						ClearActiveUnits();
+					}
+					else
+					{
+						mGameState = GS_UNIT_DYING;
+					}
+				}
+				break;
+			}
+			case GS_UNIT_DYING:
+			{
+				waitTime -= 0.5f * deltaTime;
+				if (waitTime <= 0.0f) waitTime = 0.0f;
+
+				dyingUnitBlend = static_cast<uint8_t>(255 * (waitTime / 2.0f));
+
+				if (waitTime == 0.0f)
+				{
+					if (mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState == US_DEAD)
+					{
+						DeleteUnit(mSelectedMapUnitIndex);
+
+						mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
+						mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementDirection = UM_IDLE;
+						mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementPath.clear();
+
+						ClearActiveUnits();
+					}
+					else
+					{
+						DeleteUnit(mSelectedTargetUnitIndex);
+
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_IDLE;
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementDirection = UM_IDLE;
+						mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath.clear();
+
+						ClearActiveUnits();
+					}
+
+					waitTime = 1.0f;
 					mGameState = GS_PLAYER_IDLE;
-					ClearUnitAttacks(mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
-					ClearActiveUnits();
 				}
-				else
-				{
-					mGameState = GS_UNIT_DYING;
-				}
+				break;
 			}
-			break;
-		case GS_UNIT_DYING:
-			waitTime -= 0.5f * deltaTime;
-			if (waitTime <= 0.0f) waitTime = 0.0f;
-
-			dyingUnitBlend = static_cast<uint8_t>(255 * (waitTime / 2.0f));
-
-			if (waitTime == 0.0f)
-			{
-				if (mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState == US_DEAD)
-				{
-					DeleteUnit(mSelectedMapUnitIndex);
-
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].unitState = US_IDLE;
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementDirection = UM_IDLE;
-					mAnimatedUnitSprites[mSelectedTargetUnitIndex].movementPath.clear();
-
-					ClearActiveUnits();
-				}
-				else
-				{
-					DeleteUnit(mSelectedTargetUnitIndex);
-
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].unitState = US_IDLE;
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementDirection = UM_IDLE;
-					mAnimatedUnitSprites[mSelectedMapUnitIndex].movementPath.clear();
-
-					ClearActiveUnits();
-				}
-
-				waitTime = 1.0f;
-				mGameState = GS_PLAYER_IDLE;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -654,17 +663,21 @@ void MapEditorScene::Render(SDL_Renderer* renderer)
 
 	switch (mEditorState)
 	{
-	case ES_EDITING_MAP:
-		RenderEditorMode(renderer);
-		break;
-	case ES_SELECTING_SPRITE:
-		DrawTileMap(renderer);
-		break;
-	case ES_PLAYING_GAME:
-		RenderPlayMode(renderer);
-		break;
-	default:
-		break;
+		case ES_EDITING_MAP:
+		{
+			RenderEditorMode(renderer);
+			break;
+		}
+		case ES_SELECTING_SPRITE:
+		{
+			DrawTileMap(renderer);
+			break;
+		}
+		case ES_PLAYING_GAME:
+		{
+			RenderPlayMode(renderer);
+			break;
+		}
 	}
 
 	SDL_RenderPresent(renderer);
@@ -698,59 +711,71 @@ void MapEditorScene::RenderPlayMode(SDL_Renderer* renderer)
 
 	switch (mGameState)
 	{
-	case GS_PLAYER_IDLE:
-		if (mShowSelectedUnitMovement)
+		case GS_PLAYER_IDLE:
 		{
-			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			DrawSelectedUnitMovement(renderer);
+			if (mShowSelectedUnitMovement)
+			{
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+				DrawSelectedUnitMovement(renderer);
 
+				DrawSelectedUnitAttackRange(renderer);
+			}
+
+			DrawAnimatedSprites(renderer);
+
+			if (mUnitHovered)
+			{
+				DrawHoveredUnitStats();
+			}
+			break;
+		}
+		case GS_UNIT_MOVING:
+		{
+			DrawAnimatedSprites(renderer);
+			break;
+		}
+		case GS_SELECTING_ACTION:
+		{
+			DrawAnimatedSprites(renderer);
+			DrawUnitActions();
+			break;
+		}
+		case GS_SELECTING_TARGET:
+		{
 			DrawSelectedUnitAttackRange(renderer);
+			DrawAnimatedSprites(renderer);
+			break;
 		}
-
-		DrawAnimatedSprites(renderer);
-
-		if (mUnitHovered)
+		case GS_BEFORE_ENCOUNTER_BUFFER:
 		{
-			DrawHoveredUnitStats();
+			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			break;
 		}
-		break;
-	case GS_UNIT_MOVING:
-		DrawAnimatedSprites(renderer);
-		break;
-	case GS_SELECTING_ACTION:
-		DrawAnimatedSprites(renderer);
-		DrawUnitActions();
-		break;
-	case GS_SELECTING_TARGET:
-		DrawSelectedUnitAttackRange(renderer);
-		DrawAnimatedSprites(renderer);
-		break;
-	case GS_BEFORE_ENCOUNTER_BUFFER:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	case GS_PLAYER_ATTACKING:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	case GS_ATTACK_BUFFER:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	case GS_ENEMY_ATTACKING:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	case GS_ENCOUNTER_BUFFER:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	case GS_UNIT_DYING:
-		DrawAnimatedSprites(renderer);
-		DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
-		break;
-	default:
-		break;
+		case GS_PLAYER_ATTACKING:
+		{
+			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			break;
+		}
+		case GS_ATTACK_BUFFER:
+		{
+			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			break;
+		}
+		case GS_ENEMY_ATTACKING:
+		{
+			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			break;
+		}
+		case GS_ENCOUNTER_BUFFER:
+		{
+			DrawAnimatedSprites(renderer);
+			DrawUnitHealthBars(renderer, mAnimatedUnitSprites[mSelectedMapUnitIndex], mAnimatedUnitSprites[mSelectedTargetUnitIndex]);
+			break;
+		}
 	}
 }
 
@@ -762,11 +787,13 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 		{
 			if (TileInsideCamera(x, y))
 			{
-				SDL_Rect srcRect = {
+				SDL_Rect srcRect =
+				{
 					(mMapSpriteIndeces[x][y] % TILE_MAP_WIDTH) << 4,
 					(mMapSpriteIndeces[x][y] / TILE_MAP_WIDTH) << 4,
 					SQUARE_PIXEL_SIZE,
-					SQUARE_PIXEL_SIZE };
+					SQUARE_PIXEL_SIZE
+				};
 
 				SDL_Rect dstRect = mMapRects[x][y];
 
@@ -777,15 +804,19 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 
 	if (mShowOverlay)
 	{
-		Vec2D position = {
+		Vec2D position =
+		{
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset)) };
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset))
+		};
 
-		SDL_Rect overlayRect = {
+		SDL_Rect overlayRect =
+		{
 			static_cast<int>(position.GetX()),
 			static_cast<int>(position.GetY()),
 			4096 * 2 * mMapZoom,
-			4096 * 2 * mMapZoom };
+			4096 * 2 * mMapZoom
+		};
 
 		SDL_SetTextureBlendMode(mOverlayTexture, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(mOverlayTexture, 100);
@@ -799,9 +830,11 @@ void MapEditorScene::DrawTileMap(SDL_Renderer* renderer)
 	{
 		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
 		{
-			Vec2D position = {
+			Vec2D position =
+			{
 				static_cast<float>((Application::GetWindowWidth() / 2 - (TILE_MAP_WIDTH * SQUARE_RENDER_SIZE) / 2 + x * SQUARE_RENDER_SIZE)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - (TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2 + y * SQUARE_RENDER_SIZE)) };
+				static_cast<float>((Application::GetWindowHeight() / 2 - (TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2 + y * SQUARE_RENDER_SIZE))
+			};
 
 			SDL_Rect srcRect = { x * SQUARE_PIXEL_SIZE, y * SQUARE_PIXEL_SIZE, SQUARE_PIXEL_SIZE, SQUARE_PIXEL_SIZE };
 			SDL_Rect dstRect = { position.GetX(), position.GetY(), SQUARE_RENDER_SIZE, SQUARE_RENDER_SIZE };
@@ -818,28 +851,38 @@ void MapEditorScene::DrawAnimatedSprites(SDL_Renderer* renderer)
 		int directionIndex = 0;
 		switch (sprite.movementDirection)
 		{
-		case UM_IDLE:
-			directionIndex = 0;
-			break;
-		case UM_UP:
-			directionIndex = 1;
-			break;
-		case UM_DOWN:
-			directionIndex = 2;
-			break;
-		case UM_LEFT:
-			directionIndex = 3;
-			break;
-		case UM_RIGHT:
-			directionIndex = 4;
-			break;
-		default:
-			break;
+			case UM_IDLE:
+			{
+				directionIndex = 0;
+				break;
+			}
+			case UM_UP:
+			{
+				directionIndex = 1;
+				break;
+			}
+			case UM_DOWN:
+			{
+				directionIndex = 2;
+				break;
+			}
+			case UM_LEFT:
+			{
+				directionIndex = 3;
+				break;
+			}
+			case UM_RIGHT:
+			{
+				directionIndex = 4;
+				break;
+			}
 		}
 
-		Vec2D position = {
+		Vec2D position =
+		{
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+		};
 
 		SDL_Rect srcRect = { sprite.frameSize * sprite.currentFrame, directionIndex * sprite.frameSize, sprite.frameSize, sprite.frameSize };
 		SDL_Rect dstRect = { position.GetX(), position.GetY() - 32 * mMapZoom, sprite.frameSize * 2 * mMapZoom, sprite.frameSize * 2 * mMapZoom };
@@ -864,24 +907,30 @@ void MapEditorScene::DrawUnitHealthBars(SDL_Renderer* renderer, const AnimatedUn
 	{
 		if (sprite == playerUnit || sprite == enemyUnit)
 		{
-			Vec2D position = {
+			Vec2D position =
+			{
 					static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + sprite.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-					static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+					static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + sprite.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+			};
 
-			SDL_Rect heatlhBackgroundRect = {
+			SDL_Rect heatlhBackgroundRect =
+			{
 				position.GetX() + UNIT_HEALTH_BAR_X_OFFSET,
 				position.GetY() - UNIT_HEALTH_BAR_Y_OFFSET,
 				(sprite.frameSize - UNIT_HEALTH_BAR_X_PADDING) * mMapZoom,
-				UNIT_HEALTH_BAR_HEIGHT * mMapZoom };
+				UNIT_HEALTH_BAR_HEIGHT * mMapZoom
+			};
 
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 			SDL_RenderFillRect(renderer, &heatlhBackgroundRect);
 
-			SDL_Rect healthRect = {
+			SDL_Rect healthRect =
+			{
 				position.GetX() + UNIT_HEALTH_BAR_X_OFFSET,
 				position.GetY() - UNIT_HEALTH_BAR_Y_OFFSET,
 				(static_cast<float>(sprite.frameSize - UNIT_HEALTH_BAR_X_PADDING) * (static_cast<float>(sprite.currentHP) / static_cast<float>(sprite.maxHP))) * mMapZoom,
-				UNIT_HEALTH_BAR_HEIGHT * mMapZoom };
+				UNIT_HEALTH_BAR_HEIGHT * mMapZoom
+			};
 
 			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
 			SDL_RenderFillRect(renderer, &healthRect);
@@ -896,9 +945,11 @@ void MapEditorScene::DrawSelectedUnitMovement(SDL_Renderer* renderer)
 
 	for (const Vec2D& position : mMovementPositions)
 	{
-		Vec2D drawPosition = {
+		Vec2D drawPosition =
+		{
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 * mMapZoom + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+		};
 
 		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), (SQUARE_RENDER_SIZE - 4) * mMapZoom, (SQUARE_RENDER_SIZE - 4) * mMapZoom };
 
@@ -913,9 +964,11 @@ void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 
 	for (const Vec2D& position : mAttackPositions)
 	{
-		Vec2D drawPosition = {
+		Vec2D drawPosition =
+		{
 				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + 2 * mMapZoom + position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + 2 * mMapZoom + position.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+		};
 
 		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), (SQUARE_RENDER_SIZE - 4) * mMapZoom, (SQUARE_RENDER_SIZE - 4) * mMapZoom };
 
@@ -1131,35 +1184,6 @@ void MapEditorScene::DrawGUI()
 					SelectUnit(GetCursorMapRect());
 				}
 			}
-
-			/*if (mSelectedMapUnitIndex != -1)
-			{
-				std::string unitString = "Selected Unit: " + GetUnitTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].unitTexture);
-				std::string unitAttackString = "Selected Unit Attack Type: " + GetUnitAttackTypeName(mAnimatedUnitSprites[mSelectedMapUnitIndex].attackType);
-				std::string levelString = "Selected Unit Level: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].level);
-				std::string maxHPString = "Selected Unit Max HP: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].maxHP);
-				std::string currentHPString = "Selected Unit Current HP: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].currentHP);
-				std::string strengthString = "Selected Unit Strength: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].strength);
-				std::string magicString = "Selected Unit magic: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].magic);
-				std::string skillString = "Selected Unit Skill: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].skill);
-				std::string speedString = "Selected Unit Speed: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].speed);
-				std::string luckString = "Selected Unit Luck: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].luck);
-				std::string defenseString = "Selected Unit Defense: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].defense);
-				std::string movementString = "Selected Unit Movement: " + std::to_string(mAnimatedUnitSprites[mSelectedMapUnitIndex].movement);
-
-				ImGui::Text(unitString.c_str());
-				ImGui::Text(unitAttackString.c_str());
-				ImGui::Text(levelString.c_str());
-				ImGui::Text(maxHPString.c_str());
-				ImGui::Text(currentHPString.c_str());
-				ImGui::Text(strengthString.c_str());
-				ImGui::Text(magicString.c_str());
-				ImGui::Text(skillString.c_str());
-				ImGui::Text(speedString.c_str());
-				ImGui::Text(luckString.c_str());
-				ImGui::Text(defenseString.c_str());
-				ImGui::Text(movementString.c_str());
-			}*/
 		}
 	}
 	ImGui::End();
