@@ -16,8 +16,11 @@ public:
 	void Run();
 	void Destroy();
 
-	static const uint32_t GetWindowWidth() { return mWindowWidth; } const
-	static const uint32_t GetWindowHeight() { return mWindowHeight; } const
+	static const uint32_t GetWindowWidth();
+	static const uint32_t GetWindowHeight();
+	static const uint32_t GetMilliseconds() { return millisecondsPreviousFrame; } 
+	
+	static float millisecondsPreviousFrame;
 
 private:
 
@@ -29,6 +32,5 @@ private:
 	static uint32_t mWindowWidth;
 	static uint32_t mWindowHeight;
 
-	uint32_t millisecondsPreviousFrame;
 };
 

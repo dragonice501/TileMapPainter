@@ -61,6 +61,10 @@ public:
 	void SetMapTerrainIndeces();
 	ETerrainType GetTerrainType(uint32_t mapSpriteIndex);
 	bool InMapBounds(const Vec2D& position);
+	void IncreaseMapWidth();
+	void DecreaseMapWidth();
+	void IncreaseMapHeight();
+	void DecreaseMapHeight();
 
 	// SpriteSheet Functions
 	void InitSpriteSheet();
@@ -150,9 +154,11 @@ private:
 	// Paint Variables
 	uint16_t mSelectedSpriteIndex = 168;
 
-	// Map Save/Load Variables
+	// Map Variables
 	int mFileNameSize = 0;
 	char mFileName[16];
+	int mMapGUIWidth = 16;
+	int mMapGUIHeight = 16;
 
 	// Unit Variables
 	std::vector<SDL_Texture*> mUnitClassTextures;
@@ -224,17 +230,16 @@ private:
 	uint16_t mMapWidth = 256;
 	uint16_t mMapHeight = 256;
 	float mMapZoom = 1.0f;
-	const uint8_t MAX_MAP_SIZE = 512;
+	const int MAX_MAP_SIZE = 256;
 	const uint8_t SQUARE_PIXEL_SIZE = 16;
 	const uint8_t SQUARE_RENDER_SIZE = 32;
 	static const uint8_t SPRITE_SHEET_SIZE = 32;
-	static const uint8_t TILE_MAP_WIDTH = 28;
-	static const uint8_t TILE_MAP_HEIGHT = 24;
+	static const size_t TILE_MAP_SIZE = 32;
 
 	SDL_Texture* mSpriteSheet;
-	SDL_Texture* mTileMap[TILE_MAP_WIDTH][TILE_MAP_HEIGHT];
+	SDL_Texture* mTileMap[TILE_MAP_SIZE][TILE_MAP_SIZE];
 	SDL_Rect** mMapRects;
-	SDL_Rect* mSpriteSheetRects[TILE_MAP_WIDTH][TILE_MAP_HEIGHT];
+	SDL_Rect* mSpriteSheetRects[TILE_MAP_SIZE][TILE_MAP_SIZE];
 	uint16_t** mMapSpriteIndeces;
 	ETerrainType** mMapTerrainIndeces;
 

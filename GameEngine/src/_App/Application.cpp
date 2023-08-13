@@ -3,6 +3,7 @@
 
 uint32_t Application::mWindowWidth = 0;
 uint32_t Application::mWindowHeight = 0;
+float Application::millisecondsPreviousFrame = 0;
 
 Application::Application(): mIsRunning(false)
 {
@@ -22,8 +23,8 @@ bool Application::Init()
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	mWindowWidth = displayMode.w;
 	mWindowHeight = displayMode.h;
-	/*mWindowWidth = 1024;
-	mWindowHeight = 1024;*/
+	mWindowWidth = 1024;
+	mWindowHeight = 1024;
 
 	mWindow = SDL_CreateWindow("Game Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mWindowWidth, mWindowHeight, SDL_WINDOW_FOREIGN);
 	if (!mWindow) return false;
@@ -68,4 +69,14 @@ void Application::Destroy()
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
+}
+
+const uint32_t Application::GetWindowWidth()
+{
+	return mWindowWidth;
+}
+
+const uint32_t Application::GetWindowHeight()
+{
+	return mWindowHeight;
 }

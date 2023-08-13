@@ -41,9 +41,9 @@ void MapEditorScene::Destroy()
 
 	SDL_DestroyTexture(mSpriteSheet);
 
-	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
+	for (uint8_t y = 0; y < TILE_MAP_SIZE; y++)
 	{
-		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
+		for (uint8_t x = 0; x < TILE_MAP_SIZE; x++)
 		{
 			SDL_DestroyTexture(mTileMap[x][y]);
 		}
@@ -141,10 +141,9 @@ void MapEditorScene::Input()
 			break;
 		case ES_SELECTING_SPRITE:
 			InputSelectingSpriteMode(sdlEvent, cursorMapPosition);
+			break;
 		case ES_PLAYING_GAME:
 			InputPlayMode(sdlEvent, cursorMapPosition);
-			break;
-		default:
 			break;
 		}
 	}
@@ -320,7 +319,6 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 		case SDL_MOUSEMOTION:
 		{
 			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
-			GetCursorMapRect();
 			if (mMouseButtonDown && !CursorInGUI())
 			{
 				switch (mSelectedTool)
@@ -358,6 +356,11 @@ void MapEditorScene::InputSelectingSpriteMode(const SDL_Event& sdlEvent, Vec2D& 
 			{
 				CheckCursorInSpriteSheet();
 			}
+			break;
+		}
+		case SDL_MOUSEMOTION:
+		{
+			mCursorPosition = Vec2D(sdlEvent.motion.x, sdlEvent.motion.y);
 			break;
 		}
 	}
@@ -789,8 +792,8 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 			{
 				SDL_Rect srcRect =
 				{
-					(mMapSpriteIndeces[x][y] % TILE_MAP_WIDTH) << 4,
-					(mMapSpriteIndeces[x][y] / TILE_MAP_WIDTH) << 4,
+					(mMapSpriteIndeces[x][y] % TILE_MAP_SIZE) << 4,
+					(mMapSpriteIndeces[x][y] / TILE_MAP_SIZE) << 4,
 					SQUARE_PIXEL_SIZE,
 					SQUARE_PIXEL_SIZE
 				};
@@ -826,14 +829,14 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 
 void MapEditorScene::DrawTileMap(SDL_Renderer* renderer)
 {
-	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
+	for (uint8_t y = 0; y < TILE_MAP_SIZE; y++)
 	{
-		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
+		for (uint8_t x = 0; x < TILE_MAP_SIZE; x++)
 		{
 			Vec2D position =
 			{
-				static_cast<float>((Application::GetWindowWidth() / 2 - (TILE_MAP_WIDTH * SQUARE_RENDER_SIZE) / 2 + x * SQUARE_RENDER_SIZE)),
-				static_cast<float>((Application::GetWindowHeight() / 2 - (TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2 + y * SQUARE_RENDER_SIZE))
+				static_cast<float>((Application::GetWindowWidth() / 2 - (TILE_MAP_SIZE * SQUARE_RENDER_SIZE) / 2 + x * SQUARE_RENDER_SIZE)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - (TILE_MAP_SIZE * SQUARE_RENDER_SIZE) / 2 + y * SQUARE_RENDER_SIZE))
 			};
 
 			SDL_Rect srcRect = { x * SQUARE_PIXEL_SIZE, y * SQUARE_PIXEL_SIZE, SQUARE_PIXEL_SIZE, SQUARE_PIXEL_SIZE };
@@ -991,10 +994,57 @@ void MapEditorScene::DrawGUI()
 		if (ImGui::CollapsingHeader("Map Settings", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			Vec2D cursorRect = GetCursorMapRect();
+			ImGui::Text("MPF: %.1f", Application::GetMilliseconds());
 			ImGui::Text("Mouse coordinates (x=%.1f, y=%.1f)", static_cast<float>(mCursorPosition.GetX()), static_cast<float>(mCursorPosition.GetY()));
 			ImGui::Text("Map coordinates (x=%.1f, y=%.1f)", static_cast<float>(cursorRect.GetX()), static_cast<float>(cursorRect.GetY()));
 			ImGui::Text("Map offset (x=%.1f, y=%.1f)", -mMapXOffset, -mMapYOffset);
 
+			if (ImGui::InputInt("Map Width", &mMapGUIWidth))
+			{
+				if (mMapGUIWidth <= 0) mMapGUIWidth = 1;
+				else if (mMapGUIWidth > MAX_MAP_SIZE) mMapGUIWidth = MAX_MAP_SIZE;
+				
+				if (mMapGUIWidth > mMapWidth)
+				{
+					IncreaseMapWidth();
+					mMapWidth = mMapGUIWidth;
+					SetMapRectPositions();
+				}
+				else if (mMapGUIWidth < mMapWidth)
+				{
+					DecreaseMapWidth();
+					mMapWidth = mMapGUIWidth;
+					SetMapRectPositions();
+				}
+			}
+			if (ImGui::InputInt("Map Height", &mMapGUIHeight))
+			{
+				if (mMapGUIHeight <= 0) mMapGUIHeight = 1;
+				else if (mMapGUIHeight > MAX_MAP_SIZE) mMapGUIHeight = MAX_MAP_SIZE;
+
+				if (mMapGUIHeight > mMapHeight)
+				{
+					IncreaseMapHeight();
+					mMapHeight = mMapGUIHeight;
+					SetMapRectPositions();
+				}
+				else if (mMapGUIHeight < mMapHeight)
+				{
+					DecreaseMapHeight();
+					mMapHeight = mMapGUIHeight;
+					SetMapRectPositions();
+				}
+			}
+
+			ImGui::InputText("File Name", mFileName, IM_ARRAYSIZE(mFileName));
+			if (ImGui::Button("Clear Name"))
+			{
+				for (int i = 0; i < 16; i++)
+				{
+					mFileName[i] = ' ';
+				}
+			}
+			
 			if (ImGui::Button("New Map"))
 			{
 				ResetTools();
@@ -1004,8 +1054,6 @@ void MapEditorScene::DrawGUI()
 
 				mAnimatedUnitSprites.clear();
 			}
-
-			//ImGui::InputText("File Name", mFileName, IM_ARRAYSIZE(mFileName));
 
 			if (ImGui::Button("Save Map"))
 			{
@@ -1142,42 +1190,42 @@ void MapEditorScene::DrawGUI()
 			}
 			if (ImGui::InputInt("HP", &mNewUnitMaxHP))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitMaxHP = 1;
+				if (mNewUnitMaxHP <= 0) mNewUnitMaxHP = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].maxHP = mNewUnitMaxHP;
 			}
 			if (ImGui::InputInt("Strength", &mNewUnitStrength))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitStrength = 1;
+				if (mNewUnitStrength <= 0) mNewUnitStrength = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].strength = mNewUnitStrength;
 			}
 			if (ImGui::InputInt("Magic", &mNewUnitMagic))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitMagic = 1;
+				if (mNewUnitMagic <= 0) mNewUnitMagic = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].magic = mNewUnitMagic;
 			}
 			if (ImGui::InputInt("Skill", &mNewUnitSkill))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitSkill = 1;
+				if (mNewUnitSkill <= 0) mNewUnitSkill = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].skill = mNewUnitSkill;
 			}
 			if (ImGui::InputInt("Speed", &mNewUnitSpeed))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitSpeed = 1;
+				if (mNewUnitSpeed <= 0) mNewUnitSpeed = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].speed = mNewUnitSpeed;
 			}
 			if (ImGui::InputInt("Luck", &mNewUnitLuck))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitLuck = 1;
+				if (mNewUnitLuck <= 0) mNewUnitLuck = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].luck = mNewUnitLuck;
 			}
 			if (ImGui::InputInt("Defense", &mNewUnitDefense))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitDefense = 1;
+				if (mNewUnitDefense <= 0) mNewUnitDefense = 1;
 				if (mSelectedMapUnitIndex != -1) mAnimatedUnitSprites[mSelectedMapUnitIndex].defense = mNewUnitDefense;
 			}
 			if (ImGui::InputInt("Movement", &mNewUnitMovement))
 			{
-				if (mNewUnitLevel <= 0) mNewUnitMovement = 1;
+				if (mNewUnitMovement <= 0) mNewUnitMovement = 1;
 				if (mSelectedMapUnitIndex != -1)
 				{
 					mAnimatedUnitSprites[mSelectedMapUnitIndex].movement = mNewUnitMovement;
@@ -1302,12 +1350,15 @@ bool MapEditorScene::TileInsideCamera(uint16_t x, uint16_t y)
 bool MapEditorScene::CursorInGUI()
 {
 	return
-		mCursorPosition.GetX() < 300 &&
-		mCursorPosition.GetY() < 980;
+		mCursorPosition.GetX() < 350 &&
+		mCursorPosition.GetY() < 810;
 }
 
 void MapEditorScene::InitMap()
 {
+	mMapWidth = mMapGUIWidth;
+	mMapHeight = mMapGUIHeight;
+
 	mMapRects = new SDL_Rect * [mMapWidth];
 	mMapSpriteIndeces = new uint16_t * [mMapWidth];
 	mMapTerrainIndeces = new ETerrainType * [mMapWidth];
@@ -1466,21 +1517,181 @@ bool MapEditorScene::InMapBounds(const Vec2D& position)
 		position.GetY() < mMapHeight;
 }
 
+void MapEditorScene::IncreaseMapWidth()
+{
+	SDL_Rect** newRects = new SDL_Rect*[mMapWidth + 1];
+	uint16_t** newSprites = new uint16_t*[mMapWidth + 1];
+	ETerrainType** newTerrain = new ETerrainType*[mMapWidth + 1];
+	for (size_t i = 0; i < mMapWidth + 1; i++)
+	{
+		newRects[i] = new SDL_Rect[mMapHeight];
+		newSprites[i] = new uint16_t[mMapHeight];
+		newTerrain[i] = new ETerrainType[mMapHeight];
+	}
+
+	for (size_t i = 0; i < mMapWidth; i++)
+	{
+		for (size_t j = 0; j < mMapHeight; j++)
+		{
+			newRects[i][j] = mMapRects[i][j];
+			newSprites[i][j] = mMapSpriteIndeces[i][j];
+			newTerrain[i][j] = mMapTerrainIndeces[i][j];
+		}
+	}
+
+	for (size_t i = 0; i < mMapHeight; i++)
+	{
+		newSprites[mMapWidth][i] = 0;
+		newTerrain[mMapWidth][i] = ETerrainType::PLAIN;
+	}
+
+	for (uint32_t i = 0; i < mMapWidth; i++)
+	{
+		delete[] mMapRects[i];
+		delete[] mMapSpriteIndeces[i];
+		delete[] mMapTerrainIndeces[i];
+	}
+	delete[] mMapRects;
+	delete[] mMapSpriteIndeces;
+	delete[] mMapTerrainIndeces;
+
+	mMapRects = newRects;
+	mMapSpriteIndeces = newSprites;
+	mMapTerrainIndeces = newTerrain;
+}
+
+void MapEditorScene::DecreaseMapWidth()
+{
+	SDL_Rect** newRects = new SDL_Rect * [mMapWidth - 1];
+	uint16_t** newSprites = new uint16_t * [mMapWidth - 1];
+	ETerrainType** newTerrain = new ETerrainType * [mMapWidth - 1];
+	for (size_t i = 0; i < mMapWidth - 1; i++)
+	{
+		newRects[i] = new SDL_Rect[mMapHeight];
+		newSprites[i] = new uint16_t[mMapHeight];
+		newTerrain[i] = new ETerrainType[mMapHeight];
+	}
+
+	for (size_t i = 0; i < mMapWidth - 1; i++)
+	{
+		for (size_t j = 0; j < mMapHeight; j++)
+		{
+			newRects[i][j] = mMapRects[i][j];
+			newSprites[i][j] = mMapSpriteIndeces[i][j];
+			newTerrain[i][j] = mMapTerrainIndeces[i][j];
+		}
+	}
+
+	for (uint32_t i = 0; i < mMapWidth; i++)
+	{
+		delete[] mMapRects[i];
+		delete[] mMapSpriteIndeces[i];
+		delete[] mMapTerrainIndeces[i];
+	}
+	delete[] mMapRects;
+	delete[] mMapSpriteIndeces;
+	delete[] mMapTerrainIndeces;
+
+	mMapRects = newRects;
+	mMapSpriteIndeces = newSprites;
+	mMapTerrainIndeces = newTerrain;
+}
+
+void MapEditorScene::IncreaseMapHeight()
+{
+	SDL_Rect** newRects = new SDL_Rect * [mMapWidth];
+	uint16_t** newSprites = new uint16_t * [mMapWidth];
+	ETerrainType** newTerrain = new ETerrainType * [mMapWidth];
+	for (size_t i = 0; i < mMapWidth; i++)
+	{
+		newRects[i] = new SDL_Rect[mMapHeight + 1];
+		newSprites[i] = new uint16_t[mMapHeight + 1];
+		newTerrain[i] = new ETerrainType[mMapHeight + 1];
+	}
+
+	for (size_t i = 0; i < mMapWidth; i++)
+	{
+		for (size_t j = 0; j < mMapHeight + 1; j++)
+		{
+			newRects[i][j] = mMapRects[i][j];
+			newSprites[i][j] = mMapSpriteIndeces[i][j];
+			newTerrain[i][j] = mMapTerrainIndeces[i][j];
+		}
+	}
+
+	for (size_t i = 0; i < mMapGUIWidth; i++)
+	{
+		newSprites[i][mMapHeight] = 0;
+		newTerrain[i][mMapHeight] = ETerrainType::PLAIN;
+	}
+
+	for (uint32_t i = 0; i < mMapWidth; i++)
+	{
+		delete[] mMapRects[i];
+		delete[] mMapSpriteIndeces[i];
+		delete[] mMapTerrainIndeces[i];
+	}
+	delete[] mMapRects;
+	delete[] mMapSpriteIndeces;
+	delete[] mMapTerrainIndeces;
+
+	mMapRects = newRects;
+	mMapSpriteIndeces = newSprites;
+	mMapTerrainIndeces = newTerrain;
+}
+
+void MapEditorScene::DecreaseMapHeight()
+{
+	SDL_Rect** newRects = new SDL_Rect * [mMapWidth];
+	uint16_t** newSprites = new uint16_t * [mMapWidth];
+	ETerrainType** newTerrain = new ETerrainType * [mMapWidth];
+	for (size_t i = 0; i < mMapWidth; i++)
+	{
+		newRects[i] = new SDL_Rect[mMapHeight - 1];
+		newSprites[i] = new uint16_t[mMapHeight - 1];
+		newTerrain[i] = new ETerrainType[mMapHeight - 1];
+	}
+
+	for (size_t i = 0; i < mMapWidth; i++)
+	{
+		for (size_t j = 0; j < mMapHeight - 1; j++)
+		{
+			newRects[i][j] = mMapRects[i][j];
+			newSprites[i][j] = mMapSpriteIndeces[i][j];
+			newTerrain[i][j] = mMapTerrainIndeces[i][j];
+		}
+	}
+
+	for (uint32_t i = 0; i < mMapWidth; i++)
+	{
+		delete[] mMapRects[i];
+		delete[] mMapSpriteIndeces[i];
+		delete[] mMapTerrainIndeces[i];
+	}
+	delete[] mMapRects;
+	delete[] mMapSpriteIndeces;
+	delete[] mMapTerrainIndeces;
+
+	mMapRects = newRects;
+	mMapSpriteIndeces = newSprites;
+	mMapTerrainIndeces = newTerrain;
+}
+
 void MapEditorScene::InitSpriteSheet()
 {
-	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
+	for (size_t y = 0; y < TILE_MAP_SIZE; y++)
 	{
-		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
+		for (size_t x = 0; x < TILE_MAP_SIZE; x++)
 		{
 			Vec2D position = {
-				static_cast<float>((Application::GetWindowWidth() / 2 - ((TILE_MAP_WIDTH * SQUARE_RENDER_SIZE) / 2) + x * SQUARE_RENDER_SIZE )),
-				static_cast<float>((Application::GetWindowHeight() / 2 - ((TILE_MAP_HEIGHT * SQUARE_RENDER_SIZE) / 2) + y * SQUARE_RENDER_SIZE * mMapZoom)) };
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((TILE_MAP_SIZE * SQUARE_RENDER_SIZE) / 2) + x * SQUARE_RENDER_SIZE )),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((TILE_MAP_SIZE * SQUARE_RENDER_SIZE) / 2) + y * SQUARE_RENDER_SIZE)) };
 
 			mSpriteSheetRects[x][y] = new SDL_Rect{
 				static_cast<int>(position.GetX()),
 				static_cast<int>(position.GetY()),
-				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE) * mMapZoom),
-				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE) * mMapZoom) };
+				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE)),
+				static_cast<int>(static_cast<float>(SQUARE_RENDER_SIZE)) };
 		}
 	}
 }
@@ -1526,13 +1737,13 @@ void MapEditorScene::CheckCursorInMap()
 
 void MapEditorScene::CheckCursorInSpriteSheet()
 {
-	for (uint8_t y = 0; y < TILE_MAP_HEIGHT; y++)
+	for (size_t y = 0; y < TILE_MAP_SIZE; y++)
 	{
-		for (uint8_t x = 0; x < TILE_MAP_WIDTH; x++)
+		for (size_t x = 0; x < TILE_MAP_SIZE; x++)
 		{
 			if (SquareContainsCursorPosition(*mSpriteSheetRects[x][y]))
 			{
-				mSelectedSpriteIndex = x % TILE_MAP_WIDTH + y * TILE_MAP_WIDTH;
+				mSelectedSpriteIndex = x % TILE_MAP_SIZE + y * TILE_MAP_SIZE;
 				mEditorState = ES_EDITING_MAP;
 				//std::cout << mSelectedSpriteIndex << ',';
 				return;
@@ -2882,9 +3093,10 @@ void MapEditorScene::SaveMap()
 
 void MapEditorScene::LoadMap()
 {
-	std::string path = "./Assets/MapSaveFile.txt";
+	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
+	std::string tileMapPath = "./Assets/MapSaveFile";
 	std::ifstream testFile;
-	testFile.open(path);
+	testFile.open(tileMapPath);
 	if (testFile.is_open())
 	{
 		if (mMapRects && mMapSpriteIndeces)
@@ -2942,7 +3154,7 @@ void MapEditorScene::LoadMap()
 		};
 		fileLoader.AddCommand(spriteCommand);
 
-		fileLoader.LoadFile(path);
+		fileLoader.LoadFile(tileMapPath);
 
 		InitMap();
 	}
