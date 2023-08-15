@@ -137,15 +137,21 @@ void MapEditorScene::Input()
 
 		switch (mEditorState)
 		{
-		case ES_EDITING_MAP:
-			InputEditMode(sdlEvent, cursorMapPosition);
-			break;
-		case ES_SELECTING_SPRITE:
-			InputSelectingSpriteMode(sdlEvent, cursorMapPosition);
-			break;
-		case ES_PLAYING_GAME:
-			InputPlayMode(sdlEvent, cursorMapPosition);
-			break;
+			case ES_EDITING_MAP:
+			{
+				InputEditMode(sdlEvent, cursorMapPosition);
+				break;
+			}
+			case ES_SELECTING_SPRITE:
+			{
+				InputSelectingSpriteMode(sdlEvent, cursorMapPosition);
+				break;
+			}
+			case ES_PLAYING_GAME:
+			{
+				InputPlayMode(sdlEvent, cursorMapPosition);
+				break;
+			}
 		}
 	}
 }
@@ -202,7 +208,6 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 				mMouseButtonDown = true;
 				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 				{
-					cursorMapPosition = GetCursorMapRect();
 					if (mEditorState == ES_EDITING_MAP)
 					{
 						switch (mSelectedTool)
@@ -221,6 +226,7 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 										{
 											mMapSpriteIndeces[x][y] = mSelectedSpriteIndex;
 											mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
+											break;
 										}
 									}
 								}
@@ -345,7 +351,21 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 				switch (mSelectedTool)
 				{
 					case PAINT_TILE_TOOL:
+					{
+						for (uint16_t y = 0; y < mMapHeight; y++)
+						{
+							for (uint16_t x = 0; x < mMapWidth; x++)
+							{
+								if (SquareContainsCursorPosition(mMapRects[x][y]))
+								{
+									mMapSpriteIndeces[x][y] = mSelectedSpriteIndex;
+									mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
+									break;
+								}
+							}
+						}
 						break;
+					}
 					case PAN_TOOL:
 					{
 						mMapXOffset += sdlEvent.motion.xrel;
@@ -354,7 +374,9 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						break;
 					}
 					case SELECT_TILE_TOOL:
+					{
 						break;
+					}
 				}
 			}
 			break;
@@ -1291,6 +1313,8 @@ void MapEditorScene::DrawGUI()
 				}
 			}
 		}
+
+		mGUISize = { ImGui::GetWindowWidth(), ImGui::GetWindowHeight() };
 	}
 	ImGui::End();
 
@@ -1408,8 +1432,8 @@ bool MapEditorScene::TileInsideCamera(uint16_t x, uint16_t y)
 bool MapEditorScene::CursorInGUI()
 {
 	return
-		mCursorPosition.GetX() < 350 &&
-		mCursorPosition.GetY() < 810;
+		mCursorPosition.GetX() < mGUISize.mX &&
+		mCursorPosition.GetY() < mGUISize.mY;
 }
 
 void MapEditorScene::InitMap()

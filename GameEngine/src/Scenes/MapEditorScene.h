@@ -147,6 +147,9 @@ private:
 
 	Vec2D mCursorPosition;
 
+	// ImGUI variables
+	Vec2D mGUISize;
+
 	// Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
 	float waitTime = 1.0f;

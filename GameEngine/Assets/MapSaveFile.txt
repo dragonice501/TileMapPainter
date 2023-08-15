@@ -1,9 +1,9 @@
 :width 60
 :height 34
-:xOffset 0.000000
-:yOffset 0.000000
-:startPositionX 41
-:startPositionY 17
+:xOffset -5.000000
+:yOffset -130.000000
+:startPositionX 39
+:startPositionY 32
 :tile 0
 :tile 0
 :tile 0
@@ -1783,8 +1783,8 @@
 :tile 0
 :tile 0
 :tile 0
-:tile 0
-:tile 133
+:tile 68
+:tile 99
 :tile 0
 :tile 0
 :tile 0
@@ -1843,8 +1843,8 @@
 :tile 0
 :tile 0
 :tile 0
-:tile 0
 :tile 133
+:tile 0
 :tile 0
 :tile 0
 :tile 0
@@ -1903,8 +1903,8 @@
 :tile 0
 :tile 0
 :tile 0
+:tile 160
 :tile 0
-:tile 133
 :tile 0
 :tile 0
 :tile 0
@@ -1964,7 +1964,7 @@
 :tile 0
 :tile 0
 :tile 0
-:tile 133
+:tile 0
 :tile 0
 :tile 0
 :tile 0
@@ -2024,7 +2024,7 @@
 :tile 0
 :tile 0
 :tile 0
-:tile 166
+:tile 0
 :tile 0
 :tile 0
 :tile 0
