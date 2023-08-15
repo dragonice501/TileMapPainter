@@ -31,6 +31,8 @@ bool MapEditorScene::Init(SDL_Renderer* renderer)
 
 	Setup(renderer);
 
+	mStartPosition = { static_cast<float>(mMapWidth / 2), static_cast<float>(mMapHeight / 2) };
+
 	return true;
 }
 
@@ -119,7 +121,6 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 void MapEditorScene::Input()
 {
 	SDL_Event sdlEvent;
-
 	while (SDL_PollEvent(&sdlEvent))
 	{
 		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
@@ -132,7 +133,7 @@ void MapEditorScene::Input()
 		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 
-		Vec2D cursorMapPosition;
+		Vec2D cursorMapPosition = GetCursorMapRect();
 
 		switch (mEditorState)
 		{
@@ -207,10 +208,22 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						switch (mSelectedTool)
 						{
 							case PAN_TOOL:
+							{
 								break;
+							}
 							case PAINT_TILE_TOOL:
 							{
-								CheckCursorInMap();
+								for (uint16_t y = 0; y < mMapHeight; y++)
+								{
+									for (uint16_t x = 0; x < mMapWidth; x++)
+									{
+										if (SquareContainsCursorPosition(mMapRects[x][y]))
+										{
+											mMapSpriteIndeces[x][y] = mSelectedSpriteIndex;
+											mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
+										}
+									}
+								}
 								break;
 							}
 							case FILL_TILE_TOOL:
@@ -270,6 +283,14 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 										break;
 									}
 								}
+							}
+							case SET_START_TOOL:
+							{
+								if (CheckCursorInMap())
+								{
+									mStartPosition = cursorMapPosition;
+								}
+								break;
 							}
 						}
 					}
@@ -700,6 +721,14 @@ void MapEditorScene::RenderEditorMode(SDL_Renderer* renderer)
 		DrawSelectedUnitAttackRange(renderer);
 	}
 
+	if (mShowStartPosition)
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 150);
+
+		DrawStartPosition(renderer);
+	}
+
 	if (mAnimatedUnitSprites.size() > 0)
 	{
 		DrawAnimatedSprites(renderer);
@@ -979,6 +1008,19 @@ void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 	}
 }
 
+void MapEditorScene::DrawStartPosition(SDL_Renderer* renderer)
+{
+	Vec2D drawPosition =
+	{
+			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset * mMapZoom + mStartPosition.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset * mMapZoom + mStartPosition.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+	};
+
+	SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE * mMapZoom, SQUARE_RENDER_SIZE * mMapZoom };
+
+	SDL_RenderFillRect(renderer, &rect);
+}
+
 void MapEditorScene::DrawGUI()
 {
 	static int mapXOffset = mMapXOffset;
@@ -996,7 +1038,7 @@ void MapEditorScene::DrawGUI()
 			Vec2D cursorRect = GetCursorMapRect();
 			ImGui::Text("MPF: %.1f", Application::GetMilliseconds());
 			ImGui::Text("Mouse coordinates (x=%.1f, y=%.1f)", static_cast<float>(mCursorPosition.GetX()), static_cast<float>(mCursorPosition.GetY()));
-			ImGui::Text("Map coordinates (x=%.1f, y=%.1f)", static_cast<float>(cursorRect.GetX()), static_cast<float>(cursorRect.GetY()));
+			ImGui::Text("Map coordinates (x=%.1d, y=%.1d)", static_cast<int>(cursorRect.GetX()), static_cast<int>(cursorRect.GetY()));
 			ImGui::Text("Map offset (x=%.1f, y=%.1f)", -mMapXOffset, -mMapYOffset);
 
 			if (ImGui::InputInt("Map Width", &mMapGUIWidth))
@@ -1126,6 +1168,22 @@ void MapEditorScene::DrawGUI()
 				mSelectedTool = SELECT_TILE_TOOL;
 				ResetTools();
 			}*/
+		}
+
+		if (ImGui::CollapsingHeader("RPG Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			if (ImGui::Button("Clear Start Position"))
+			{
+
+			}
+			if (ImGui::Button("Set Start Position"))
+			{
+				mSelectedTool = SET_START_TOOL;
+			}
+			if (ImGui::Button("Toggle Start Position"))
+			{
+				mShowStartPosition = !mShowStartPosition;
+			}
 		}
 
 		if (ImGui::CollapsingHeader("Unit Tools", ImGuiTreeNodeFlags_DefaultOpen))
@@ -1719,7 +1777,7 @@ Vec2D MapEditorScene::GetCursorMapRect()
 	}
 }
 
-void MapEditorScene::CheckCursorInMap()
+bool MapEditorScene::CheckCursorInMap()
 {
 	for (uint16_t y = 0; y < mMapHeight; y++)
 	{
@@ -1727,12 +1785,12 @@ void MapEditorScene::CheckCursorInMap()
 		{
 			if (SquareContainsCursorPosition(mMapRects[x][y]))
 			{
-				mMapSpriteIndeces[x][y] = mSelectedSpriteIndex;
-				mMapTerrainIndeces[x][y] = GetTerrainType(mMapSpriteIndeces[x][y]);
-				return;
+				return true;
 			}
 		}
 	}
+
+	return false;
 }
 
 void MapEditorScene::CheckCursorInSpriteSheet()
@@ -3080,6 +3138,9 @@ void MapEditorScene::SaveMap()
 		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
 		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
 
+		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
+		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
+
 		for (int y = 0; y < mMapHeight; y++)
 		{
 			for (int x = 0; x < mMapWidth; x++)
@@ -3094,7 +3155,7 @@ void MapEditorScene::SaveMap()
 void MapEditorScene::LoadMap()
 {
 	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
-	std::string tileMapPath = "./Assets/MapSaveFile";
+	std::string tileMapPath = "./Assets/MapSaveFile.txt";
 	std::ifstream testFile;
 	testFile.open(tileMapPath);
 	if (testFile.is_open())
@@ -3145,6 +3206,22 @@ void MapEditorScene::LoadMap()
 			mMapYOffset = FileCommandLoader::ReadInt(params);
 		};
 		fileLoader.AddCommand(mapYOffsetCommand);
+
+		Command startPositionXCommand;
+		startPositionXCommand.command = "startPositionX";
+		startPositionXCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mStartPosition.mX = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(startPositionXCommand);
+
+		Command startPositionYCommand;
+		startPositionYCommand.command = "startPositionY";
+		startPositionYCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mStartPosition.mY = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(startPositionYCommand);
 
 		Command spriteCommand;
 		spriteCommand.command = "tile";

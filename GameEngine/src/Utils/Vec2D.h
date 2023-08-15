@@ -57,7 +57,6 @@ public:
 
     friend Vec2D operator*(float scalar, const Vec2D& vec);
 
-private:
 	float mX, mY;
 };
 
