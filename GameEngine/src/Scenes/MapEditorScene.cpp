@@ -118,6 +118,10 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	SDL_FreeSurface(surface);
 }
 
+void MapEditorScene::LoadMapFile(const std::string& mapName, const std::string& spriteSheetName)
+{
+}
+
 void MapEditorScene::Input()
 {
 	SDL_Event sdlEvent;
@@ -171,32 +175,35 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 			{
 				mIsRunning = false;
 			}
-			else if (sdlEvent.key.keysym.sym == SDLK_UP)
+			if (mSelectedTool == SELECT_TILE_TOOL)
 			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
+				if (sdlEvent.key.keysym.sym == SDLK_UP)
 				{
-					MoveSelectionUp();
+					if (mSelectedTool == SELECT_TILE_TOOL)
+					{
+						MoveSelectionUp();
+					}
 				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
+				else if (sdlEvent.key.keysym.sym == SDLK_RIGHT)
 				{
-					MoveSelectionRight();
+					if (mSelectedTool == SELECT_TILE_TOOL)
+					{
+						MoveSelectionRight();
+					}
 				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
+				else if (sdlEvent.key.keysym.sym == SDLK_LEFT)
 				{
-					MoveSelectionLeft();
+					if (mSelectedTool == SELECT_TILE_TOOL)
+					{
+						MoveSelectionLeft();
+					}
 				}
-			}
-			else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
-			{
-				if (mSelectedTool == SELECT_TILE_TOOL)
+				else if (sdlEvent.key.keysym.sym == SDLK_DOWN)
 				{
-					MoveSelectionDown();
+					if (mSelectedTool == SELECT_TILE_TOOL)
+					{
+						MoveSelectionDown();
+					}
 				}
 			}
 			break;
@@ -242,6 +249,10 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 							case SELECT_TILE_TOOL:
 							{
 								mSelectionRectStart = cursorMapPosition;
+								mSelectionRectEnd = mSelectionRectStart + Vec2D(1, 1);
+								mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX();
+								mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY();
+								mShowTileSelection = true;
 								break;
 							}
 							case PAINT_UNIT_TOOL:
@@ -328,17 +339,21 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 		}
 		case SDL_MOUSEBUTTONUP:
 		{
-			mMouseButtonDown = false;
-			if (mSelectedTool == SELECT_TILE_TOOL)
+			if(!CursorInGUI())
 			{
-				if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+				mMouseButtonDown = false;
+				if (mSelectedTool == SELECT_TILE_TOOL)
 				{
-					mSelectionRectEnd = GetCursorMapRect();
-					SetSelectionRect();
-				}
-				else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
-				{
-					mShowTileSelection = false;
+					if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+					{
+						mSelectionRectEnd = GetCursorMapRect() + Vec2D(1, 1);
+						mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX();
+						mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY();
+					}
+					else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+					{
+						mShowTileSelection = false;
+					}
 				}
 			}
 			break;
@@ -375,6 +390,9 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 					}
 					case SELECT_TILE_TOOL:
 					{
+						mSelectionRectEnd = GetCursorMapRect() + Vec2D(1, 1);
+						mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX();
+						mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY();
 						break;
 					}
 				}
@@ -393,13 +411,12 @@ void MapEditorScene::InputSelectingSpriteMode(const SDL_Event& sdlEvent, Vec2D& 
 			mIsRunning = false;
 			break;
 		}
-		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
 		{
 			if (sdlEvent.button.button == SDL_BUTTON_LEFT)
 			{
 				CheckCursorInSpriteSheet();
 			}
-			break;
 		}
 		case SDL_MOUSEMOTION:
 		{
@@ -756,6 +773,14 @@ void MapEditorScene::RenderEditorMode(SDL_Renderer* renderer)
 		DrawAnimatedSprites(renderer);
 	}
 
+	if (mShowTileSelection)
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 150);
+
+		DrawTileSelection(renderer);
+	}
+
 	DrawGUI();
 }
 
@@ -876,6 +901,23 @@ void MapEditorScene::DrawMap(SDL_Renderer* renderer)
 		SDL_SetTextureAlphaMod(mOverlayTexture, 100);
 		SDL_RenderCopy(renderer, mOverlayTexture, NULL, &overlayRect);
 	}
+}
+
+void MapEditorScene::DrawTileSelection(SDL_Renderer* renderer)
+{
+	Vec2D drawPosition =
+	{
+			static_cast<float>(
+				(Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom +
+					mMapXOffset * mMapZoom + mSelectionRectStart.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+			static_cast<float>(
+				(Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom +
+					mMapYOffset * mMapZoom + mSelectionRectStart.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+	};
+
+	SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), mSelectionWidth * SQUARE_RENDER_SIZE * mMapZoom, mSelectionHeight * SQUARE_RENDER_SIZE * mMapZoom };
+
+	SDL_RenderFillRect(renderer, &rect);
 }
 
 void MapEditorScene::DrawTileMap(SDL_Renderer* renderer)
@@ -1051,17 +1093,62 @@ void MapEditorScene::DrawGUI()
 
 	ImGui::NewFrame();
 
-	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize;
+	//ImGui::ShowDemoWindow();
+
+	ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
 
 	if (ImGui::Begin("Map Editor", NULL, windowFlags))
 	{
-		if (ImGui::CollapsingHeader("Map Settings", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Maps"))
+		{
+			if (ImGui::Button("New Map"))
+			{
+				ResetTools();
+				InitMap();
+				mShowOverlay = false;
+				mShowTileSelection = false;
+
+				mAnimatedUnitSprites.clear();
+			}
+
+			if (ImGui::Button("Load Map"))
+			{
+				LoadMap();
+				LoadUnits();
+			}
+			ImGui::InputText("Load Map Name", mFileName, IM_ARRAYSIZE(mFileName));
+
+			if (ImGui::Button("Save Map"))
+			{
+				mSaveMapExists = SaveMapExists();
+				if (!mSaveMapExists)
+				{
+
+				}
+			}
+
+			if (mSaveMapExists)
+			{
+				ImGui::Text("Map already exists. Overwrite?");
+				if (ImGui::Button("Yes"))
+				{
+					SaveMap();
+					mSaveMapExists = false;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("No"))
+				{
+					mSaveMapExists = false;
+				}
+			}
+
+			ImGui::InputText("Save Map Name", mFileName, IM_ARRAYSIZE(mFileName));
+		}
+
+		if (ImGui::CollapsingHeader("Map Settings"))
 		{
 			Vec2D cursorRect = GetCursorMapRect();
-			ImGui::Text("MPF: %.1f", Application::GetMilliseconds());
-			ImGui::Text("Mouse coordinates (x=%.1f, y=%.1f)", static_cast<float>(mCursorPosition.GetX()), static_cast<float>(mCursorPosition.GetY()));
-			ImGui::Text("Map coordinates (x=%.1d, y=%.1d)", static_cast<int>(cursorRect.GetX()), static_cast<int>(cursorRect.GetY()));
-			ImGui::Text("Map offset (x=%.1f, y=%.1f)", -mMapXOffset, -mMapYOffset);
+			ImGui::Text("Map coordinates (x: %.1d, y: %.1d)", static_cast<int>(cursorRect.GetX()), static_cast<int>(cursorRect.GetY()));
 
 			if (ImGui::InputInt("Map Width", &mMapGUIWidth))
 			{
@@ -1081,6 +1168,7 @@ void MapEditorScene::DrawGUI()
 					SetMapRectPositions();
 				}
 			}
+
 			if (ImGui::InputInt("Map Height", &mMapGUIHeight))
 			{
 				if (mMapGUIHeight <= 0) mMapGUIHeight = 1;
@@ -1100,45 +1188,17 @@ void MapEditorScene::DrawGUI()
 				}
 			}
 
-			ImGui::InputText("File Name", mFileName, IM_ARRAYSIZE(mFileName));
-			if (ImGui::Button("Clear Name"))
-			{
-				for (int i = 0; i < 16; i++)
-				{
-					mFileName[i] = ' ';
-				}
-			}
-			
-			if (ImGui::Button("New Map"))
-			{
-				ResetTools();
-				InitMap();
-				mShowOverlay = false;
-				mShowTileSelection = false;
+			const char* items[] = { "Walkable", "Unwalkable" };
+			ImGui::Combo("Current Layer", &mCurrentPaintLayer, items, IM_ARRAYSIZE(items));
 
-				mAnimatedUnitSprites.clear();
-			}
-
-			if (ImGui::Button("Save Map"))
-			{
-				SaveMap();
-				SaveUnits();
-			}
-
-			if (ImGui::Button("Load Map"))
-			{
-				LoadMap();
-				LoadUnits();
-			}
-
-			if (ImGui::Button("Play Game"))
+			/*if (ImGui::Button("Play Game"))
 			{
 				ResetTools();
 				mEditorState = ES_PLAYING_GAME;
-			}
+			}*/
 		}
 
-		if (ImGui::CollapsingHeader("Map Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Map Tools"))
 		{
 			if (ImGui::SliderFloat("Zoom", &zoomLevel, 0.1f, 3.0f))
 			{
@@ -1168,7 +1228,7 @@ void MapEditorScene::DrawGUI()
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Tile Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Tile Tools"), ImGuiTreeNodeFlags_DefaultOpen)
 		{
 			if (ImGui::Button("Tile Map"))
 			{
@@ -1185,14 +1245,14 @@ void MapEditorScene::DrawGUI()
 				mSelectedTool = FILL_TILE_TOOL;
 				ResetTools();
 			}
-			/*if (ImGui::Button("Select Tile"))
+			if (ImGui::Button("Select Tile"))
 			{
 				mSelectedTool = SELECT_TILE_TOOL;
 				ResetTools();
-			}*/
+			}
 		}
 
-		if (ImGui::CollapsingHeader("RPG Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("RPG Tools"))
 		{
 			if (ImGui::Button("Clear Start Position"))
 			{
@@ -1208,7 +1268,7 @@ void MapEditorScene::DrawGUI()
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Unit Tools", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Unit Tools"))
 		{
 			if (ImGui::Button("Paint Unit"))
 			{
@@ -1519,7 +1579,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "SEA" << std::endl;
 			return SEA;
 		}
 	}
@@ -1528,7 +1587,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "RIVER" << std::endl;
 			return RIVER;
 		}
 	}
@@ -1537,7 +1595,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "ROAD" << std::endl;
 			return ROAD;
 		}
 	}
@@ -1546,7 +1603,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "PLAIN" << std::endl;
 			return PLAIN;
 		}
 	}
@@ -1555,7 +1611,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "FOREST" << std::endl;
 			return FOREST;
 		}
 	}
@@ -1564,7 +1619,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "MOUNTAIN" << std::endl;
 			return MOUNTAIN;
 		}
 	}
@@ -1573,7 +1627,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if (mapSpriteIndex == index)
 		{
-			//std::cout << "VILLAGE" << std::endl;
 			return VILLAGE;
 		}
 	}
@@ -1582,7 +1635,6 @@ ETerrainType MapEditorScene::GetTerrainType(uint32_t mapSpriteIndex)
 	{
 		if(mapSpriteIndex == index)
 		{
-			//std::cout << "CASTLE_DEFENSE" << std::endl;
 			return CASTLE_DEFENSE;
 		}
 	}
@@ -2941,245 +2993,126 @@ void MapEditorScene::DeleteUnit(const int& unitIndex)
 	}
 }
 
-void MapEditorScene::SetSelectionRect()
-{
-	if (mSelectionRectEnd == mSelectionRectStart)
-	{
-		mSelectionXStart = mSelectionRectStart.GetX();
-		mSelectionYStart = mSelectionRectStart.GetY();
-		mSelectionWidth = 1;
-		mSelectionHeight = 1;
-
-		Vec2D position =
-		{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + mSelectionXStart * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + mSelectionYStart * SQUARE_RENDER_SIZE * mMapZoom))
-		};
-
-		mSelectionRect =
-		{
-			static_cast<int>(position.GetX()),
-			static_cast<int>(position.GetY()),
-			SQUARE_RENDER_SIZE,
-			SQUARE_RENDER_SIZE
-		};
-
-		mShowTileSelection = true;
-		return;
-	}
-
-	if (mSelectionRectStart.GetX() < mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() < mSelectionRectEnd.GetY())
-	{
-		mSelectionXStart = mSelectionRectStart.GetX();
-		mSelectionYStart = mSelectionRectStart.GetY();
-		mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX() + 1;
-		mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY() + 1;
-
-		Vec2D position =
-		{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + mSelectionXStart * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + mSelectionYStart * SQUARE_RENDER_SIZE * mMapZoom))
-		};
-
-		mSelectionRect =
-		{
-			static_cast<int>(position.GetX()),
-			static_cast<int>(position.GetY()),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
-		};
-		mShowTileSelection = true;
-		return;
-	}
-	else if (mSelectionRectStart.GetX() < mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() > mSelectionRectEnd.GetY())
-	{
-		mSelectionXStart = mSelectionRectStart.GetX();
-		mSelectionYStart = mSelectionRectEnd.GetY();
-		mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX() + 1;
-		mSelectionHeight = mSelectionRectStart.GetY() - mSelectionRectEnd.GetY() + 1;
-
-		Vec2D position =
-		{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + mSelectionXStart * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + mSelectionYStart * SQUARE_RENDER_SIZE * mMapZoom))
-		};
-
-		mSelectionRect =
-		{
-			static_cast<int>(position.GetX()),
-			static_cast<int>(position.GetY()),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
-		};
-		mShowTileSelection = true;
-		return;
-	}
-	else if (mSelectionRectStart.GetX() > mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() > mSelectionRectEnd.GetY())
-	{
-		mSelectionXStart = mSelectionRectEnd.GetX();
-		mSelectionYStart = mSelectionRectEnd.GetY();
-		mSelectionWidth = mSelectionRectStart.GetX() - mSelectionRectEnd.GetX() + 1;
-		mSelectionHeight = mSelectionRectStart.GetY() - mSelectionRectEnd.GetY() + 1;
-
-		Vec2D position =
-		{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + mSelectionXStart * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + mSelectionYStart * SQUARE_RENDER_SIZE * mMapZoom))
-		};
-
-		mSelectionRect =
-		{
-			static_cast<int>(position.GetX()),
-			static_cast<int>(position.GetY()),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
-		};
-		mShowTileSelection = true;
-		return;
-	}
-	else if (mSelectionRectStart.GetX() > mSelectionRectEnd.GetX() && mSelectionRectStart.GetY() < mSelectionRectEnd.GetY())
-	{
-		mSelectionXStart = mSelectionRectEnd.GetX();
-		mSelectionYStart = mSelectionRectStart.GetY();
-		mSelectionWidth = mSelectionRectStart.GetX() - mSelectionRectEnd.GetX() + 1;
-		mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY() + 1;
-
-		Vec2D position =
-		{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset + mSelectionXStart * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset + mSelectionYStart * SQUARE_RENDER_SIZE * mMapZoom))
-		};
-
-		mSelectionRect =
-		{
-			static_cast<int>(position.GetX()),
-			static_cast<int>(position.GetY()),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionWidth),
-			SQUARE_RENDER_SIZE * static_cast<int>(mSelectionHeight)
-		};
-		mShowTileSelection = true;
-		return;
-	}
-
-	mShowTileSelection = false;
-	return;
-}
-
 void MapEditorScene::MoveSelectionUp()
 {
-	for (uint16_t y = mSelectionYStart; y < mSelectionYStart + mSelectionHeight; y++)
+	if (mSelectionRectStart.GetY() == 0) return;
+
+	uint16_t* coveredTiles = new uint16_t[mSelectionWidth];
+	for (uint16_t x = 0; x < mSelectionWidth; x++)
 	{
-		for (uint16_t x = mSelectionXStart; x < mSelectionXStart + mSelectionWidth; x++)
+		coveredTiles[x] = mMapSpriteIndeces[x + static_cast<int>(mSelectionRectStart.GetX())][static_cast<int>(mSelectionRectStart.GetY()) - 1];
+	}
+
+	for (uint16_t y = mSelectionRectStart.GetY(); y < mSelectionRectStart.GetY() + mSelectionHeight; y++)
+	{
+		for (uint16_t x = mSelectionRectStart.GetX(); x < mSelectionRectStart.GetX() + mSelectionWidth; x++)
 		{
 			mMapSpriteIndeces[x][y - 1] = mMapSpriteIndeces[x][y];
-
-			if (y == (mSelectionYStart + mSelectionHeight) - 1)
-			{
-				mMapSpriteIndeces[x][y] = 0;
-			}
 		}
 	}
 
-	mSelectionYStart -= 1;
-	mSelectionRect.y -= SQUARE_RENDER_SIZE;
+	for (uint16_t x = 0; x < mSelectionWidth; x++)
+	{
+		mMapSpriteIndeces[x + static_cast<int>(mSelectionRectStart.GetX())][static_cast<int>(mSelectionRectEnd.GetY()) - 1] = coveredTiles[x];
+	}
+
+	delete[] coveredTiles;
+
+	mSelectionRectStart.mY--;
+	mSelectionRectEnd.mY--;
 }
 
 void MapEditorScene::MoveSelectionDown()
 {
-	for (uint16_t y = mSelectionYStart + mSelectionHeight; y > mSelectionHeight; y--)
-	{
-		for (uint16_t x = mSelectionXStart; x < mSelectionXStart + mSelectionWidth; x++)
-		{
-			mMapSpriteIndeces[x][y] = mMapSpriteIndeces[x][y - 1];
+	if (mSelectionRectEnd.GetY() == mMapHeight) return;
 
-			if (y == mSelectionYStart - 1)
-			{
-				mMapSpriteIndeces[x][y - 1] = 0;
-			}
+	uint16_t* coveredTiles = new uint16_t[mSelectionWidth];
+	for (uint16_t x = 0; x < mSelectionWidth; x++)
+	{
+		coveredTiles[x] = mMapSpriteIndeces[x + static_cast<int>(mSelectionRectStart.GetX())][static_cast<int>(mSelectionRectEnd.GetY())];
+	}
+
+	for (int y = mSelectionRectStart.GetY() + mSelectionHeight - 1; y >= mSelectionRectStart.GetY(); y--)
+	{
+		for (int x = mSelectionRectStart.GetX() + mSelectionWidth - 1; x >= mSelectionRectStart.GetX(); x--)
+		{
+			mMapSpriteIndeces[x][y + 1] = mMapSpriteIndeces[x][y];
 		}
 	}
 
-	mSelectionYStart += 1;
-	mSelectionRect.y += SQUARE_RENDER_SIZE;
+	for (uint16_t x = 0; x < mSelectionWidth; x++)
+	{
+		mMapSpriteIndeces[x + static_cast<int>(mSelectionRectStart.GetX())][static_cast<int>(mSelectionRectStart.GetY())] = coveredTiles[x];
+	}
+
+	delete[] coveredTiles;
+
+	mSelectionRectStart.mY++;
+	mSelectionRectEnd.mY++;
 }
 
 void MapEditorScene::MoveSelectionLeft()
 {
-	for (uint16_t y = mSelectionYStart; y < mSelectionYStart + mSelectionHeight; y++)
+	if (mSelectionRectStart.GetX() == 0) return;
+
+	uint16_t* coveredTiles = new uint16_t[mSelectionHeight];
+	for (uint16_t y = 0; y < mSelectionHeight; y++)
 	{
-		for (uint16_t x = mSelectionXStart; x < mSelectionXStart + mSelectionWidth; x++)
+		coveredTiles[y] = mMapSpriteIndeces[static_cast<int>(mSelectionRectStart.GetX()) - 1][y + static_cast<int>(mSelectionRectStart.GetY())];
+	}
+
+	for (uint16_t y = mSelectionRectStart.GetY(); y < mSelectionRectStart.GetY() + mSelectionHeight; y++)
+	{
+		for (uint16_t x = mSelectionRectStart.GetX(); x < mSelectionRectStart.GetX() + mSelectionWidth; x++)
 		{
 			mMapSpriteIndeces[x - 1][y] = mMapSpriteIndeces[x][y];
-
-			if (x == (mSelectionXStart + mSelectionWidth) - 1)
-			{
-				mMapSpriteIndeces[x][y] = 0;
-			}
 		}
 	}
 
-	mSelectionXStart -= 1;
-	mSelectionRect.x -= SQUARE_RENDER_SIZE;
+	for (uint16_t y = 0; y < mSelectionHeight; y++)
+	{
+		mMapSpriteIndeces[static_cast<int>(mSelectionRectEnd.GetX()) - 1][y + static_cast<int>(mSelectionRectStart.GetY())] = coveredTiles[y];
+	}
+
+	delete[] coveredTiles;
+
+	mSelectionRectStart.mX--;
+	mSelectionRectEnd.mX--;
 }
 
 void MapEditorScene::MoveSelectionRight()
 {
-	for (uint16_t y = mSelectionYStart; y < mSelectionYStart + mSelectionHeight; y++)
-	{
-		for (uint16_t x = mSelectionXStart + mSelectionWidth; x > mSelectionWidth; x--)
-		{
-			mMapSpriteIndeces[x][y] = mMapSpriteIndeces[x - 1][y];
+	if (mSelectionRectEnd.GetX() == mMapWidth) return;
 
-			if (x == mSelectionXStart + 1)
-			{
-				mMapSpriteIndeces[x - 1][y] = 0;
-			}
+	uint16_t* coveredTiles = new uint16_t[mSelectionHeight];
+	for (uint16_t y = 0; y < mSelectionHeight; y++)
+	{
+		coveredTiles[y] = mMapSpriteIndeces[static_cast<int>(mSelectionRectEnd.GetX())][y + static_cast<int>(mSelectionRectStart.GetY())];
+	}
+
+	for (int y = mSelectionRectStart.GetY() + mSelectionHeight - 1; y >= mSelectionRectStart.GetY(); y--)
+	{
+		for (int x = mSelectionRectStart.GetX() + mSelectionWidth - 1; x >= mSelectionRectStart.GetX(); x--)
+		{
+			mMapSpriteIndeces[x + 1][y] = mMapSpriteIndeces[x][y];
 		}
 	}
 
-	mSelectionXStart += 1;
-	mSelectionRect.x += SQUARE_RENDER_SIZE;
-}
-
-void MapEditorScene::SaveMap()
-{
-	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
-	std::string tileMapPath = "./Assets/MapSaveFile.txt";
-	std::ifstream tileMapInFile;
-	tileMapInFile.open(tileMapPath);
-	if (tileMapInFile.is_open())
+	for (uint16_t y = 0; y < mSelectionHeight; y++)
 	{
-		tileMapInFile.close();
-		std::remove(tileMapPath.c_str());
+		mMapSpriteIndeces[static_cast<int>(mSelectionRectStart.GetX())][y + static_cast<int>(mSelectionRectStart.GetY())] = coveredTiles[y];
 	}
 
-	std::ofstream tileMapOutFile;
-	tileMapOutFile.open(tileMapPath);
-	if (tileMapOutFile.is_open())
-	{
-		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
-		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
-		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
-		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
+	delete[] coveredTiles;
 
-		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
-		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
-
-		for (int y = 0; y < mMapHeight; y++)
-		{
-			for (int x = 0; x < mMapWidth; x++)
-			{
-				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
-			}
-		}
-	}
-	tileMapOutFile.close();
+	mSelectionRectStart.mX++;
+	mSelectionRectEnd.mX++;
 }
 
 void MapEditorScene::LoadMap()
 {
 	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
-	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::string tileMapPath = "./Assets/TownSaveFile.txt";
 	std::ifstream testFile;
 	testFile.open(tileMapPath);
 	if (testFile.is_open())
@@ -3204,6 +3137,7 @@ void MapEditorScene::LoadMap()
 		mapWidthCommand.parseFunc = [&](ParseFuncParams params)
 		{
 			mMapWidth = FileCommandLoader::ReadInt(params);
+			mMapGUIWidth = mMapWidth;
 		};
 		fileLoader.AddCommand(mapWidthCommand);
 
@@ -3212,6 +3146,7 @@ void MapEditorScene::LoadMap()
 		mapHeightCommand.parseFunc = [&](ParseFuncParams params)
 		{
 			mMapHeight = FileCommandLoader::ReadInt(params);
+			mMapGUIHeight = mMapHeight;
 		};
 		fileLoader.AddCommand(mapHeightCommand);
 
@@ -3261,6 +3196,46 @@ void MapEditorScene::LoadMap()
 	}
 
 	testFile.close();
+}
+
+bool MapEditorScene::SaveMapExists()
+{
+	return true;
+}
+
+void MapEditorScene::SaveMap()
+{
+	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
+	std::string tileMapPath = "./Assets/TownSaveFile.txt";
+	std::ifstream tileMapInFile;
+	tileMapInFile.open(tileMapPath);
+	if (tileMapInFile.is_open())
+	{
+		tileMapInFile.close();
+		std::remove(tileMapPath.c_str());
+	}
+
+	std::ofstream tileMapOutFile;
+	tileMapOutFile.open(tileMapPath);
+	if (tileMapOutFile.is_open())
+	{
+		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
+		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
+		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
+		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
+
+		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
+		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
+
+		for (int y = 0; y < mMapHeight; y++)
+		{
+			for (int x = 0; x < mMapWidth; x++)
+			{
+				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
+			}
+		}
+	}
+	tileMapOutFile.close();
 }
 
 void MapEditorScene::ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit)
