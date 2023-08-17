@@ -20,6 +20,8 @@ public:
 	bool Init(SDL_Renderer* renderer);
 	void Setup(SDL_Renderer* renderer);
 
+	void LoadMapFile(const std::string& mapName, const std::string& spriteSheetName);
+
 	// Destroy
 	void Destroy();
 
@@ -40,6 +42,7 @@ public:
 	void RenderEditorMode(SDL_Renderer* renderer);
 	void RenderPlayMode(SDL_Renderer* renderer);
 	void DrawMap(SDL_Renderer* renderer);
+	void DrawTileSelection(SDL_Renderer* renderer);
 	void DrawTileMap(SDL_Renderer* renderer);
 	void DrawAnimatedSprites(SDL_Renderer* renderer);
 	void DrawUnitHealthBars(SDL_Renderer* renderer, const AnimatedUnitSprite& playerUnit, const AnimatedUnitSprite& enemyUnit);
@@ -122,14 +125,14 @@ public:
 	void DeleteUnit(const int& unitIndex);
 
 	// Select Functions
-	void SetSelectionRect();
 	void MoveSelectionUp();
 	void MoveSelectionDown();
 	void MoveSelectionLeft();
 	void MoveSelectionRight();
 
-	void SaveMap();
 	void LoadMap();
+	bool SaveMapExists();
+	void SaveMap();
 
 	// Game Functions
 	void ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit);
@@ -149,6 +152,9 @@ private:
 
 	// ImGUI variables
 	Vec2D mGUISize;
+	bool mSaveMapExists = false;
+	std::vector<std::string> mLayers;
+	int mCurrentPaintLayer = 0;
 
 	// Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
@@ -159,7 +165,7 @@ private:
 	uint16_t mSelectedSpriteIndex = 192;
 
 	// Map Variables
-	int mFileNameSize = 0;
+	size_t mFileNameSize = 16;
 	char mFileName[16];
 	int mMapGUIWidth = 60;
 	int mMapGUIHeight = 34;
@@ -220,14 +226,11 @@ private:
 	int mNewUnitMovement = 1;
 
 	// Tile Select Tool Variables
-	SDL_Rect mSelectionRect;
 	Vec2D mSelectionRectStart;
 	Vec2D mSelectionRectEnd;
+	int mSelectionWidth;
+	int mSelectionHeight;
 	bool mShowTileSelection = false;
-	uint16_t mSelectionXStart;
-	uint16_t mSelectionYStart;
-	uint16_t mSelectionWidth;
-	uint16_t mSelectionHeight;
 
 	// Fill Tile Tool Variables
 	int mMaxFillRange = 20;
@@ -265,7 +268,7 @@ private:
 	uint16_t mRoadIndeces[48] =
 	{
 		64,65,66,67,68,69,70,72,74,75,76,77,96,97,98,99,100,101,103,104,105,107,108,109,128,129,130,
-		131,132,133,134,135,136,137,138,139,140,141,160,161,162,163,164,165,166,167,169, 172
+		131,132,133,134,135,136,137,138,139,140,141,160,161,162,163,164,165,166,167,169,172
 	};
 
 	uint16_t mBridgeIndeces[5] =
@@ -273,10 +276,10 @@ private:
 		528,529,530,560,592
 	};
 
-	uint16_t mPlainIndeces[40] =
+	uint16_t mPlainIndeces[41] =
 	{
 		0,1,2,3,4,6,7,8,9,11,12,28,29,30,31,32,33,33,34,35,36,37,38,39,40,41,62,91,112,140,201,202,204,205,308,
-		309,338,366,495,496
+		309,338,366,495,496,561
 	};
 
 	uint16_t mSandIndeces[17] =
