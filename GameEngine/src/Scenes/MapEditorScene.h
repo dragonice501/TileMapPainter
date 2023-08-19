@@ -20,7 +20,10 @@ public:
 	bool Init(SDL_Renderer* renderer);
 	void Setup(SDL_Renderer* renderer);
 
-	void LoadMapFile(const std::string& mapName, const std::string& spriteSheetName);
+	void LoadMap();
+	void LoadSceneEntrances();
+	bool SaveMapExists();
+	void SaveMap();
 
 	// Destroy
 	void Destroy();
@@ -49,6 +52,7 @@ public:
 	void DrawSelectedUnitMovement(SDL_Renderer* renderer);
 	void DrawSelectedUnitAttackRange(SDL_Renderer* renderer);
 	void DrawStartPosition(SDL_Renderer* renderer);
+	void DrawSceneEntrances(SDL_Renderer* renderer);
 	void DrawGUI();
 	void DrawHoveredUnitStats();
 	Vec2D GetCursorToScreenRect();
@@ -130,10 +134,6 @@ public:
 	void MoveSelectionLeft();
 	void MoveSelectionRight();
 
-	void LoadMap();
-	bool SaveMapExists();
-	void SaveMap();
-
 	// Game Functions
 	void ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit);
 
@@ -153,8 +153,6 @@ private:
 	// ImGUI variables
 	Vec2D mGUISize;
 	bool mSaveMapExists = false;
-	std::vector<std::string> mLayers;
-	int mCurrentPaintLayer = 0;
 
 	// Game variables
 	EGameState mGameState = GS_PLAYER_IDLE;
@@ -171,8 +169,18 @@ private:
 	int mMapGUIHeight = 5;
 
 	// RPG Variables
-	bool mShowStartPosition = false;
+	bool mShowStartPosition = true;
 	Vec2D mStartPosition;
+
+	bool mShowSceneEntrances = true;
+	int mSceneToLoadName = 0;
+	int mSceneToLoadEntranceIndex = 0;
+	std::vector<SceneEntrance> mSceneEntrances;
+
+	std::vector<int> mLoadedSceneEntranceNames;
+	std::vector<int> mLoadedSceneEntranceIndeces;
+	std::vector<float> mLoadedSceneEntranceXs;
+	std::vector<float> mLoadedSceneEntranceYs;
 
 	// Unit Variables
 	std::vector<SDL_Texture*> mUnitClassTextures;
@@ -262,6 +270,13 @@ private:
 		Vec2D(1.0f, 0.0f),
 		Vec2D(0.0f, 1.0f),
 		Vec2D(-1.0f, 0.0f)
+	};
+
+	// Scenes
+	const char* scenes[2] =
+	{
+		"World",
+		"Town"
 	};
 
 	// Terrain Indeces

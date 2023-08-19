@@ -35,7 +35,9 @@ enum ESelectedTool
 	SELECT_TILE_TOOL,
 	PAINT_UNIT_TOOL,
 	SELECT_UNIT_TOOL,
-	SET_START_TOOL
+	SET_START_TOOL,
+	SET_SCENE_ENTRANCE_TOOL,
+	SELECT_SCENE_ENTRANCE_TOOL
 };
 
 enum ETerrainType
@@ -114,6 +116,13 @@ enum EAttackDirection
 	UP_LEFT,
 	DOWN_RIGHT,
 	DOWN_LEFT
+};
+
+struct SceneEntrance
+{
+	int sceneName;
+	int entranceIndex;
+	Vec2D position;
 };
 
 struct AnimatedUnitSprite

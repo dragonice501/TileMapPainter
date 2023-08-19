@@ -33,6 +33,8 @@ bool MapEditorScene::Init(SDL_Renderer* renderer)
 
 	mStartPosition = { static_cast<float>(mMapWidth / 2), static_cast<float>(mMapHeight / 2) };
 
+	LoadMap();
+
 	return true;
 }
 
@@ -73,7 +75,7 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	InitMap();
 	InitSpriteSheet();
 
-	SDL_Surface* surface = IMG_Load("./Assets/Chapter_0_m.png");
+	SDL_Surface* surface = IMG_Load("./Assets/WorldSpriteSheet.png");
 	mSpriteSheet = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
@@ -118,8 +120,195 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	SDL_FreeSurface(surface);
 }
 
-void MapEditorScene::LoadMapFile(const std::string& mapName, const std::string& spriteSheetName)
+void MapEditorScene::LoadMap()
 {
+	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
+	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::ifstream testFile;
+	testFile.open(tileMapPath);
+	if (testFile.is_open())
+	{
+		if (mMapRects && mMapSpriteIndeces)
+		{
+			for (uint32_t i = 0; i < mMapWidth; i++)
+			{
+				delete[] mMapRects[i];
+				delete[] mMapSpriteIndeces[i];
+				delete[] mMapTerrainIndeces[i];
+			}
+			delete[] mMapRects;
+			delete[] mMapSpriteIndeces;
+			delete[] mMapTerrainIndeces;
+		}
+
+		FileCommandLoader fileLoader;
+
+		Command mapWidthCommand;
+		mapWidthCommand.command = "width";
+		mapWidthCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapWidth = FileCommandLoader::ReadInt(params);
+			mMapGUIWidth = mMapWidth;
+		};
+		fileLoader.AddCommand(mapWidthCommand);
+
+		Command mapHeightCommand;
+		mapHeightCommand.command = "height";
+		mapHeightCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapHeight = FileCommandLoader::ReadInt(params);
+			mMapGUIHeight = mMapHeight;
+		};
+		fileLoader.AddCommand(mapHeightCommand);
+
+		Command mapXOffsetCommand;
+		mapXOffsetCommand.command = "xOffset";
+		mapXOffsetCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapXOffset = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(mapXOffsetCommand);
+
+		Command mapYOffsetCommand;
+		mapYOffsetCommand.command = "yOffset";
+		mapYOffsetCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mMapYOffset = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(mapYOffsetCommand);
+
+		Command startPositionXCommand;
+		startPositionXCommand.command = "startPositionX";
+		startPositionXCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mStartPosition.mX = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(startPositionXCommand);
+
+		Command startPositionYCommand;
+		startPositionYCommand.command = "startPositionY";
+		startPositionYCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mStartPosition.mY = FileCommandLoader::ReadInt(params);
+		};
+		fileLoader.AddCommand(startPositionYCommand);
+
+		Command entranceNameCommand;
+		entranceNameCommand.command = "sceneEntranceName";
+		entranceNameCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedSceneEntranceNames.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(entranceNameCommand);
+
+		Command entranceIndexCommand;
+		entranceIndexCommand.command = "sceneEntranceIndex";
+		entranceIndexCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedSceneEntranceIndeces.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(entranceIndexCommand);
+
+		Command entrancePosXCommand;
+		entrancePosXCommand.command = "sceneEntrancePositionX";
+		entrancePosXCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedSceneEntranceXs.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(entrancePosXCommand);
+
+		Command entrancePosYCommand;
+		entrancePosYCommand.command = "sceneEntrancePositionY";
+		entrancePosYCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedSceneEntranceYs.push_back(FileCommandLoader::ReadInt(params));
+		};
+		fileLoader.AddCommand(entrancePosYCommand);
+
+		Command spriteCommand;
+		spriteCommand.command = "tile";
+		spriteCommand.parseFunc = [&](ParseFuncParams params)
+		{
+			mLoadedSpriteIndeces.push_back(static_cast<uint32_t>(FileCommandLoader::ReadInt(params)));
+		};
+		fileLoader.AddCommand(spriteCommand);
+
+		fileLoader.LoadFile(tileMapPath);
+
+		InitMap();
+	}
+
+	testFile.close();
+
+	LoadSceneEntrances();
+}
+
+void MapEditorScene::LoadSceneEntrances()
+{
+	for (int i = 0; i < mLoadedSceneEntranceNames.size(); i++)
+	{
+		SceneEntrance loadedEntrance;
+
+		loadedEntrance.sceneName = mLoadedSceneEntranceNames[i];
+		loadedEntrance.entranceIndex = mLoadedSceneEntranceIndeces[i];
+		loadedEntrance.position.mX = mLoadedSceneEntranceXs[i];
+		loadedEntrance.position.mY = mLoadedSceneEntranceYs[i];
+
+		mSceneEntrances.push_back(loadedEntrance);
+	}
+
+	mLoadedSceneEntranceNames.clear();
+	mLoadedSceneEntranceIndeces.clear();
+	mLoadedSceneEntranceXs.clear();
+	mLoadedSceneEntranceYs.clear();
+}
+
+bool MapEditorScene::SaveMapExists()
+{
+	return true;
+}
+
+void MapEditorScene::SaveMap()
+{
+	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
+	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::ifstream tileMapInFile;
+	tileMapInFile.open(tileMapPath);
+	if (tileMapInFile.is_open())
+	{
+		tileMapInFile.close();
+		std::remove(tileMapPath.c_str());
+	}
+
+	std::ofstream tileMapOutFile;
+	tileMapOutFile.open(tileMapPath);
+	if (tileMapOutFile.is_open())
+	{
+		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
+		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
+		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
+		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
+
+		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
+		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
+
+		for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
+		{
+			tileMapOutFile << ":sceneEntranceName " + std::to_string(i->sceneName) << std::endl;
+			tileMapOutFile << ":sceneEntranceIndex " + std::to_string(i->entranceIndex) << std::endl;
+			tileMapOutFile << ":sceneEntrancePositionX " + std::to_string(static_cast<int>(i->position.GetX())) << std::endl;
+			tileMapOutFile << ":sceneEntrancePositionY " + std::to_string(static_cast<int>(i->position.GetY())) << std::endl;
+		}
+
+		for (int y = 0; y < mMapHeight; y++)
+		{
+			for (int x = 0; x < mMapWidth; x++)
+			{
+				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
+			}
+		}
+	}
+	tileMapOutFile.close();
 }
 
 void MapEditorScene::Input()
@@ -303,10 +492,7 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 							}
 							case SET_START_TOOL:
 							{
-								if (CheckCursorInMap())
-								{
-									mStartPosition = cursorMapPosition;
-								}
+								
 								break;
 							}
 						}
@@ -342,17 +528,93 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 			if(!CursorInGUI())
 			{
 				mMouseButtonDown = false;
-				if (mSelectedTool == SELECT_TILE_TOOL)
+				switch (mSelectedTool)
 				{
-					if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+					case PAN_TOOL:
+						break;
+					case PAINT_TILE_TOOL:
+						break;
+					case FILL_TILE_TOOL:
+						break;
+					case SELECT_TILE_TOOL:
 					{
-						mSelectionRectEnd = GetCursorMapRect() + Vec2D(1, 1);
-						mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX();
-						mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY();
+						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+						{
+							mSelectionRectEnd = GetCursorMapRect() + Vec2D(1, 1);
+							mSelectionWidth = mSelectionRectEnd.GetX() - mSelectionRectStart.GetX();
+							mSelectionHeight = mSelectionRectEnd.GetY() - mSelectionRectStart.GetY();
+						}
+						else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+						{
+							mShowTileSelection = false;
+						}
+						break;
 					}
-					else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+					case PAINT_UNIT_TOOL:
+						break;
+					case SELECT_UNIT_TOOL:
+						break;
+					case SET_START_TOOL:
 					{
-						mShowTileSelection = false;
+						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+						{
+							if (CheckCursorInMap())
+							{
+								mStartPosition = cursorMapPosition;
+							}
+						}
+						break;
+					}
+					case SET_SCENE_ENTRANCE_TOOL:
+					{
+						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+						{
+							if (CheckCursorInMap())
+							{
+								for (const SceneEntrance& entrance : mSceneEntrances)
+								{
+									if (entrance.position == cursorMapPosition)
+									{
+										//std::cout << "Entrance already exists there" << std::endl;
+										return;
+									}
+								}
+								SceneEntrance newEntrance = { mSceneToLoadName, mSceneToLoadEntranceIndex, cursorMapPosition };
+								mSceneEntrances.push_back(newEntrance);
+
+								//std::cout << "Created entrance at: " << newEntrance.position.GetX() << ',' << newEntrance.position.GetY() << std::endl;
+							}
+						}
+						else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
+						{
+							for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
+							{
+								if (i->position == cursorMapPosition)
+								{
+									//std::cout << "Erased entrance at: " << i->position.GetX() << ',' << i->position.GetY() << std::endl;
+									mSceneEntrances.erase(i);
+									return;
+								}
+							}
+						}
+						break;
+					}
+					case SELECT_SCENE_ENTRANCE_TOOL:
+					{
+						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
+						{
+							for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
+							{
+								if (i->position == cursorMapPosition)
+								{
+									mSceneToLoadName = i->sceneName;
+									mSceneToLoadEntranceIndex = i->entranceIndex;
+									return;
+								}
+							}
+						}
+						
+						break;
 					}
 				}
 			}
@@ -768,6 +1030,14 @@ void MapEditorScene::RenderEditorMode(SDL_Renderer* renderer)
 		DrawStartPosition(renderer);
 	}
 
+	if (mShowSceneEntrances)
+	{
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 255, 00, 255, 150);
+
+		DrawSceneEntrances(renderer);
+	}
+
 	if (mAnimatedUnitSprites.size() > 0)
 	{
 		DrawAnimatedSprites(renderer);
@@ -1085,6 +1355,22 @@ void MapEditorScene::DrawStartPosition(SDL_Renderer* renderer)
 	SDL_RenderFillRect(renderer, &rect);
 }
 
+void MapEditorScene::DrawSceneEntrances(SDL_Renderer* renderer)
+{
+	for (const SceneEntrance& entrance : mSceneEntrances)
+	{
+		Vec2D drawPosition =
+		{
+				static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset * mMapZoom + entrance.position.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
+				static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset * mMapZoom + entrance.position.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
+		};
+
+		SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE * mMapZoom, SQUARE_RENDER_SIZE * mMapZoom };
+
+		SDL_RenderFillRect(renderer, &rect);
+	}
+}
+
 void MapEditorScene::DrawGUI()
 {
 	static int mapXOffset = mMapXOffset;
@@ -1109,6 +1395,8 @@ void MapEditorScene::DrawGUI()
 				mShowTileSelection = false;
 
 				mAnimatedUnitSprites.clear();
+				mSceneEntrances.clear();
+				mStartPosition = { -1.0f, -1.0f };
 			}
 
 			if (ImGui::Button("Load Map"))
@@ -1188,9 +1476,6 @@ void MapEditorScene::DrawGUI()
 				}
 			}
 
-			const char* items[] = { "Walkable", "Unwalkable" };
-			ImGui::Combo("Current Layer", &mCurrentPaintLayer, items, IM_ARRAYSIZE(items));
-
 			/*if (ImGui::Button("Play Game"))
 			{
 				ResetTools();
@@ -1212,6 +1497,7 @@ void MapEditorScene::DrawGUI()
 				mMapZoom = zoomLevel;
 				SetMapRectPositions();
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Recenter Map"))
 			{
 				mMapXOffset = 0;
@@ -1222,13 +1508,14 @@ void MapEditorScene::DrawGUI()
 			{
 				mSelectedTool = PAN_TOOL;
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Show Overlay"))
 			{
 				mShowOverlay = !mShowOverlay;
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Tile Tools"), ImGuiTreeNodeFlags_DefaultOpen)
+		if (ImGui::CollapsingHeader("Tile Tools"))
 		{
 			if (ImGui::Button("Tile Map"))
 			{
@@ -1240,11 +1527,13 @@ void MapEditorScene::DrawGUI()
 				mSelectedTool = PAINT_TILE_TOOL;
 				ResetTools();
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Fill Tile"))
 			{
 				mSelectedTool = FILL_TILE_TOOL;
 				ResetTools();
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Select Tile"))
 			{
 				mSelectedTool = SELECT_TILE_TOOL;
@@ -1254,17 +1543,34 @@ void MapEditorScene::DrawGUI()
 
 		if (ImGui::CollapsingHeader("RPG Tools"))
 		{
-			if (ImGui::Button("Clear Start Position"))
+			if (ImGui::Button("Set Start Position"))
+			{
+				ResetTools();
+				mSelectedTool = SET_START_TOOL;
+			}
+			ImGui::SameLine();
+			ImGui::Checkbox("Show Start", &mShowStartPosition);
+
+			if (ImGui::Button("Set Scene Entrance"))
+			{
+				ResetTools();
+				mSelectedTool = SET_SCENE_ENTRANCE_TOOL;
+			}
+			ImGui::SameLine();
+			ImGui::Checkbox("Show Entrances", &mShowSceneEntrances);
+
+			if (ImGui::Combo("Scene", &mSceneToLoadName, scenes, IM_ARRAYSIZE(scenes)))
 			{
 
 			}
-			if (ImGui::Button("Set Start Position"))
+			if (ImGui::InputInt("Entrance Num", &mSceneToLoadEntranceIndex))
 			{
-				mSelectedTool = SET_START_TOOL;
+				if (mSceneToLoadEntranceIndex < 0) mSceneToLoadEntranceIndex = 0;
 			}
-			if (ImGui::Button("Toggle Start Position"))
+			if (ImGui::Button("Select Scene Entrance"))
 			{
-				mShowStartPosition = !mShowStartPosition;
+				ResetTools();
+				mSelectedTool = SELECT_SCENE_ENTRANCE_TOOL;
 			}
 		}
 
@@ -1275,11 +1581,13 @@ void MapEditorScene::DrawGUI()
 				mSelectedTool = PAINT_UNIT_TOOL;
 				ResetTools();
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Select Unit"))
 			{
 				mSelectedTool = SELECT_UNIT_TOOL;
 				ResetTools();
 			}
+			ImGui::SameLine();
 			if (ImGui::Button("Reset Stats"))
 			{
 				mNewSelectedUnit = NONE;
@@ -3107,135 +3415,6 @@ void MapEditorScene::MoveSelectionRight()
 
 	mSelectionRectStart.mX++;
 	mSelectionRectEnd.mX++;
-}
-
-void MapEditorScene::LoadMap()
-{
-	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
-	std::string tileMapPath = "./Assets/TownSaveFile.txt";
-	std::ifstream testFile;
-	testFile.open(tileMapPath);
-	if (testFile.is_open())
-	{
-		if (mMapRects && mMapSpriteIndeces)
-		{
-			for (uint32_t i = 0; i < mMapWidth; i++)
-			{
-				delete[] mMapRects[i];
-				delete[] mMapSpriteIndeces[i];
-				delete[] mMapTerrainIndeces[i];
-			}
-			delete[] mMapRects;
-			delete[] mMapSpriteIndeces;
-			delete[] mMapTerrainIndeces;
-		}
-
-		FileCommandLoader fileLoader;
-
-		Command mapWidthCommand;
-		mapWidthCommand.command = "width";
-		mapWidthCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapWidth = FileCommandLoader::ReadInt(params);
-			mMapGUIWidth = mMapWidth;
-		};
-		fileLoader.AddCommand(mapWidthCommand);
-
-		Command mapHeightCommand;
-		mapHeightCommand.command = "height";
-		mapHeightCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapHeight = FileCommandLoader::ReadInt(params);
-			mMapGUIHeight = mMapHeight;
-		};
-		fileLoader.AddCommand(mapHeightCommand);
-
-		Command mapXOffsetCommand;
-		mapXOffsetCommand.command = "xOffset";
-		mapXOffsetCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapXOffset = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(mapXOffsetCommand);
-
-		Command mapYOffsetCommand;
-		mapYOffsetCommand.command = "yOffset";
-		mapYOffsetCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapYOffset = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(mapYOffsetCommand);
-
-		Command startPositionXCommand;
-		startPositionXCommand.command = "startPositionX";
-		startPositionXCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mStartPosition.mX = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(startPositionXCommand);
-
-		Command startPositionYCommand;
-		startPositionYCommand.command = "startPositionY";
-		startPositionYCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mStartPosition.mY = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(startPositionYCommand);
-
-		Command spriteCommand;
-		spriteCommand.command = "tile";
-		spriteCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSpriteIndeces.push_back(static_cast<uint32_t>(FileCommandLoader::ReadInt(params)));
-		};
-		fileLoader.AddCommand(spriteCommand);
-
-		fileLoader.LoadFile(tileMapPath);
-
-		InitMap();
-	}
-
-	testFile.close();
-}
-
-bool MapEditorScene::SaveMapExists()
-{
-	return true;
-}
-
-void MapEditorScene::SaveMap()
-{
-	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
-	std::string tileMapPath = "./Assets/TownSaveFile.txt";
-	std::ifstream tileMapInFile;
-	tileMapInFile.open(tileMapPath);
-	if (tileMapInFile.is_open())
-	{
-		tileMapInFile.close();
-		std::remove(tileMapPath.c_str());
-	}
-
-	std::ofstream tileMapOutFile;
-	tileMapOutFile.open(tileMapPath);
-	if (tileMapOutFile.is_open())
-	{
-		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
-		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
-		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
-		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
-
-		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
-		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
-
-		for (int y = 0; y < mMapHeight; y++)
-		{
-			for (int x = 0; x < mMapWidth; x++)
-			{
-				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
-			}
-		}
-	}
-	tileMapOutFile.close();
 }
 
 void MapEditorScene::ApplyDamage(const AnimatedUnitSprite& attackingUnit, AnimatedUnitSprite& attackedUnit)
