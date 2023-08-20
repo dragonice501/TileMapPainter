@@ -122,125 +122,50 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 
 void MapEditorScene::LoadMap()
 {
-	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
+	std::string type;
+
 	std::string tileMapPath = "./Assets/MapSaveFile.txt";
 	std::ifstream testFile;
 	testFile.open(tileMapPath);
 	if (testFile.is_open())
 	{
-		if (mMapRects && mMapSpriteIndeces)
+		while (testFile >> type)
 		{
-			for (uint32_t i = 0; i < mMapWidth; i++)
+			if (type == "MapSize")
 			{
-				delete[] mMapRects[i];
-				delete[] mMapSpriteIndeces[i];
-				delete[] mMapTerrainIndeces[i];
+				testFile >> mMapGUIWidth >> mMapGUIHeight;
 			}
-			delete[] mMapRects;
-			delete[] mMapSpriteIndeces;
-			delete[] mMapTerrainIndeces;
+			else if (type == "StartPosition")
+			{
+				testFile >> mStartPosition.mX >> mStartPosition.mY;
+			}
+			else if (type == "SceneEntrance")
+			{
+				SceneEntrance newEntrance;
+
+				testFile >> newEntrance.sceneName >> newEntrance.entranceIndex >> newEntrance.position.mX >> newEntrance.position.mY;
+
+				mSceneEntrances.push_back(newEntrance);
+			}
+			else if (type == "Tile")
+			{
+				int tileIndex;
+
+				testFile >> tileIndex;
+
+				mLoadedSpriteIndeces.push_back(tileIndex);
+			}
 		}
 
-		FileCommandLoader fileLoader;
-
-		Command mapWidthCommand;
-		mapWidthCommand.command = "width";
-		mapWidthCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapWidth = FileCommandLoader::ReadInt(params);
-			mMapGUIWidth = mMapWidth;
-		};
-		fileLoader.AddCommand(mapWidthCommand);
-
-		Command mapHeightCommand;
-		mapHeightCommand.command = "height";
-		mapHeightCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapHeight = FileCommandLoader::ReadInt(params);
-			mMapGUIHeight = mMapHeight;
-		};
-		fileLoader.AddCommand(mapHeightCommand);
-
-		Command mapXOffsetCommand;
-		mapXOffsetCommand.command = "xOffset";
-		mapXOffsetCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapXOffset = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(mapXOffsetCommand);
-
-		Command mapYOffsetCommand;
-		mapYOffsetCommand.command = "yOffset";
-		mapYOffsetCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mMapYOffset = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(mapYOffsetCommand);
-
-		Command startPositionXCommand;
-		startPositionXCommand.command = "startPositionX";
-		startPositionXCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mStartPosition.mX = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(startPositionXCommand);
-
-		Command startPositionYCommand;
-		startPositionYCommand.command = "startPositionY";
-		startPositionYCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mStartPosition.mY = FileCommandLoader::ReadInt(params);
-		};
-		fileLoader.AddCommand(startPositionYCommand);
-
-		Command entranceNameCommand;
-		entranceNameCommand.command = "sceneEntranceName";
-		entranceNameCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSceneEntranceNames.push_back(FileCommandLoader::ReadInt(params));
-		};
-		fileLoader.AddCommand(entranceNameCommand);
-
-		Command entranceIndexCommand;
-		entranceIndexCommand.command = "sceneEntranceIndex";
-		entranceIndexCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSceneEntranceIndeces.push_back(FileCommandLoader::ReadInt(params));
-		};
-		fileLoader.AddCommand(entranceIndexCommand);
-
-		Command entrancePosXCommand;
-		entrancePosXCommand.command = "sceneEntrancePositionX";
-		entrancePosXCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSceneEntranceXs.push_back(FileCommandLoader::ReadInt(params));
-		};
-		fileLoader.AddCommand(entrancePosXCommand);
-
-		Command entrancePosYCommand;
-		entrancePosYCommand.command = "sceneEntrancePositionY";
-		entrancePosYCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSceneEntranceYs.push_back(FileCommandLoader::ReadInt(params));
-		};
-		fileLoader.AddCommand(entrancePosYCommand);
-
-		Command spriteCommand;
-		spriteCommand.command = "tile";
-		spriteCommand.parseFunc = [&](ParseFuncParams params)
-		{
-			mLoadedSpriteIndeces.push_back(static_cast<uint32_t>(FileCommandLoader::ReadInt(params)));
-		};
-		fileLoader.AddCommand(spriteCommand);
-
-		fileLoader.LoadFile(tileMapPath);
-
 		InitMap();
+		LoadSceneEntrances();
+
+		testFile.close();
+
+		return;
 	}
 
-	testFile.close();
-
-	LoadSceneEntrances();
+	std::cout << "Faile to read file" << std::endl;
 }
 
 void MapEditorScene::LoadSceneEntrances()
@@ -270,7 +195,6 @@ bool MapEditorScene::SaveMapExists()
 
 void MapEditorScene::SaveMap()
 {
-	//std::string tileMapPath = "./Assets/" + static_cast<std::string>(mFileName) + ".txt";
 	std::string tileMapPath = "./Assets/MapSaveFile.txt";
 	std::ifstream tileMapInFile;
 	tileMapInFile.open(tileMapPath);
@@ -284,27 +208,19 @@ void MapEditorScene::SaveMap()
 	tileMapOutFile.open(tileMapPath);
 	if (tileMapOutFile.is_open())
 	{
-		tileMapOutFile << ":width " + std::to_string(mMapWidth) << std::endl;
-		tileMapOutFile << ":height " + std::to_string(mMapHeight) << std::endl;
-		tileMapOutFile << ":xOffset " + std::to_string(mMapXOffset) << std::endl;
-		tileMapOutFile << ":yOffset " + std::to_string(mMapYOffset) << std::endl;
-
-		tileMapOutFile << ":startPositionX " + std::to_string(static_cast<int>(mStartPosition.GetX())) << std::endl;
-		tileMapOutFile << ":startPositionY " + std::to_string(static_cast<int>(mStartPosition.GetY())) << std::endl;
+		tileMapOutFile << "MapSize " << mMapWidth << ' ' << mMapHeight << std::endl;
+		tileMapOutFile << "StartPosition " << mStartPosition.GetX() << ' ' << mStartPosition.GetY() << std::endl;
 
 		for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
 		{
-			tileMapOutFile << ":sceneEntranceName " + std::to_string(i->sceneName) << std::endl;
-			tileMapOutFile << ":sceneEntranceIndex " + std::to_string(i->entranceIndex) << std::endl;
-			tileMapOutFile << ":sceneEntrancePositionX " + std::to_string(static_cast<int>(i->position.GetX())) << std::endl;
-			tileMapOutFile << ":sceneEntrancePositionY " + std::to_string(static_cast<int>(i->position.GetY())) << std::endl;
+			tileMapOutFile << "SceneEntrance " << i->sceneName << ' ' << i->entranceIndex << ' ' << i->position.GetX() << ' ' << i->position.GetY() << std::endl;
 		}
 
 		for (int y = 0; y < mMapHeight; y++)
 		{
 			for (int x = 0; x < mMapWidth; x++)
 			{
-				tileMapOutFile << ":tile " + std::to_string(mMapSpriteIndeces[x][y]) << std::endl;
+				tileMapOutFile << "Tile " << mMapSpriteIndeces[x][y] << std::endl;
 			}
 		}
 	}
