@@ -143,8 +143,10 @@ private:
 	// Editor Variables
 	EEditorState mEditorState = ES_EDITING_MAP;
 	ESelectedTool mSelectedTool = PAINT_TILE_TOOL;
+	ESelectedTool mPreviousTool;
 
 	bool mMouseButtonDown = false;
+	bool mSpaceBarDown = false;
 	bool mShowOverlay = false;
 	SDL_Texture* mOverlayTexture;
 
@@ -152,6 +154,7 @@ private:
 
 	// ImGUI variables
 	Vec2D mGUISize;
+	bool mLoadFileWarning = false;
 	bool mSaveMapExists = false;
 
 	// Game variables
@@ -163,15 +166,14 @@ private:
 	uint16_t mSelectedSpriteIndex = 192;
 
 	// Map Variables
+	std::string mFileString = "WorldSaveFile";
+	std::string mSpriteSheetString = "WorldSpriteSheet";
 	size_t mFileNameSize = 16;
 	char mFileName[16];
 	int mMapGUIWidth = 5;
 	int mMapGUIHeight = 5;
 
 	// RPG Variables
-	bool mShowStartPosition = true;
-	Vec2D mStartPosition;
-
 	bool mShowSceneEntrances = true;
 	int mSceneToLoadName = 0;
 	int mSceneToLoadEntranceIndex = 0;

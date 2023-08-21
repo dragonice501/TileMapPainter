@@ -31,8 +31,6 @@ bool MapEditorScene::Init(SDL_Renderer* renderer)
 
 	Setup(renderer);
 
-	mStartPosition = { static_cast<float>(mMapWidth / 2), static_cast<float>(mMapHeight / 2) };
-
 	LoadMap();
 
 	return true;
@@ -75,7 +73,8 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	InitMap();
 	InitSpriteSheet();
 
-	SDL_Surface* surface = IMG_Load("./Assets/WorldSpriteSheet.png");
+	std::string fileName = "./Assets/" + mSpriteSheetString + ".png";
+	SDL_Surface* surface = IMG_Load(fileName.c_str());
 	mSpriteSheet = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
@@ -83,7 +82,7 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	mOverlayTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	mUnitClassTextures.resize(EUnitClass::NONE);
+	/*mUnitClassTextures.resize(EUnitClass::NONE);
 
 	surface = IMG_Load("./Assets/Bow_Fighter.png");
 	SDL_Texture* bowFighterTexture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -117,14 +116,16 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	SDL_Texture* barbarianChiefTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	mUnitClassTextures[BARBARIAN_CHIEF] = barbarianChiefTexture;
 
-	SDL_FreeSurface(surface);
+	SDL_FreeSurface(surface);*/
 }
 
 void MapEditorScene::LoadMap()
 {
+	if (mSceneEntrances.size() > 0) mSceneEntrances.clear();
+
 	std::string type;
 
-	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::string tileMapPath = "./Assets/" + mFileString + ".txt";
 	std::ifstream testFile;
 	testFile.open(tileMapPath);
 	if (testFile.is_open())
@@ -134,10 +135,6 @@ void MapEditorScene::LoadMap()
 			if (type == "MapSize")
 			{
 				testFile >> mMapGUIWidth >> mMapGUIHeight;
-			}
-			else if (type == "StartPosition")
-			{
-				testFile >> mStartPosition.mX >> mStartPosition.mY;
 			}
 			else if (type == "SceneEntrance")
 			{
@@ -195,7 +192,7 @@ bool MapEditorScene::SaveMapExists()
 
 void MapEditorScene::SaveMap()
 {
-	std::string tileMapPath = "./Assets/MapSaveFile.txt";
+	std::string tileMapPath = "./Assets/" + mFileString + ".txt";
 	std::ifstream tileMapInFile;
 	tileMapInFile.open(tileMapPath);
 	if (tileMapInFile.is_open())
@@ -209,7 +206,6 @@ void MapEditorScene::SaveMap()
 	if (tileMapOutFile.is_open())
 	{
 		tileMapOutFile << "MapSize " << mMapWidth << ' ' << mMapHeight << std::endl;
-		tileMapOutFile << "StartPosition " << mStartPosition.GetX() << ' ' << mStartPosition.GetY() << std::endl;
 
 		for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
 		{
@@ -279,6 +275,14 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 			if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 			{
 				mIsRunning = false;
+				break;
+			}
+			else if (sdlEvent.key.keysym.sym == SDLK_SPACE && !mSpaceBarDown)
+			{
+				mSpaceBarDown = true;
+				mPreviousTool = mSelectedTool;
+				mSelectedTool = PAN_TOOL;
+				break;
 			}
 			if (mSelectedTool == SELECT_TILE_TOOL)
 			{
@@ -312,6 +316,15 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 				}
 			}
 			break;
+		}
+		case SDL_KEYUP:
+		{
+			if (sdlEvent.key.keysym.sym == SDLK_SPACE && mSpaceBarDown)
+			{
+				mSpaceBarDown = false;
+				mSelectedTool = mPreviousTool;
+				break;
+			}
 		}
 		case SDL_MOUSEBUTTONDOWN:
 		{
@@ -406,11 +419,6 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 									}
 								}
 							}
-							case SET_START_TOOL:
-							{
-								
-								break;
-							}
 						}
 					}
 				}
@@ -470,17 +478,6 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 						break;
 					case SELECT_UNIT_TOOL:
 						break;
-					case SET_START_TOOL:
-					{
-						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
-						{
-							if (CheckCursorInMap())
-							{
-								mStartPosition = cursorMapPosition;
-							}
-						}
-						break;
-					}
 					case SET_SCENE_ENTRANCE_TOOL:
 					{
 						if (sdlEvent.button.button == SDL_BUTTON_LEFT)
@@ -491,14 +488,11 @@ void MapEditorScene::InputEditMode(const SDL_Event& sdlEvent, Vec2D& cursorMapPo
 								{
 									if (entrance.position == cursorMapPosition)
 									{
-										//std::cout << "Entrance already exists there" << std::endl;
 										return;
 									}
 								}
 								SceneEntrance newEntrance = { mSceneToLoadName, mSceneToLoadEntranceIndex, cursorMapPosition };
 								mSceneEntrances.push_back(newEntrance);
-
-								//std::cout << "Created entrance at: " << newEntrance.position.GetX() << ',' << newEntrance.position.GetY() << std::endl;
 							}
 						}
 						else if (sdlEvent.button.button == SDL_BUTTON_RIGHT)
@@ -938,14 +932,6 @@ void MapEditorScene::RenderEditorMode(SDL_Renderer* renderer)
 		DrawSelectedUnitAttackRange(renderer);
 	}
 
-	if (mShowStartPosition)
-	{
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 150);
-
-		DrawStartPosition(renderer);
-	}
-
 	if (mShowSceneEntrances)
 	{
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -1258,19 +1244,6 @@ void MapEditorScene::DrawSelectedUnitAttackRange(SDL_Renderer* renderer)
 	}
 }
 
-void MapEditorScene::DrawStartPosition(SDL_Renderer* renderer)
-{
-	Vec2D drawPosition =
-	{
-			static_cast<float>((Application::GetWindowWidth() / 2 - ((mMapWidth * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapXOffset * mMapZoom + mStartPosition.GetX() * SQUARE_RENDER_SIZE * mMapZoom)),
-			static_cast<float>((Application::GetWindowHeight() / 2 - ((mMapHeight * SQUARE_RENDER_SIZE) / 2) * mMapZoom + mMapYOffset * mMapZoom + mStartPosition.GetY() * SQUARE_RENDER_SIZE * mMapZoom))
-	};
-
-	SDL_Rect rect = { drawPosition.GetX(), drawPosition.GetY(), SQUARE_RENDER_SIZE * mMapZoom, SQUARE_RENDER_SIZE * mMapZoom };
-
-	SDL_RenderFillRect(renderer, &rect);
-}
-
 void MapEditorScene::DrawSceneEntrances(SDL_Renderer* renderer)
 {
 	for (const SceneEntrance& entrance : mSceneEntrances)
@@ -1312,25 +1285,32 @@ void MapEditorScene::DrawGUI()
 
 				mAnimatedUnitSprites.clear();
 				mSceneEntrances.clear();
-				mStartPosition = { -1.0f, -1.0f };
 			}
 
 			if (ImGui::Button("Load Map"))
 			{
-				LoadMap();
-				LoadUnits();
+				mLoadFileWarning = true;
 			}
-			ImGui::InputText("Load Map Name", mFileName, IM_ARRAYSIZE(mFileName));
+			if (mLoadFileWarning)
+			{
+				ImGui::Text("Load Map?");
+				if (ImGui::Button("Yes"))
+				{
+					LoadMap();
+					mLoadFileWarning = false;
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("No"))
+				{
+					mLoadFileWarning = false;
+				}
+			}
 
 			if (ImGui::Button("Save Map"))
 			{
 				mSaveMapExists = SaveMapExists();
-				if (!mSaveMapExists)
-				{
-
-				}
+				if (!mSaveMapExists) {}
 			}
-
 			if (mSaveMapExists)
 			{
 				ImGui::Text("Map already exists. Overwrite?");
@@ -1345,8 +1325,6 @@ void MapEditorScene::DrawGUI()
 					mSaveMapExists = false;
 				}
 			}
-
-			ImGui::InputText("Save Map Name", mFileName, IM_ARRAYSIZE(mFileName));
 		}
 
 		if (ImGui::CollapsingHeader("Map Settings"))
@@ -1420,11 +1398,6 @@ void MapEditorScene::DrawGUI()
 				mMapYOffset = 0;
 				SetMapRectPositions();
 			}
-			if (ImGui::Button("Pan"))
-			{
-				mSelectedTool = PAN_TOOL;
-			}
-			ImGui::SameLine();
 			if (ImGui::Button("Show Overlay"))
 			{
 				mShowOverlay = !mShowOverlay;
@@ -1459,15 +1432,7 @@ void MapEditorScene::DrawGUI()
 
 		if (ImGui::CollapsingHeader("RPG Tools"))
 		{
-			if (ImGui::Button("Set Start Position"))
-			{
-				ResetTools();
-				mSelectedTool = SET_START_TOOL;
-			}
-			ImGui::SameLine();
-			ImGui::Checkbox("Show Start", &mShowStartPosition);
-
-			if (ImGui::Button("Set Scene Entrance"))
+			if (ImGui::Button("Paint Scene Entrance"))
 			{
 				ResetTools();
 				mSelectedTool = SET_SCENE_ENTRANCE_TOOL;
@@ -1475,10 +1440,7 @@ void MapEditorScene::DrawGUI()
 			ImGui::SameLine();
 			ImGui::Checkbox("Show Entrances", &mShowSceneEntrances);
 
-			if (ImGui::Combo("Scene", &mSceneToLoadName, scenes, IM_ARRAYSIZE(scenes)))
-			{
-
-			}
+			if (ImGui::Combo("Entrance Scene", &mSceneToLoadName, scenes, IM_ARRAYSIZE(scenes))) {}
 			if (ImGui::InputInt("Entrance Num", &mSceneToLoadEntranceIndex))
 			{
 				if (mSceneToLoadEntranceIndex < 0) mSceneToLoadEntranceIndex = 0;
