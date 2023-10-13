@@ -122,11 +122,7 @@ struct SceneEntrance
 	int sceneName;
 	int entranceIndex;
 	Vec2D position;
-};
-
-struct SceneExit
-{
-
+	Vec2D offset;
 };
 
 struct AnimatedUnitSprite

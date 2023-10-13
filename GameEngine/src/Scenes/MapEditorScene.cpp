@@ -82,7 +82,7 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	mOverlayTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	/*mUnitClassTextures.resize(EUnitClass::NONE);
+	mUnitClassTextures.resize(EUnitClass::NONE);
 
 	surface = IMG_Load("./Assets/Bow_Fighter.png");
 	SDL_Texture* bowFighterTexture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -116,7 +116,7 @@ void MapEditorScene::Setup(SDL_Renderer* renderer)
 	SDL_Texture* barbarianChiefTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	mUnitClassTextures[BARBARIAN_CHIEF] = barbarianChiefTexture;
 
-	SDL_FreeSurface(surface);*/
+	SDL_FreeSurface(surface);
 }
 
 void MapEditorScene::LoadMap()
@@ -140,9 +140,24 @@ void MapEditorScene::LoadMap()
 			{
 				SceneEntrance newEntrance;
 
-				testFile >> newEntrance.sceneName >> newEntrance.entranceIndex >> newEntrance.position.mX >> newEntrance.position.mY;
+				while (testFile >> type)
+				{
+					if (type == "Name")
+					{
+						testFile >> newEntrance.sceneName >> newEntrance.entranceIndex;
+					}
+					else if (type == "Position")
+					{
+						testFile >> newEntrance.position.mX >> newEntrance.position.mY;
+					}
+					else if (type == "Offset")
+					{
+						testFile >> newEntrance.offset.mX >> newEntrance.offset.mY;
+						mSceneEntrances.push_back(newEntrance);
+						break;
+					}
+				}
 
-				mSceneEntrances.push_back(newEntrance);
 			}
 			else if (type == "Tile")
 			{
@@ -205,11 +220,14 @@ void MapEditorScene::SaveMap()
 	tileMapOutFile.open(tileMapPath);
 	if (tileMapOutFile.is_open())
 	{
-		tileMapOutFile << "MapSize " << mMapWidth << ' ' << mMapHeight << std::endl;
+		tileMapOutFile << "MapSize " << mMapWidth << ' ' << mMapHeight << std::endl << std::endl;
 
 		for (auto i = mSceneEntrances.begin(); i != mSceneEntrances.end(); i++)
 		{
-			tileMapOutFile << "SceneEntrance " << i->sceneName << ' ' << i->entranceIndex << ' ' << i->position.GetX() << ' ' << i->position.GetY() << std::endl;
+			tileMapOutFile << "SceneEntrance " << std::endl;
+			tileMapOutFile << "Name" << ' ' << i->sceneName << ' ' << i->entranceIndex << std::endl;
+			tileMapOutFile << "Position" << i->position.GetX() << ' ' << i->position.GetY() << std::endl;
+			tileMapOutFile << "Offset" << i->offset.GetX() << ' ' << i->offset.GetY() << std::endl << std::endl;
 		}
 
 		for (int y = 0; y < mMapHeight; y++)
@@ -1286,11 +1304,20 @@ void MapEditorScene::DrawGUI()
 				mAnimatedUnitSprites.clear();
 				mSceneEntrances.clear();
 			}
-
+			ImGui::SameLine();
 			if (ImGui::Button("Load Map"))
 			{
 				mLoadFileWarning = true;
+				mSaveMapExists = false;
 			}
+			ImGui::SameLine();
+			if (ImGui::Button("Save Map"))
+			{
+				mLoadFileWarning = false;
+				mSaveMapExists = SaveMapExists();
+				if (!mSaveMapExists) {}
+			}
+
 			if (mLoadFileWarning)
 			{
 				ImGui::Text("Load Map?");
@@ -1304,12 +1331,6 @@ void MapEditorScene::DrawGUI()
 				{
 					mLoadFileWarning = false;
 				}
-			}
-
-			if (ImGui::Button("Save Map"))
-			{
-				mSaveMapExists = SaveMapExists();
-				if (!mSaveMapExists) {}
 			}
 			if (mSaveMapExists)
 			{
@@ -1370,15 +1391,6 @@ void MapEditorScene::DrawGUI()
 				}
 			}
 
-			/*if (ImGui::Button("Play Game"))
-			{
-				ResetTools();
-				mEditorState = ES_PLAYING_GAME;
-			}*/
-		}
-
-		if (ImGui::CollapsingHeader("Map Tools"))
-		{
 			if (ImGui::SliderFloat("Zoom", &zoomLevel, 0.1f, 3.0f))
 			{
 				mMouseButtonDown = false;
@@ -1439,16 +1451,22 @@ void MapEditorScene::DrawGUI()
 			}
 			ImGui::SameLine();
 			ImGui::Checkbox("Show Entrances", &mShowSceneEntrances);
+			
+			if (ImGui::Button("Select Scene Entrance"))
+			{
+				ResetTools();
+				mSelectedTool = SELECT_SCENE_ENTRANCE_TOOL;
+			}
 
 			if (ImGui::Combo("Entrance Scene", &mSceneToLoadName, scenes, IM_ARRAYSIZE(scenes))) {}
 			if (ImGui::InputInt("Entrance Num", &mSceneToLoadEntranceIndex))
 			{
 				if (mSceneToLoadEntranceIndex < 0) mSceneToLoadEntranceIndex = 0;
 			}
-			if (ImGui::Button("Select Scene Entrance"))
+
+			if (ImGui::Button("Paint NPC"))
 			{
-				ResetTools();
-				mSelectedTool = SELECT_SCENE_ENTRANCE_TOOL;
+
 			}
 		}
 
